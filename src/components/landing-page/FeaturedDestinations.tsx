@@ -35,10 +35,10 @@ export function FeaturedDestinations() {
     >
       <div className="mx-auto max-w-7xl px-6">
         <header className="mx-auto max-w-2xl text-center">
-          <h2 className="text-[36px] font-bold text-white ">
+          <h2 className="text-[32px] sm:text-[36px] font-bold text-white ">
             Featured destinations
           </h2>
-          <p className="mt-4 text-[18px] text-white">
+          <p className="mt-4 text-lg text-white">
             We offer visas for all of the most popular destinations. Start your
             visa application for one of them now.
           </p>
@@ -60,10 +60,10 @@ export function FeaturedDestinations() {
                 />
               </div>
               <div className="p-6">
-                <h3 className="text-[24px] font-bold text-primary-copy">
+                <h3 className="text-2xl font-bold text-primary-copy">
                   {dest.name}
                 </h3>
-                <p className="mt-2 text-primary-copy text-[14px] leading-relaxed">
+                <p className="mt-2 text-primary-copy text-lg sm:text-sm leading-relaxed">
                   {dest.description}
                 </p>
               </div>

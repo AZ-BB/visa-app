@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 
 const NAV_LINKS = [
   { label: "Testimonials", href: "#testimonials" },

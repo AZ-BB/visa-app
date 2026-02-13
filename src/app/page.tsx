@@ -1,10 +1,10 @@
-import { FeaturedDestinations } from "@/components/FeaturedDestinations";
-import { Footer } from "@/components/Footer";
-import { Hero } from "@/components/Hero";
-import { HowItWorks } from "@/components/HowItWorks";
-import { Navbar } from "@/components/Navbar";
-import { QA } from "@/components/QA";
-import { Testimonials } from "@/components/Testimonials";
+import { FeaturedDestinations } from "@/components/landing-page/FeaturedDestinations";
+import { Footer } from "@/components/layout/Footer";
+import { Hero } from "@/components/landing-page/Hero";
+import { HowItWorks } from "@/components/landing-page/HowItWorks";
+import { Navbar } from "@/components/layout/Navbar";
+import { QA } from "@/components/landing-page/QA";
+import { Testimonials } from "@/components/landing-page/Testimonials";
 
 export default function Home() {
   return (
