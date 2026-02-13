@@ -1,11 +1,11 @@
-import { Qoutes } from "./svgs/qoutes";
+import { Qoutes } from "../svgs/qoutes";
 
 const TESTIMONIAL_TEXT =
   "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.";
 
 export function Testimonials() {
   return (
-    <section id="testimonials" className="py-20">
+    <section id="testimonials" className="sm:py-20">
       <div className="mx-auto max-w-7xl px-6">
         <h2 className="text-center text-3xl font-bold text-gray-900 md:text-4xl mt-10">
           How we&apos;ve helped people
