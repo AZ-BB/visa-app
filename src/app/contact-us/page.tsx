@@ -6,7 +6,7 @@ import { ChevronRightIcon } from "lucide-react";
 
 export default function ContactUs() {
     return (
-        <div className="min-h-screen max-w-7xl mx-auto flex flex-col sm:flex-row gap-10 py-16 px-6 sm:px-0 scale-95">
+        <div className="min-h-screen max-w-7xl mx-auto flex flex-col sm:flex-row gap-10 pt-16 px-6 sm:px-0 scale-95">
 
             <div className="w-full sm:w-1/2 space-y-10">
                 <section className="space-y-4">
