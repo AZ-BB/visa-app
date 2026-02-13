@@ -4,13 +4,13 @@ import Link from "next/link";
 export function Footer() {
   return (
     <footer className="bg-primary-dark text-white py-8">
-      <div className="max-w-7xl mx-auto space-y-4">
-        <div className="text-2xl font-bold">
+      <div className="max-w-7xl mx-auto space-y-6 px-4 sm:px-6">
+        <div className="text-xl sm:text-2xl font-bold">
           logo <span className="text-orange-500 -ml-1">.</span>
         </div>
 
-        <div className="flex justify-between items-center">
-          <span className=" font-normal text-base">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <span className="font-normal text-sm sm:text-base">
             © 2025 Visa Pro LTD. All rights reserved. Company Number 123456
           </span>
 
@@ -24,13 +24,13 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="flex justify-between">
-          <div className="flex gap-4 font-semibold text-base">
+        <div className="flex flex-col sm:flex-row sm:justify-between gap-4">
+          <div className="flex flex-wrap gap-4 font-semibold text-sm sm:text-base">
             <Link href="/terms" className="hover:underline">Terms of Service</Link>
             <Link href="/contact-us" className="hover:underline">Contact Us</Link>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4 text-sm sm:text-base">
             <span className="flex items-center gap-2">
               <svg width="24" height="16" viewBox="0 0 24 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M22.2024 0.00012207H1.79741C0.804698 0.00012207 0 0.818934 0 1.82906V14.171C0 15.1811 0.804698 16 1.79741 16H22.2024C23.1951 16 23.9999 15.1812 23.9999 14.171V1.82906C23.9999 0.818934 23.1952 0.00012207 22.2024 0.00012207Z" fill="#41479B" />
