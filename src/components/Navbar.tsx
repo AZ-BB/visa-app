@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { Button } from "./ui/button";
+
 const NAV_LINKS = [
   { label: "Testimonials", href: "#testimonials" },
   { label: "How it works", href: "#how-it-works" },
@@ -28,12 +31,12 @@ export function Navbar() {
             </a>
           ))}
         </nav>
-        <a
-          href="#contact"
-          className="rounded-[8px] bg-white border border-border-default font-semibold text-primary px-5 py-2.5 text-sm transition hover:bg-blue-700"
+        <Button
+          variant="outline"
+          className="rounded-lg px-5 py-2.5 text-sm"
         >
-          Contact us
-        </a>
+          <Link href="/contact-us">Contact us</Link>
+        </Button>
       </div>
     </header>
   );

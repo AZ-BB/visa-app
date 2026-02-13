@@ -6,7 +6,7 @@ const STATS = [
 
 export function Stats() {
   return (
-    <section className="relative border-t border-gray-100 bg-gray-50/50 py-16">
+    <section className="relative py-16">
       <div className="mx-auto max-w-7xl px-6">
         <div className="grid gap-10 sm:grid-cols-3">
           {STATS.map((stat) => (
