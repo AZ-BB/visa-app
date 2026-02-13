@@ -9,7 +9,6 @@ import { Testimonials } from "@/components/Testimonials";
 export default function Home() {
   return (
     <div className="min-h-screen text-gray-800">
-      <Navbar />
       <Hero />
       <Testimonials />
       <HowItWorks />
