@@ -1,6 +1,6 @@
 export default function Terms() {
     return (
-        <main className="min-h-screen bg-bg-light-grey py-16 flex justify-center items-start">
+        <main className="min-h-screen bg-bg-light-grey pt-16 flex justify-center items-start">
             <div className="max-w-3xl space-y-10 px-6 sm:px-0">
                 <h2 className="text-4xl font-bold text-primary-copy">
                     Terms of Service
