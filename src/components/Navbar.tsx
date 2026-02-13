@@ -9,7 +9,11 @@ export function Navbar() {
   return (
     <header className="fixed left-0 right-0 top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-        <a href="/" className="flex font-bold items-center font-sans gap-1 text-[32px] text-gray-800">
+        <a
+          href="/"
+          className="flex font-bold items-center gap-1 text-[32px] text-gray-800"
+          style={{ letterSpacing: "-0.5px" }}
+        >
           <span>logo</span>
           <span className="text-orange-500">.</span>
         </a>
@@ -18,7 +22,7 @@ export function Navbar() {
             <a
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-gray-700 transition hover:text-gray-900"
+              className="text-sm font-semibold text-accent transition hover:text-gray-900"
             >
               {link.label}
             </a>

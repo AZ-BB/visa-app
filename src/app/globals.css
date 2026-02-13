@@ -5,12 +5,27 @@
   --foreground: #1f2937;
   --muted: #6b7280;
   --accent: #ea580c;
-  --primary: #2563eb;
+  --primary: #279bff;
+  --primary-dark: #00315c;
+  --primary-copy: #111827;
+  --secondary-copy: #6e7787;
+  --border-default: #dde2ee;
+  --bg-light-grey: #fbfcfe;
+  --white: #ffffff;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-copy: var(--primary-copy);
+  --color-secondary-copy: var(--secondary-copy);
+  --color-border-default: var(--border-default);
+  --color-bg-light-grey: var(--bg-light-grey);
+  --color-white: var(--white);
   --font-poppins: var(--font-poppins), system-ui, sans-serif;
 }
 
