@@ -9,7 +9,6 @@ export default function Home() {
     <div className="min-h-screen bg-white text-gray-800">
       <Navbar />
       <Hero />
-      <Stats />
       <Testimonials />
       <Footer />
     </div>

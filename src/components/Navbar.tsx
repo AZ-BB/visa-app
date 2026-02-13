@@ -22,7 +22,7 @@ export function Navbar() {
             <a
               key={link.href}
               href={link.href}
-              className="text-sm font-semibold text-accent transition hover:text-gray-900"
+              className="text-sm font-semibold text-secondary-copy transition hover:text-gray-900"
             >
               {link.label}
             </a>
@@ -30,7 +30,7 @@ export function Navbar() {
         </nav>
         <a
           href="#contact"
-          className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700"
+          className="rounded-[8px] bg-white border border-border-default font-semibold text-primary px-5 py-2.5 text-sm transition hover:bg-blue-700"
         >
           Contact us
         </a>

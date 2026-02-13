@@ -11,8 +11,8 @@ export function Stats() {
         <div className="grid gap-10 sm:grid-cols-3">
           {STATS.map((stat) => (
             <div key={stat.label}>
-              <div className="text-3xl font-bold text-gray-900 md:text-4xl">{stat.value}</div>
-              <div className="mt-1 text-gray-600">{stat.label}</div>
+              <div className="text-[48px] font-bold text-primary-copy md:text-4xl">{stat.value}</div>
+              <div className=" text-[16px] text-secondary-copy">{stat.label}</div>
             </div>
           ))}
         </div>
