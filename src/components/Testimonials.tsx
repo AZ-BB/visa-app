@@ -10,7 +10,7 @@ export function Testimonials() {
         <h2 className="text-center text-3xl font-bold text-gray-900 md:text-4xl mt-10">
           How we&apos;ve helped people
         </h2>
-        <div className="mt-24 grid gap-8 md:grid-cols-3">
+        <div className="mt-24 grid gap-16 md:gap-8  md:grid-cols-3">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
