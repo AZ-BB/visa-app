@@ -10,7 +10,7 @@ export function Hero() {
         <div className="flex gap-12 lg:gap-28">
           <div className="max-w-xl mt-6">
             <h1 className="text-[80px] font-bold leading-tight tracking-tight text-primary-copy ">
-              Your <span className="text-orange-500">journey</span> <br />{" "}
+              Your <span className="text-[#fd7835]">journey</span> <br />{" "}
               starts here
             </h1>
             <p className="mt-6 text-[18px] text-secondary-copy">
