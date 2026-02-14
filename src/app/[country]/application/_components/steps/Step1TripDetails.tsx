@@ -143,12 +143,12 @@ export function Step1TripDetails({
             Additional costs
           </h3>
 
-          <p className="text-base">{'{number}'} of traveller/s</p>
+          <p className="text-base">{order.travellers.length} of traveller/s</p>
           <Separator className="mt-2 mb-4" />
 
           <div className="flex justify-between text-base">
-            <span className="text-secondary-copy">{'{fee-detail}'}</span>
-            <span className="font-medium">£{'{cost}'}</span>
+            <span className="text-secondary-copy">Visa fee</span>
+            <span className="font-medium">£{order.costs.visaFee || 50}</span>
           </div>
         </div>
 

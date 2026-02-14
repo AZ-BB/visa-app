@@ -96,7 +96,7 @@ export const defaultOrder: ApplicationOrder = {
   nationality: "",
   visaType: "",
   tripDetails: {
-    arrivalDate: "",
+    arrivalDate: new Date().toISOString(),
     email: "",
   },
   travellers: [{ ...defaultTraveller }],

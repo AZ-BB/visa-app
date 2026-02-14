@@ -69,7 +69,6 @@ function ApplicationFlowContent({
           <Step1TripDetails
             country={countryDisplay}
             onNext={handleNext}
-            onBack={handleBack}
             errors={validationErrors}
           />
         )}
