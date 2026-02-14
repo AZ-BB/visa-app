@@ -1,7 +1,9 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Calendar, Info } from "lucide-react";
+import { ArrowLeft, ArrowRight, Info } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
@@ -32,17 +34,12 @@ export function Step1TripDetails({
             >
               When do you arrive in {country}?
             </label>
-            <div className="relative">
-              <Input
-                id="arrival-date"
-                type="text"
-                placeholder="05 Sep 2025"
-                className="pr-12"
-              />
-              <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-secondary-copy">
-                <Calendar className="size-5" aria-hidden />
-              </div>
-            </div>
+            <DatePicker
+              id="arrival-date"
+              value={new Date()}
+              onValueChange={() => {}}
+              placeholder="DD MM YYYY"
+            />
           </div>
 
           <div>
