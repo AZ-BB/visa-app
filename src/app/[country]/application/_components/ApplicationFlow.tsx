@@ -1,12 +1,14 @@
 "use client"
 
 import { useState } from "react"
+import { ApplicationOrderProvider, useApplicationOrder } from "./ApplicationOrderContext"
 import { ApplicationProgressBar, type StepId } from "./ApplicationProgressBar"
 import { Step1TripDetails } from "./steps/Step1TripDetails"
 import { Step2PersonalInfo } from "./steps/Step2PersonalInfo"
 import { Step4TurnaroundTime } from "./steps/Step4TurnaroundTime"
 import { Step3BusinessInfo } from "./steps/Step3BusinessInfo"
 import { Step5Checkout } from "./steps/Step5Checkout"
+import { validateStep, type StepId as ValidationStepId } from "./applicationStepValidation"
 
 const MIN_STEP = 1
 const MAX_STEP = 5
@@ -18,15 +20,26 @@ function formatCountryDisplay(slug: string) {
     .join(" ")
 }
 
-export function ApplicationFlow({ country }: { country: string }) {
+export type StepValidationErrors = Record<string, string> | null
+
+function ApplicationFlowContent({ country }: { country: string }) {
+  const { order } = useApplicationOrder()
   const [currentStep, setCurrentStep] = useState<StepId>(1)
+  const [validationErrors, setValidationErrors] = useState<StepValidationErrors>(null)
   const countryDisplay = formatCountryDisplay(country)
 
-  const goNext = () => {
-    setCurrentStep((s) => (s < MAX_STEP ? ((s + 1) as StepId) : s))
+  const handleNext = () => {
+    const errors = validateStep(currentStep as ValidationStepId, order)
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors)
+    } else {
+      setValidationErrors(null)
+      setCurrentStep((s) => (s < MAX_STEP ? ((s + 1) as StepId) : s))
+    }
   }
 
-  const goBack = () => {
+  const handleBack = () => {
+    setValidationErrors(null)
     setCurrentStep((s) => (s > MIN_STEP ? ((s - 1) as StepId) : s))
   }
 
@@ -38,21 +51,49 @@ export function ApplicationFlow({ country }: { country: string }) {
       <section
         aria-live="polite"
         aria-label={`Step ${currentStep} of ${MAX_STEP}`}
-        >
+      >
         {currentStep === 1 && (
           <Step1TripDetails
             country={countryDisplay}
-            onNext={goNext}
-            onBack={goBack}
+            onNext={handleNext}
+            onBack={handleBack}
+            errors={validationErrors}
           />
         )}
-        {currentStep === 2 && <Step2PersonalInfo onNext={goNext} onBack={goBack} />}
-        {currentStep === 3 && (
-          <Step3BusinessInfo onNext={goNext} onBack={goBack} />
+        {currentStep === 2 && (
+          <Step2PersonalInfo
+            onNext={handleNext}
+            onBack={handleBack}
+            errors={validationErrors}
+          />
         )}
-        {currentStep === 4 && <Step4TurnaroundTime onNext={goNext} onBack={goBack} />}
-        {currentStep === 5 && <Step5Checkout onBack={goBack} />}
+        {currentStep === 3 && (
+          <Step3BusinessInfo
+            onNext={handleNext}
+            onBack={handleBack}
+            errors={validationErrors}
+          />
+        )}
+        {currentStep === 4 && (
+          <Step4TurnaroundTime onNext={handleNext} onBack={handleBack} />
+        )}
+        {currentStep === 5 && (
+          <Step5Checkout
+            country={countryDisplay}
+            visaType="Tourist eVisa"
+            onBack={handleBack}
+            onContinueToPayment={handleNext}
+          />
+        )}
       </section>
     </div>
+  )
+}
+
+export function ApplicationFlow({ country }: { country: string }) {
+  return (
+    <ApplicationOrderProvider>
+      <ApplicationFlowContent country={country} />
+    </ApplicationOrderProvider>
   )
 }

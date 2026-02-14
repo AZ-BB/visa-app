@@ -4,18 +4,24 @@ import { ArrowLeft, ArrowRight, Calendar, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useApplicationOrder } from "../ApplicationOrderContext";
 
 interface Step1TripDetailsProps {
   country: string;
   onNext?: () => void;
   onBack?: () => void;
+  errors?: Record<string, string> | null;
 }
 
 export function Step1TripDetails({
   country,
   onNext,
   onBack,
+  errors,
 }: Step1TripDetailsProps) {
+  const { order, updateOrder } = useApplicationOrder();
+  const { tripDetails } = order;
+
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
       {/* Left: main form — ~2/3 */}
@@ -37,12 +43,25 @@ export function Step1TripDetails({
                 id="arrival-date"
                 type="text"
                 placeholder="05 Sep 2025"
-                className="pr-12"
+                className={cn("pr-12", errors?.arrivalDate && "border-red-500")}
+                value={tripDetails.arrivalDate}
+                onChange={(e) =>
+                  updateOrder({
+                    tripDetails: { ...tripDetails, arrivalDate: e.target.value },
+                  })
+                }
+                aria-invalid={!!errors?.arrivalDate}
+                aria-describedby={errors?.arrivalDate ? "arrival-date-error" : undefined}
               />
               <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-secondary-copy">
                 <Calendar className="size-5" aria-hidden />
               </div>
             </div>
+            {errors?.arrivalDate && (
+              <p id="arrival-date-error" className="mt-1.5 text-sm text-red-600">
+                {errors.arrivalDate}
+              </p>
+            )}
           </div>
 
           <div>
@@ -59,7 +78,21 @@ export function Step1TripDetails({
               id="email"
               type="email"
               placeholder="josh.hadley@company.co.uk"
+              value={tripDetails.email}
+              onChange={(e) =>
+                updateOrder({
+                  tripDetails: { ...tripDetails, email: e.target.value },
+                })
+              }
+              className={errors?.email ? "border-red-500" : ""}
+              aria-invalid={!!errors?.email}
+              aria-describedby={errors?.email ? "email-error" : undefined}
             />
+            {errors?.email && (
+              <p id="email-error" className="mt-1.5 text-sm text-red-600">
+                {errors.email}
+              </p>
+            )}
           </div>
         </div>
 

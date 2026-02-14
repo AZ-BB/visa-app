@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { ArrowLeft, ArrowRight, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import type { TurnaroundTimeId } from "../ApplicationOrderContext";
+import { useApplicationOrder } from "../ApplicationOrderContext";
 
 interface Step4TurnaroundTimeProps {
   onNext?: () => void;
@@ -31,10 +32,9 @@ const TURNAROUND_OPTIONS = [
   },
 ] as const;
 
-type TurnaroundId = (typeof TURNAROUND_OPTIONS)[number]["id"];
-
 export function Step4TurnaroundTime({ onNext, onBack }: Step4TurnaroundTimeProps) {
-  const [selected, setSelected] = useState<TurnaroundId>("standard");
+  const { order, updateOrder } = useApplicationOrder();
+  const selected = order.turnaroundTime;
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -82,7 +82,7 @@ export function Step4TurnaroundTime({ onNext, onBack }: Step4TurnaroundTimeProps
                   name="turnaround"
                   value={option.id}
                   checked={isSelected}
-                  onChange={() => setSelected(option.id)}
+                  onChange={() => updateOrder({ turnaroundTime: option.id as TurnaroundTimeId })}
                   className="sr-only"
                 />
               </label>
