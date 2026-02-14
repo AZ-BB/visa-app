@@ -7,6 +7,10 @@ import { DatePicker } from "@/components/ui/date-picker"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { useApplicationOrder } from "../ApplicationOrderContext"
+import { getCountryNameFromCode } from "@/lib/contries-name"
+import TipCard from "@/components/TipCard"
+import { Separator } from "@/components/ui/separator"
+import ArrowButton from "@/components/ArrowButton"
 
 interface Step1TripDetailsProps {
   country: string
@@ -24,11 +28,13 @@ export function Step1TripDetails({
   const { order, updateOrder } = useApplicationOrder()
   const { tripDetails } = order
 
+  const countryName = getCountryNameFromCode(country)
+
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
       {/* Left: main form — ~2/3 */}
       <div className="lg:col-span-2">
-        <h2 className="text-2xl font-bold text-primary-copy mb-8">
+        <h2 className="text-xl font-bold text-primary-copy mb-8">
           Trip details
         </h2>
 
@@ -38,7 +44,7 @@ export function Step1TripDetails({
               htmlFor="arrival-date"
               className="block text-base font-medium text-primary-copy mb-2"
             >
-              When do you arrive in {country}?
+              When do you arrive in {countryName}?
             </label>
             <div className="relative">
               <DatePicker
@@ -52,7 +58,7 @@ export function Step1TripDetails({
                   updateOrder({
                     tripDetails: {
                       ...tripDetails,
-                      arrivalDate: date ? format(date, "yyyy-MM-dd") : "",
+                      arrivalDate: date ? date.toISOString() : "",
                     },
                   })
                 }
@@ -118,38 +124,35 @@ export function Step1TripDetails({
             <span />
           )}
           {onNext && (
-            <Button
-              type="button"
+            <ArrowButton
+              variant="default"
+              className="text-base"
               onClick={onNext}
-              className="rounded-xl px-6 py-3 gap-2"
             >
               Save & continue
-              <ArrowRight className="size-5" aria-hidden />
-            </Button>
+            </ArrowButton>
           )}
         </div>
       </div>
 
       {/* Right: sidebar — ~1/3 */}
-      <div className="lg:col-span-1">
-        <h3 className="text-2xl font-bold text-primary-copy mb-6">
-          Additional costs
-        </h3>
-        <div className="space-y-2 text-primary-copy">
-          <p className="text-base">1 of traveller/s</p>
+      <div className="space-y-5">
+        <div className="bg-white rounded-2xl p-5 border border-border-default shadow-sm">
+
+          <h3 className="text-xl font-bold text-primary-copy mb-2">
+            Additional costs
+          </h3>
+
+          <p className="text-base">{'{number}'} of traveller/s</p>
+          <Separator className="mt-2 mb-4" />
+
           <div className="flex justify-between text-base">
-            <span className="text-secondary-copy">Visa fee</span>
-            <span className="font-medium">£—</span>
+            <span className="text-secondary-copy">{'{fee-detail}'}</span>
+            <span className="font-medium">£{'{cost}'}</span>
           </div>
         </div>
 
-        <div
-          className={cn(
-            "mt-6 flex gap-3 rounded-xl border-2 border-primary/30",
-            "bg-primary/5 px-4 py-4",
-          )}
-        >
-          <Info className="size-5 shrink-0 text-primary mt-0.5" aria-hidden />
+        <TipCard>
           <p className="text-sm text-primary-copy">
             <a
               href="#"
@@ -159,7 +162,7 @@ export function Step1TripDetails({
             </a>{" "}
             about how we keep your information safe.
           </p>
-        </div>
+        </TipCard>
       </div>
     </div>
   )

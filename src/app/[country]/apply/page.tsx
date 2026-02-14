@@ -5,6 +5,10 @@ import { getCountryNameFromCode } from "@/lib/contries-name";
 import InfoIcon from "@/components/svgs/info";
 import { ApplyFormSection } from "./_components/ApplyFormSection";
 import { ResumeApplicationBanner } from "./_components/ResumeApplicationBanner";
+import { CountryDropdown } from "@/components/ui/country-dropdown";
+import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import TipCard from "@/components/TipCard";
 
 export default async function ApplyPage({ params, searchParams }: { params: Promise<{ country: string }>, searchParams: Promise<{ from: string }> }) {
     const { country } = await params;
