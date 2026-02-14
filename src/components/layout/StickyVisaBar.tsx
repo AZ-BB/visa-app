@@ -36,7 +36,7 @@ export function StickyVisaBar() {
 
   return (
     <div
-      className="fixed left-0 right-0 z-40 flex flex-col w-full bg-white transition-opacity duration-200"
+      className="fixed left-0 right-0 z-40 flex flex-col w-full bg-white transition-opacity duration-200 shadow-[0_24px_48px_0_rgba(0,0,0,0.04)]"
       style={{
         top: STICK_TOP_OFFSET,
         opacity: visible ? 1 : 0,
