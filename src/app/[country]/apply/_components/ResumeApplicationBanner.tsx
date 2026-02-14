@@ -31,8 +31,9 @@ export function ResumeApplicationBanner() {
 
   if (dismissed || !hasStep2Data(storedOrder)) return null;
 
+  const step = storedOrder?.currentStep ?? 1;
   const applicationHref = storedOrder?.destinationCountry
-    ? `/${storedOrder.destinationCountry}/application`
+    ? `/${storedOrder.destinationCountry}/application?step=${step}`
     : "#";
 
   return (

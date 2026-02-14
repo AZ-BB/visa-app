@@ -64,6 +64,8 @@ export interface Costs {
   total: number | null;
 }
 
+export type ApplicationStepId = 1 | 2 | 3 | 4 | 5;
+
 export interface ApplicationOrder {
   destinationCountry: string;
   nationality: string;
@@ -73,6 +75,8 @@ export interface ApplicationOrder {
   turnaroundTime: TurnaroundTimeId;
   costs: Costs;
   readyByDate: string;
+  /** Last step the user was on (1–5). Used to resume application. */
+  currentStep?: ApplicationStepId;
 }
 
 export const defaultTraveller: Traveller = {
@@ -103,6 +107,7 @@ export const defaultOrder: ApplicationOrder = {
     total: null,
   },
   readyByDate: "",
+  currentStep: 1,
 };
 
 export type OrderUpdate = Partial<ApplicationOrder> | ((prev: ApplicationOrder) => Partial<ApplicationOrder>);

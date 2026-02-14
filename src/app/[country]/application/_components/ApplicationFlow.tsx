@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { ApplicationOrderProvider, useApplicationOrder } from "./ApplicationOrderContext"
 import { ApplicationProgressBar, type StepId } from "./ApplicationProgressBar"
 import { Step1TripDetails } from "./steps/Step1TripDetails"
@@ -22,11 +22,24 @@ function formatCountryDisplay(slug: string) {
 
 export type StepValidationErrors = Record<string, string> | null
 
-function ApplicationFlowContent({ country }: { country: string }) {
-  const { order } = useApplicationOrder()
-  const [currentStep, setCurrentStep] = useState<StepId>(1)
+function ApplicationFlowContent({
+  country,
+  initialStep,
+}: {
+  country: string;
+  initialStep?: StepId | null;
+}) {
+  const { order, updateOrder } = useApplicationOrder()
+  const [currentStep, setCurrentStep] = useState<StepId>(() => {
+    const step = initialStep ?? order.currentStep ?? 1
+    return Math.min(MAX_STEP, Math.max(MIN_STEP, step)) as StepId
+  })
   const [validationErrors, setValidationErrors] = useState<StepValidationErrors>(null)
   const countryDisplay = formatCountryDisplay(country)
+
+  useEffect(() => {
+    updateOrder({ currentStep })
+  }, [currentStep, updateOrder])
 
   const handleNext = () => {
     const errors = validateStep(currentStep as ValidationStepId, order)
@@ -90,10 +103,16 @@ function ApplicationFlowContent({ country }: { country: string }) {
   )
 }
 
-export function ApplicationFlow({ country }: { country: string }) {
+export function ApplicationFlow({
+  country,
+  initialStep,
+}: {
+  country: string;
+  initialStep?: StepId | null;
+}) {
   return (
     <ApplicationOrderProvider>
-      <ApplicationFlowContent country={country} />
+      <ApplicationFlowContent country={country} initialStep={initialStep} />
     </ApplicationOrderProvider>
   )
 }
