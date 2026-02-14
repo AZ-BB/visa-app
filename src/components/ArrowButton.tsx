@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 export default function ArrowButton({ children, variant = "default", className, iconClassName, iconContainerClassName }: { children: React.ReactNode, variant?: "default" | "outline", className?: string, iconClassName?: string, iconContainerClassName?: string }) {
     return (
         <Button
-            className={cn("flex gap-3 group items-center pl-6 pr-4 py-4 rounded-full text-lg", className)}
+            className={cn("flex gap-3 group items-center pl-6 pr-4 py-8 rounded-full text-lg", className)}
             variant={variant}
         >
             {children}

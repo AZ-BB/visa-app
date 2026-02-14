@@ -7,6 +7,7 @@ import InfoIcon from "@/components/svgs/info";
 import { CountryDropdown } from "@/components/ui/country-dropdown";
 import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import TipCard from "@/components/TipCard";
 
 export default async function ApplyPage({ params, searchParams }: { params: Promise<{ country: string }>, searchParams: Promise<{ from: string }> }) {
     const { country } = await params;
@@ -92,12 +93,12 @@ export default async function ApplyPage({ params, searchParams }: { params: Prom
                         <div className="flex items-center gap-2">
                             <Button
                                 variant={"outline"}
-                                className="border-white text-white bg-light-primary py-4 px-4 rounded-full"
+                                className="border-white text-white bg-light-primary py-6 px-4 rounded-full"
                             >
                                 Dissmiss
                             </Button>
 
-                            <ArrowButton variant={"outline"} className="text-sm py-2 border-border-default px-4 hover:text-white" iconContainerClassName="scale-80" >
+                            <ArrowButton variant={"outline"} className="text-sm py-6 pl-4 pr-2 border-border-default hover:text-white" iconContainerClassName="scale-80" >
                                 Continue
                             </ArrowButton>
                         </div>
@@ -108,12 +109,11 @@ export default async function ApplyPage({ params, searchParams }: { params: Prom
 
             <div className="flex gap-12">
                 <div className="w-2/3 space-y-9">
-                    <div className="border-2 border-primary/75 rounded-2xl p-5 text-base flex items-start gap-2 shadow-sm">
-                        <InfoIcon className="size-5 fill-primary mt-0.5" />
+                    <TipCard>
                         <span>
                             A visa is <span className="font-semibold">required</span> when travelling to {countryName} with a passport from {nationality}.
                         </span>
-                    </div>
+                    </TipCard>
 
                     <div className="space-y-3">
                         <div className="space-y-1">
