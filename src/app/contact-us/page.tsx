@@ -67,7 +67,7 @@ export default function ContactUs() {
                     </section>
 
                     <section className="flex flex-col gap-2">
-                        <Label htmlFor="phone">Phone <span className="text-secondary-copy text-lg italic font-normal">(Optional)</span></Label>
+                        <Label htmlFor="phone">Phone <span className="text-secondary-copy text-base italic font-normal">(Optional)</span></Label>
                         <Input
                             type="tel"
                             id="phone"

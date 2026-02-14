@@ -43,9 +43,11 @@ export function Navbar() {
 
         {/* Desktop Contact us */}
         <div className="hidden md:block">
-          <Button variant="outline" className="rounded-lg px-5 py-2.5 text-sm">
-            <Link href="/contact-us">Contact us</Link>
-          </Button>
+          <Link href="/contact-us">
+            <Button variant="outline" className="rounded-lg px-5 py-2.5 text-sm">
+              Contact us
+            </Button>
+          </Link>
         </div>
 
         {/* Mobile: hamburger / close button */}
