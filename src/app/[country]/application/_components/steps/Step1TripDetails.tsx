@@ -1,16 +1,18 @@
-"use client";
+"use client"
 
-import { ArrowLeft, ArrowRight, Calendar, Info } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import { useApplicationOrder } from "../ApplicationOrderContext";
+import { ArrowLeft, ArrowRight, Info } from "lucide-react"
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { DatePicker } from "@/components/ui/date-picker"
+import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
+import { useApplicationOrder } from "../ApplicationOrderContext"
 
 interface Step1TripDetailsProps {
-  country: string;
-  onNext?: () => void;
-  onBack?: () => void;
-  errors?: Record<string, string> | null;
+  country: string
+  onNext?: () => void
+  onBack?: () => void
+  errors?: Record<string, string> | null
 }
 
 export function Step1TripDetails({
@@ -19,8 +21,8 @@ export function Step1TripDetails({
   onBack,
   errors,
 }: Step1TripDetailsProps) {
-  const { order, updateOrder } = useApplicationOrder();
-  const { tripDetails } = order;
+  const { order, updateOrder } = useApplicationOrder()
+  const { tripDetails } = order
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -39,26 +41,18 @@ export function Step1TripDetails({
               When do you arrive in {country}?
             </label>
             <div className="relative">
-              <Input
+              <DatePicker
                 id="arrival-date"
-                type="text"
-                placeholder="05 Sep 2025"
-                className={cn("pr-12", errors?.arrivalDate && "border-red-500")}
-                value={tripDetails.arrivalDate}
-                onChange={(e) =>
-                  updateOrder({
-                    tripDetails: { ...tripDetails, arrivalDate: e.target.value },
-                  })
-                }
-                aria-invalid={!!errors?.arrivalDate}
-                aria-describedby={errors?.arrivalDate ? "arrival-date-error" : undefined}
+                value={new Date()}
+                onValueChange={() => {}}
+                placeholder="DD MM YYYY"
               />
-              <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-secondary-copy">
-                <Calendar className="size-5" aria-hidden />
-              </div>
             </div>
             {errors?.arrivalDate && (
-              <p id="arrival-date-error" className="mt-1.5 text-sm text-red-600">
+              <p
+                id="arrival-date-error"
+                className="mt-1.5 text-sm text-red-600"
+              >
                 {errors.arrivalDate}
               </p>
             )}
@@ -103,7 +97,7 @@ export function Step1TripDetails({
               onClick={onBack}
               className={cn(
                 "inline-flex items-center gap-2 text-primary font-semibold",
-                "hover:text-primary-dark transition-colors"
+                "hover:text-primary-dark transition-colors",
               )}
             >
               <ArrowLeft className="size-5" aria-hidden />
@@ -141,13 +135,10 @@ export function Step1TripDetails({
         <div
           className={cn(
             "mt-6 flex gap-3 rounded-xl border-2 border-primary/30",
-            "bg-primary/5 px-4 py-4"
+            "bg-primary/5 px-4 py-4",
           )}
         >
-          <Info
-            className="size-5 shrink-0 text-primary mt-0.5"
-            aria-hidden
-          />
+          <Info className="size-5 shrink-0 text-primary mt-0.5" aria-hidden />
           <p className="text-sm text-primary-copy">
             <a
               href="#"
@@ -160,5 +151,5 @@ export function Step1TripDetails({
         </div>
       </div>
     </div>
-  );
+  )
 }
