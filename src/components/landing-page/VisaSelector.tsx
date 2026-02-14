@@ -1,10 +1,11 @@
 import { ChevronDown } from "../svgs/chevron-down"
 import { HorizontalDivider } from "../svgs/horizontal-divider"
 import { Separator } from "../ui/separator"
+import { cn } from "@/lib/utils"
 
-export function VisaSelector() {
+export function VisaSelector({ rounded = true, shadow = true }: { rounded?: boolean, shadow?: boolean }) {
   return (
-    <div className="flex flex-col mt-4 sm:mt-0 md:w-[95%] w-full overflow-hidden rounded-xl bg-white shadow-[0_24px_48px_0_rgba(0,0,0,0.08)] sm:flex-row py-1.5 ">
+    <div className={cn("flex flex-col  sm:mt-0 md:w-full w-full overflow-hidden bg-white sm:flex-row py-1.5 ", rounded && "rounded-xl", shadow && "shadow-[0_24px_48px_0_rgba(0,0,0,0.08)]")}>
       <div className="flex flex-col md:flex-row w-full items-center">
         {/* Where am I from? */}
 

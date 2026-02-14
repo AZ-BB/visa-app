@@ -35,3 +35,8 @@
 body {
   font-family: var(--font-poppins), system-ui, sans-serif;
 }
+
+/* When the fixed visa bar is shown, hide the hero one so only one is visible */
+body.sticky-visa-bar-active #hero-visa-selector {
+  visibility: hidden;
+}
