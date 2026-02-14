@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -8,21 +7,17 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { CountryDropdown } from "@/components/ui/country-dropdown";
-import { ArrowLeft, ArrowRight, Info, Plus } from "lucide-react";
+import { ArrowLeft, ArrowRight, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import type { Traveller } from "../ApplicationOrderContext";
+import { useApplicationOrder } from "../ApplicationOrderContext";
 
 interface Step3BusinessInfoProps {
   onNext?: () => void;
   onBack?: () => void;
+  errors?: Record<string, string> | null;
 }
 
 function ApplicationSidebar({
@@ -63,15 +58,20 @@ function ApplicationSidebar({
   );
 }
 
-const BUSINESS_TYPES = [
-  "Limited company",
-  "Sole trader",
-  "Partnership",
-  "PLC",
-  "Other",
-];
-
-function BusinessFields({ idPrefix }: { idPrefix: string }) {
+function PassportFields({
+  idPrefix,
+  index,
+  traveller,
+  onUpdate,
+  errors,
+}: {
+  idPrefix: string;
+  index: number;
+  traveller: Traveller;
+  onUpdate: (patch: Partial<Traveller>) => void;
+  errors?: Record<string, string> | null;
+}) {
+  const field = (key: string) => errors?.[`traveller_${index}_${key}`];
   return (
     <div className="space-y-5 pt-2">
       <div>
@@ -81,7 +81,14 @@ function BusinessFields({ idPrefix }: { idPrefix: string }) {
         >
           Passport destination
         </label>
-        <CountryDropdown placeholder="Select destination"  />  
+        <CountryDropdown
+          placeholder="Select destination"
+          value={traveller.passportDestination || undefined}
+          onValueChange={(value) => onUpdate({ passportDestination: value })}
+        />
+        {field("passportDestination") && (
+          <p className="mt-1.5 text-sm text-red-600">{field("passportDestination")}</p>
+        )}
       </div>
       <div>
         <label
@@ -94,7 +101,14 @@ function BusinessFields({ idPrefix }: { idPrefix: string }) {
           id={`${idPrefix}-passport-number`}
           type="text"
           placeholder="12345678"
+          value={traveller.passportNumber}
+          onChange={(e) => onUpdate({ passportNumber: e.target.value })}
+          className={field("passportNumber") ? "border-red-500" : ""}
+          aria-invalid={!!field("passportNumber")}
         />
+        {field("passportNumber") && (
+          <p className="mt-1.5 text-sm text-red-600">{field("passportNumber")}</p>
+        )}
       </div>
       <div>
         <label
@@ -106,8 +120,15 @@ function BusinessFields({ idPrefix }: { idPrefix: string }) {
         <Input
           id={`${idPrefix}-passport-expiry-date`}
           type="text"
-          placeholder="12345678"
+          placeholder="12 Mar 2035"
+          value={traveller.passportExpiryDate}
+          onChange={(e) => onUpdate({ passportExpiryDate: e.target.value })}
+          className={field("passportExpiryDate") ? "border-red-500" : ""}
+          aria-invalid={!!field("passportExpiryDate")}
         />
+        {field("passportExpiryDate") && (
+          <p className="mt-1.5 text-sm text-red-600">{field("passportExpiryDate")}</p>
+        )}
       </div>
       <div>
         <label className="block text-base font-medium text-primary-copy mb-2">
@@ -115,8 +136,13 @@ function BusinessFields({ idPrefix }: { idPrefix: string }) {
         </label>
         <CountryDropdown
           placeholder="Select country of birth"
+          value={traveller.countryOfBirth || undefined}
+          onValueChange={(value) => onUpdate({ countryOfBirth: value })}
           aria-label="Country of birth"
         />
+        {field("countryOfBirth") && (
+          <p className="mt-1.5 text-sm text-red-600">{field("countryOfBirth")}</p>
+        )}
       </div>
       <div>
         <label
@@ -127,80 +153,66 @@ function BusinessFields({ idPrefix }: { idPrefix: string }) {
         </label>
         <CountryDropdown
           placeholder="Select country of residence"
+          value={traveller.countryOfResidence || undefined}
+          onValueChange={(value) => onUpdate({ countryOfResidence: value })}
           aria-label="Country of residence"
         />
+        {field("countryOfResidence") && (
+          <p className="mt-1.5 text-sm text-red-600">{field("countryOfResidence")}</p>
+        )}
       </div>
     </div>
   );
 }
 
-export function Step3BusinessInfo({ onNext, onBack }: Step3BusinessInfoProps) {
-  const [businessCount, setBusinessCount] = useState(2);
+export function Step3BusinessInfo({ onNext, onBack, errors }: Step3BusinessInfoProps) {
+  const { order, updateOrder } = useApplicationOrder();
+  const { travellers } = order;
+
+  const updateTraveller = (index: number, patch: Partial<Traveller>) => {
+    updateOrder({
+      travellers: travellers.map((t, i) => (i === index ? { ...t, ...patch } : t)),
+    });
+  };
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
       <div className="lg:col-span-2">
         <h2 className="text-2xl font-bold text-primary-copy mb-2">
-          Business info
+          Passport info
         </h2>
         <p className="text-secondary-copy text-base mb-6">
-          Add business details for each traveller applying.
+          Add passport details for each traveller. Each section matches a traveller from the previous step.
         </p>
 
         <Accordion
           type="single"
-          defaultValue="business-1"
+          defaultValue="traveller-1"
           collapsible
           className="space-y-3"
         >
-          <AccordionItem value="business-1">
-            <AccordionTrigger className="text-primary-copy font-bold">
-              Traveller #1
-            </AccordionTrigger>
-            <AccordionContent>
-              <BusinessFields idPrefix="b1" />
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="business-2">
-            <AccordionTrigger className="text-primary-copy font-bold">
-              Traveller #2
-            </AccordionTrigger>
-            <AccordionContent>
-              <BusinessFields idPrefix="b2" />
-            </AccordionContent>
-          </AccordionItem>
-          {businessCount > 2 &&
-            Array.from({ length: businessCount - 2 }, (_, i) => i + 3).map(
-              (n) => (
-                <AccordionItem key={n} value={`business-${n}`}>
-                  <AccordionTrigger className="text-primary-copy font-bold">
-                    Traveller #{n}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <BusinessFields idPrefix={`b${n}`} />
-                  </AccordionContent>
-                </AccordionItem>
-              )
-            )}
+          {travellers.map((traveller, index) => (
+            <AccordionItem key={index} value={`traveller-${index + 1}`}>
+              <AccordionTrigger className="text-primary-copy font-bold">
+                Traveller #{index + 1}
+                {[traveller.firstName, traveller.lastName].filter(Boolean).length > 0 && (
+                  <span className="font-normal text-secondary-copy ml-2">
+                    — {[traveller.firstName, traveller.lastName].filter(Boolean).join(" ")}
+                  </span>
+                )}
+              </AccordionTrigger>
+              <AccordionContent>
+                <PassportFields
+                  idPrefix={`t${index + 1}`}
+                  index={index}
+                  traveller={traveller}
+                  onUpdate={(patch) => updateTraveller(index, patch)}
+                  errors={errors}
+                />
+              </AccordionContent>
+            </AccordionItem>
+          ))}
         </Accordion>
-
-        <div className="mt-6 flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setBusinessCount((c) => c + 1)}
-            className="inline-flex items-center gap-2 rounded-xl border-2 border-dashed border-primary px-4 py-3 text-primary font-semibold hover:bg-primary/5 transition-colors"
-          >
-            Add Traveller
-          </button>
-          <button
-            type="button"
-            onClick={() => setBusinessCount((c) => c + 1)}
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary text-white hover:bg-primary-dark/90 transition-colors"
-            aria-label="Add business"
-          >
-            <Plus className="size-6" aria-hidden />
-          </button>
-        </div>
 
         <div className="mt-10 flex items-center justify-between">
           {onBack ? (
@@ -231,7 +243,7 @@ export function Step3BusinessInfo({ onNext, onBack }: Step3BusinessInfoProps) {
         </div>
       </div>
 
-      <ApplicationSidebar travellerCount={businessCount} />
+      <ApplicationSidebar travellerCount={travellers.length} />
     </div>
   );
 }

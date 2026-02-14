@@ -1,23 +1,29 @@
-"use client";
+"use client"
 
-import { ArrowLeft, ArrowRight, Info } from "lucide-react";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { DatePicker } from "@/components/ui/date-picker";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { ArrowLeft, ArrowRight, Info } from "lucide-react"
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { DatePicker } from "@/components/ui/date-picker"
+import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
+import { useApplicationOrder } from "../ApplicationOrderContext"
 
 interface Step1TripDetailsProps {
-  country: string;
-  onNext?: () => void;
-  onBack?: () => void;
+  country: string
+  onNext?: () => void
+  onBack?: () => void
+  errors?: Record<string, string> | null
 }
 
 export function Step1TripDetails({
   country,
   onNext,
   onBack,
+  errors,
 }: Step1TripDetailsProps) {
+  const { order, updateOrder } = useApplicationOrder()
+  const { tripDetails } = order
+
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
       {/* Left: main form — ~2/3 */}
@@ -34,12 +40,22 @@ export function Step1TripDetails({
             >
               When do you arrive in {country}?
             </label>
-            <DatePicker
-              id="arrival-date"
-              value={new Date()}
-              onValueChange={() => {}}
-              placeholder="DD MM YYYY"
-            />
+            <div className="relative">
+              <DatePicker
+                id="arrival-date"
+                value={new Date()}
+                onValueChange={() => {}}
+                placeholder="DD MM YYYY"
+              />
+            </div>
+            {errors?.arrivalDate && (
+              <p
+                id="arrival-date-error"
+                className="mt-1.5 text-sm text-red-600"
+              >
+                {errors.arrivalDate}
+              </p>
+            )}
           </div>
 
           <div>
@@ -56,7 +72,21 @@ export function Step1TripDetails({
               id="email"
               type="email"
               placeholder="josh.hadley@company.co.uk"
+              value={tripDetails.email}
+              onChange={(e) =>
+                updateOrder({
+                  tripDetails: { ...tripDetails, email: e.target.value },
+                })
+              }
+              className={errors?.email ? "border-red-500" : ""}
+              aria-invalid={!!errors?.email}
+              aria-describedby={errors?.email ? "email-error" : undefined}
             />
+            {errors?.email && (
+              <p id="email-error" className="mt-1.5 text-sm text-red-600">
+                {errors.email}
+              </p>
+            )}
           </div>
         </div>
 
@@ -67,7 +97,7 @@ export function Step1TripDetails({
               onClick={onBack}
               className={cn(
                 "inline-flex items-center gap-2 text-primary font-semibold",
-                "hover:text-primary-dark transition-colors"
+                "hover:text-primary-dark transition-colors",
               )}
             >
               <ArrowLeft className="size-5" aria-hidden />
@@ -105,13 +135,10 @@ export function Step1TripDetails({
         <div
           className={cn(
             "mt-6 flex gap-3 rounded-xl border-2 border-primary/30",
-            "bg-primary/5 px-4 py-4"
+            "bg-primary/5 px-4 py-4",
           )}
         >
-          <Info
-            className="size-5 shrink-0 text-primary mt-0.5"
-            aria-hidden
-          />
+          <Info className="size-5 shrink-0 text-primary mt-0.5" aria-hidden />
           <p className="text-sm text-primary-copy">
             <a
               href="#"
@@ -124,5 +151,5 @@ export function Step1TripDetails({
         </div>
       </div>
     </div>
-  );
+  )
 }
