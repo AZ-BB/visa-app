@@ -30,7 +30,7 @@ export function Hero() {
               <Stats />
             </div>
           </div>
-          <div className="absolute -z-50 md:flex hidden right-10 top-0 items-center justify-center lg:justify-end overflow-hidden">
+          <div className="absolute -z-50 md:flex hidden right-10 top-0 items-center justify-center lg:justify-end">
             <div className="flex items-center justify-center relative">
               <div className="absolute -top-20 right-10 z-0">
                 <Dots />
