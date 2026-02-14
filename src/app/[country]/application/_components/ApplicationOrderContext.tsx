@@ -40,6 +40,9 @@ export interface Costs {
 }
 
 export interface ApplicationOrder {
+  destinationCountry: string;
+  nationality: string;
+  visaType: string;
   tripDetails: TripDetails;
   travellers: Traveller[];
   turnaroundTime: TurnaroundTimeId;
@@ -60,6 +63,9 @@ export const defaultTraveller: Traveller = {
 };
 
 export const defaultOrder: ApplicationOrder = {
+  destinationCountry: "",
+  nationality: "",
+  visaType: "",
   tripDetails: {
     arrivalDate: "",
     email: "",
