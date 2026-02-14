@@ -20,6 +20,7 @@ interface DatePickerProps {
   className?: string;
   disabled?: boolean;
   disableAfterToday?: boolean;
+  disableBeforeToday?: boolean;
 }
 
 export function DatePicker({
@@ -30,6 +31,7 @@ export function DatePicker({
   className,
   disabled,
   disableAfterToday = false,
+  disableBeforeToday = false,
 }: DatePickerProps) {
   const [open, setOpen] = useState(false);
 
@@ -60,6 +62,7 @@ export function DatePicker({
             setOpen(false);
           }}
           disableAfterToday={disableAfterToday}
+          disableBeforeToday={disableBeforeToday}
         />
       </PopoverContent>
     </Popover>

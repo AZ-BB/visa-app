@@ -112,7 +112,7 @@ export function ApplyFormSection({
         </div>
 
         <div className="w-1/3">
-          <div className="bg-white rounded-2xl p-5 shadow-sm">
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-border-default/50">
             <h3 className="text-xl font-semibold">
               {countryName} {selectedVisaLabel}
             </h3>

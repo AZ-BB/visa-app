@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { TurnaroundTimeId } from "../ApplicationOrderContext";
 import { useApplicationOrder } from "../ApplicationOrderContext";
+import { Separator } from "@/components/ui/separator";
+import TipCard from "@/components/TipCard";
+import ArrowButton from "@/components/ArrowButton";
 
 interface Step4TurnaroundTimeProps {
   onNext?: () => void;
@@ -57,10 +60,10 @@ export function Step4TurnaroundTime({ onNext, onBack }: Step4TurnaroundTimeProps
                 )}
               >
                 <div className="min-w-0">
-                  <p className="font-bold text-primary-copy">
+                  <p className="font-bold text-primary-copy text-lg">
                     {option.cost} – {option.label}
                   </p>
-                  <p className="text-sm text-secondary-copy mt-0.5">
+                  <p className="text-base text-secondary-copy font-medium mt-0.5">
                     {option.description}
                   </p>
                 </div>
@@ -107,55 +110,35 @@ export function Step4TurnaroundTime({ onNext, onBack }: Step4TurnaroundTimeProps
             <span />
           )}
           {onNext && (
-            <Button
-              type="button"
+            <ArrowButton
+              variant="default"
+              className="text-base"
               onClick={onNext}
-              className="rounded-xl px-6 py-3 gap-2"
             >
               Save & continue
-              <ArrowRight className="size-5" aria-hidden />
-            </Button>
+            </ArrowButton>
           )}
         </div>
       </div>
 
       {/* Sidebar - Additional costs */}
-      <div className="lg:col-span-1">
-        <div className="rounded-xl border border-border-default bg-white p-6 shadow-sm">
-          <h3 className="text-2xl font-bold text-primary-copy mb-6">
+      <div className="space-y-5">
+        <div className="bg-white rounded-2xl p-5 border border-border-default/50 shadow-sm">
+
+          <h3 className="text-xl font-bold text-primary-copy mb-2">
             Additional costs
           </h3>
-          <div className="space-y-2 text-primary-copy">
-            <p className="text-base">1 of traveller/s</p>
-            <div className="flex justify-between text-base">
-              <span className="text-secondary-copy">Visa fee</span>
-              <span className="font-medium">£—</span>
-            </div>
-            <div className="flex justify-between text-base">
-              <span className="text-secondary-copy">Turnaround time</span>
-              <span className="font-medium">£—</span>
-            </div>
-          </div>
-          <div className="mt-4 pt-4 border-t border-border-default">
-            <div className="flex justify-between items-baseline">
-              <div>
-                <p className="font-bold text-primary-copy">Total</p>
-                <p className="text-sm text-secondary-copy">
-                  Including taxes & fees
-                </p>
-              </div>
-              <span className="text-xl font-bold text-primary-copy">£—</span>
-            </div>
+
+          <p className="text-base">{'{number}'} of traveller/s</p>
+          <Separator className="mt-2 mb-4" />
+
+          <div className="flex justify-between text-base">
+            <span className="text-secondary-copy">{'{fee-detail}'}</span>
+            <span className="font-medium">£{'{cost}'}</span>
           </div>
         </div>
 
-        <div
-          className={cn(
-            "mt-6 flex gap-3 rounded-xl border-2 border-primary/30",
-            "bg-primary/5 px-4 py-4"
-          )}
-        >
-          <Info className="size-5 shrink-0 text-primary mt-0.5" aria-hidden />
+        <TipCard>
           <p className="text-sm text-primary-copy">
             <a
               href="#"
@@ -165,7 +148,7 @@ export function Step4TurnaroundTime({ onNext, onBack }: Step4TurnaroundTimeProps
             </a>{" "}
             about how we keep your information safe.
           </p>
-        </div>
+        </TipCard>
       </div>
     </div>
   );

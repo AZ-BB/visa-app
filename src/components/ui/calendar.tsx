@@ -23,6 +23,7 @@ function Calendar({
   captionLayout = "dropdown",
   buttonVariant = "ghost",
   disableAfterToday = false,
+  disableBeforeToday = false,
   formatters,
   components,
   disabled,
@@ -30,6 +31,7 @@ function Calendar({
 }: React.ComponentProps<typeof DayPicker> & {
   buttonVariant?: React.ComponentProps<typeof Button>["variant"]
   disableAfterToday?: boolean
+  disableBeforeToday?: boolean
 }) {
   const defaultClassNames = getDefaultClassNames()
 
@@ -39,11 +41,18 @@ function Calendar({
     return d
   }, [])
 
-  const disabledProp: Matcher | Matcher[] | undefined = disableAfterToday
-    ? disabled !== undefined
-      ? ([disabled, { after: today }] as Matcher[])
-      : { after: today }
-    : disabled
+  const dateLimitMatchers: Matcher[] = []
+  if (disableAfterToday) dateLimitMatchers.push({ after: today })
+  if (disableBeforeToday) dateLimitMatchers.push({ before: today })
+
+  const disabledProp: Matcher | Matcher[] | undefined =
+    dateLimitMatchers.length > 0
+      ? disabled !== undefined
+        ? ([disabled, ...dateLimitMatchers] as Matcher[])
+        : dateLimitMatchers.length === 1
+          ? dateLimitMatchers[0]
+          : (dateLimitMatchers as Matcher[])
+      : disabled
 
   return (
     <DayPicker
