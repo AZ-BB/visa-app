@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -64,14 +65,18 @@ function PassportFields({
   traveller,
   onUpdate,
   errors,
+  defaultPassportDestination,
 }: {
   idPrefix: string;
   index: number;
   traveller: Traveller;
   onUpdate: (patch: Partial<Traveller>) => void;
   errors?: Record<string, string> | null;
+  defaultPassportDestination?: string;
 }) {
   const field = (key: string) => errors?.[`traveller_${index}_${key}`];
+  const passportDestinationValue =
+    traveller.passportDestination || defaultPassportDestination || undefined;
   return (
     <div className="space-y-5 pt-2">
       <div>
@@ -83,7 +88,7 @@ function PassportFields({
         </label>
         <CountryDropdown
           placeholder="Select destination"
-          value={traveller.passportDestination || undefined}
+          value={passportDestinationValue}
           onValueChange={(value) => onUpdate({ passportDestination: value })}
         />
         {field("passportDestination") && (
@@ -167,7 +172,20 @@ function PassportFields({
 
 export function Step3BusinessInfo({ onNext, onBack, errors }: Step3BusinessInfoProps) {
   const { order, updateOrder } = useApplicationOrder();
-  const { travellers } = order;
+  const { travellers, destinationCountry } = order;
+
+  useEffect(() => {
+    if (!destinationCountry?.trim()) return;
+    const needsDefault = travellers.some((t) => !t.passportDestination?.trim());
+    if (!needsDefault) return;
+    updateOrder({
+      travellers: travellers.map((t) =>
+        t.passportDestination?.trim()
+          ? t
+          : { ...t, passportDestination: destinationCountry }
+      ),
+    });
+  }, [destinationCountry]);
 
   const updateTraveller = (index: number, patch: Partial<Traveller>) => {
     updateOrder({
@@ -208,6 +226,7 @@ export function Step3BusinessInfo({ onNext, onBack, errors }: Step3BusinessInfoP
                   traveller={traveller}
                   onUpdate={(patch) => updateTraveller(index, patch)}
                   errors={errors}
+                  defaultPassportDestination={order.destinationCountry}
                 />
               </AccordionContent>
             </AccordionItem>
