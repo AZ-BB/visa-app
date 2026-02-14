@@ -14,7 +14,6 @@ import getVisaSearchResult from "@/actions/visas";
 export default async function ApplyPage({ params, searchParams }: { params: Promise<{ country: string }>, searchParams: Promise<{ from: string }> }) {
     const { country } = await params;
     const { from } = await searchParams;
-    console.log(from, country);
     const nationality = getCountryNameFromCode(from);
     const countryName = getCountryNameFromCode(country);
     const visaSearchResult = getVisaSearchResult(country, from);
@@ -69,12 +68,7 @@ export default async function ApplyPage({ params, searchParams }: { params: Prom
 
     return (
         <div className="max-w-7xl mx-auto min-h-screen px-6 pt-10 space-y-10">
-            <h2 className="text-2xl md:text-4xl font-bold">
-                Apply for your {countryName} {visaSearchResult.data?.visaTypes[0]?.name ?? ""}
-            </h2>
-
-            <ResumeApplicationBanner />
-
+        
             <ApplyFormSection
                 destinationCountry={visaSearchResult.data?.toCountry ?? ""}
                 destinationCountryName={countryName ?? ""}
