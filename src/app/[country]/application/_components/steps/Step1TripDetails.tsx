@@ -1,7 +1,7 @@
 "use client"
 
 import { ArrowLeft, ArrowRight, Info } from "lucide-react"
-import { useState } from "react"
+import { format, parseISO } from "date-fns"
 import { Button } from "@/components/ui/button"
 import { DatePicker } from "@/components/ui/date-picker"
 import { Input } from "@/components/ui/input"
@@ -49,12 +49,19 @@ export function Step1TripDetails({
             <div className="relative">
               <DatePicker
                 id="arrival-date"
-                value={tripDetails.arrivalDate ? new Date(tripDetails.arrivalDate) : undefined}
-                onValueChange={(date) => {
+                value={
+                  tripDetails.arrivalDate
+                    ? parseISO(tripDetails.arrivalDate)
+                    : undefined
+                }
+                onValueChange={(date) =>
                   updateOrder({
-                    tripDetails: { ...tripDetails, arrivalDate: date ? date.toISOString() : "" },
+                    tripDetails: {
+                      ...tripDetails,
+                      arrivalDate: date ? date.toISOString() : "",
+                    },
                   })
-                }}
+                }
                 placeholder="DD MM YYYY"
               />
             </div>

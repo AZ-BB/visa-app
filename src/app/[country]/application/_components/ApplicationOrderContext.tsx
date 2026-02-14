@@ -4,10 +4,35 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
+
+const APPLICATION_ORDER_STORAGE_KEY = "visa-application-order";
+
+export function getStoredOrder(): ApplicationOrder | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(APPLICATION_ORDER_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as unknown;
+    if (parsed && typeof parsed === "object") return parsed as ApplicationOrder;
+  } catch {
+    // ignore
+  }
+  return null;
+}
+
+export function setStoredOrder(order: ApplicationOrder): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(APPLICATION_ORDER_STORAGE_KEY, JSON.stringify(order));
+  } catch {
+    // ignore
+  }
+}
 
 // --- Order type: one object for the whole application flow
 
@@ -96,10 +121,15 @@ export function ApplicationOrderProvider({
   children: ReactNode;
   initialOrder?: Partial<ApplicationOrder>;
 }) {
-  const [order, setOrder] = useState<ApplicationOrder>(() => ({
-    ...defaultOrder,
-    ...initialOrder,
-  }));
+  const [order, setOrder] = useState<ApplicationOrder>(() => {
+    const stored = getStoredOrder();
+    const base = stored ? { ...defaultOrder, ...stored } : { ...defaultOrder, ...initialOrder };
+    return base;
+  });
+
+  useEffect(() => {
+    setStoredOrder(order);
+  }, [order]);
 
   const updateOrder = useCallback((update: OrderUpdate) => {
     setOrder((prev) => {
