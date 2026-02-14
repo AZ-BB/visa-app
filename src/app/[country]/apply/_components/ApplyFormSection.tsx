@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CountryDropdown } from "@/components/ui/country-dropdown";
 import {
@@ -14,10 +14,15 @@ import { Separator } from "@/components/ui/separator";
 import ArrowButton from "@/components/ArrowButton";
 import {
   defaultOrder,
+  defaultTraveller,
   setStoredOrder,
   type ApplicationOrder,
 } from "@/app/[country]/application/_components/ApplicationOrderContext";
+import { Minus, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import TipCard from "@/components/TipCard";
+import { VisaType } from "@/actions/visas";
 
 const VISA_OPTIONS = [
   { value: "tourist", label: "Tourist visa" },
@@ -25,37 +30,49 @@ const VISA_OPTIONS = [
 ] as const;
 
 interface ApplyFormSectionProps {
-  country: string;
-  countryName: string;
-  initialFrom?: string;
+  destinationCountry: string;
+  destinationCountryName: string;
+  passportCountry: string;
+  passportCountryName: string;
+  validFor: string;
+  numberOfEntries: string;
+  maxStay: string;
+  visaOptions: VisaType[];
 }
 
 export function ApplyFormSection({
-  country,
-  countryName,
-  initialFrom,
+  destinationCountry,
+  destinationCountryName,
+  passportCountry,
+  passportCountryName,
+  visaOptions
 }: ApplyFormSectionProps) {
   const router = useRouter();
-  const [nationality, setNationality] = useState<string>(initialFrom ?? "");
-  const [visaTypeValue, setVisaTypeValue] = useState<string>("tourist");
-
-  const selectedVisaLabel =
-    VISA_OPTIONS.find((o) => o.value === visaTypeValue)?.label ?? "Tourist visa";
+  const [nationality, setNationality] = useState<string>(passportCountry ?? "");
+  const [visaTypeValue, setVisaTypeValue] = useState<string>(visaOptions[0]?.id ?? "");
+  const [numberOfTravellers, setNumberOfTravellers] = useState<number>(1);
+  const selectedVisa = visaOptions.find((o) => o.id === visaTypeValue);
 
   const handleStartApplication = () => {
+    const count = Math.min(20, Math.max(1, numberOfTravellers));
+    const travellers = Array.from({ length: count }, () => ({
+      ...defaultTraveller,
+      passportDestination: destinationCountry,
+    }));
     const order: ApplicationOrder = {
       ...defaultOrder,
-      destinationCountry: country,
+      destinationCountry: destinationCountry,
       nationality,
-      visaType: selectedVisaLabel,
-      travellers: defaultOrder.travellers.map((t) => ({
-        ...t,
-        passportDestination: country,
-      })),
+      visaType: selectedVisa?.name ?? "",
+      travellers,
     };
     setStoredOrder(order);
-    router.push(`/${country}/application`);
+    router.push(`/${destinationCountry}/application`);
   };
+  function handleNationalityChange(value: string) {
+    setNationality(value);
+    router.push(`/${destinationCountry}/apply?from=${value}`);
+  }
 
   return (
     <>
@@ -63,7 +80,7 @@ export function ApplyFormSection({
         <div className="w-2/3 space-y-8">
           <TipCard>
             <span>
-              A visa is <span className="font-semibold">required</span> when travelling to {countryName} with a passport from {nationality}.
+              A visa is <span className="font-semibold">required</span> when travelling to {destinationCountryName} with a passport from {passportCountryName}.
             </span>
           </TipCard>
 
@@ -78,7 +95,7 @@ export function ApplyFormSection({
             <CountryDropdown
               className="py-4"
               value={nationality}
-              onValueChange={setNationality}
+              onValueChange={handleNationalityChange}
               placeholder="Choose nationality"
             />
           </div>
@@ -95,13 +112,57 @@ export function ApplyFormSection({
                 <SelectValue placeholder="Select a visa" />
               </SelectTrigger>
               <SelectContent>
-                {VISA_OPTIONS.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label}
+                {visaOptions.map((opt) => (
+                  <SelectItem key={opt.id} value={opt.id}>
+                    {opt.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-3">
+            <label className="block text-base font-medium text-primary-copy">
+              Number of travelers
+            </label>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                aria-label="Decrease number of travelers"
+                disabled={numberOfTravellers <= 1}
+                onClick={() => setNumberOfTravellers((n) => Math.max(1, n - 1))}
+                className={cn(
+                  "size-12 rounded-2xl border-2 border-border-default shadow-sm",
+                  numberOfTravellers <= 1
+                    ? "bg-muted/50 text-muted-foreground border-border-default/50"
+                    : "bg-white hover:bg-gray-50 text-primary-copy"
+                )}
+              >
+                <Minus className="size-5" strokeWidth={2.5} />
+              </Button>
+              <span
+                className="min-w-10 text-center text-base font-medium text-primary-copy"
+                aria-live="polite"
+              >
+                {numberOfTravellers}
+              </span>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                aria-label="Increase number of travelers"
+                disabled={numberOfTravellers >= 20}
+                onClick={() => setNumberOfTravellers((n) => Math.min(20, n + 1))}
+                className={cn(
+                  "size-12 rounded-2xl border-2 border-border-default bg-white shadow-sm hover:bg-gray-50 text-primary-copy",
+                  numberOfTravellers >= 20 && "opacity-50"
+                )}
+              >
+                <Plus className="size-5" strokeWidth={2.5} />
+              </Button>
+            </div>
           </div>
 
           <div className="w-full flex items-center justify-end">
@@ -114,7 +175,7 @@ export function ApplyFormSection({
         <div className="w-1/3">
           <div className="bg-white rounded-2xl p-5 shadow-sm">
             <h3 className="text-xl font-semibold">
-              {countryName} {selectedVisaLabel}
+              {destinationCountryName} {selectedVisa?.name ?? ""}
             </h3>
             <Separator className="my-4" />
             <div className="space-y-5">
@@ -148,7 +209,7 @@ export function ApplyFormSection({
                 <div>
                   <p className="text-secondary-copy text-sm">Valid for</p>
                   <p className="text-base font-semibold">
-                    {"{x}"} {"{time}"} after issue
+                    {selectedVisa?.validFor ?? ""} after issue
                   </p>
                 </div>
               </div>
@@ -184,7 +245,7 @@ export function ApplyFormSection({
                     Number of entries
                   </p>
                   <p className="text-base font-semibold">
-                    {"{number-of-entries}"}
+                    {selectedVisa?.numberOfEntries ?? ""}
                   </p>
                 </div>
               </div>
@@ -218,7 +279,7 @@ export function ApplyFormSection({
                 <div>
                   <p className="text-secondary-copy text-sm">Max stay</p>
                   <p className="text-base font-semibold">
-                    {"{x}"} {"{time}"} per entry
+                    {selectedVisa?.maxStay ?? ""} per entry
                   </p>
                 </div>
               </div>
