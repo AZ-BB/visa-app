@@ -14,6 +14,11 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import type { Traveller } from "../ApplicationOrderContext";
 import { useApplicationOrder } from "../ApplicationOrderContext";
+import { Separator } from "@/components/ui/separator";
+import TipCard from "@/components/TipCard";
+import { DatePicker } from "@/components/ui/date-picker";
+import { parseISO } from "date-fns";
+import ArrowButton from "@/components/ArrowButton";
 
 interface Step3BusinessInfoProps {
   onNext?: () => void;
@@ -27,24 +32,23 @@ function ApplicationSidebar({
   travellerCount?: number;
 }) {
   return (
-    <div className="lg:col-span-1">
-      <h3 className="text-2xl font-bold text-primary-copy mb-6">
-        Additional costs
-      </h3>
-      <div className="space-y-2 text-primary-copy">
+    <div className="space-y-5">
+      <div className="bg-white rounded-2xl p-5 border border-border-default/50 shadow-sm">
+
+        <h3 className="text-xl font-bold text-primary-copy mb-2">
+          Additional costs
+        </h3>
+
         <p className="text-base">{travellerCount} of traveller/s</p>
+        <Separator className="mt-2 mb-4" />
+
         <div className="flex justify-between text-base">
-          <span className="text-secondary-copy">Visa fee</span>
-          <span className="font-medium">£—</span>
+          <span className="text-secondary-copy">{'{fee-detail}'}</span>
+          <span className="font-medium">£{'{cost}'}</span>
         </div>
       </div>
-      <div
-        className={cn(
-          "mt-6 flex gap-3 rounded-xl border-2 border-primary/30",
-          "bg-primary/5 px-4 py-4"
-        )}
-      >
-        <Info className="size-5 shrink-0 text-primary mt-0.5" aria-hidden />
+
+      <TipCard>
         <p className="text-sm text-primary-copy">
           <a
             href="#"
@@ -54,7 +58,7 @@ function ApplicationSidebar({
           </a>{" "}
           about how we keep your information safe.
         </p>
-      </div>
+      </TipCard>
     </div>
   );
 }
@@ -78,17 +82,18 @@ function PassportFields({
   const passportDestinationValue =
     traveller.passportDestination || defaultPassportDestination || undefined;
   return (
-    <div className="space-y-5 pt-2">
+    <div className="space-y-5 pt-5">
       <div>
         <label
           htmlFor={`${idPrefix}-passport-destination`}
-          className="block text-base font-medium text-primary-copy mb-2"
+          className="block text-base font-semibold text-primary-copy mb-2"
         >
           Passport destination
         </label>
         <CountryDropdown
           placeholder="Select destination"
           value={passportDestinationValue}
+          className="py-4"
           onValueChange={(value) => onUpdate({ passportDestination: value })}
         />
         {field("passportDestination") && (
@@ -98,7 +103,7 @@ function PassportFields({
       <div>
         <label
           htmlFor={`${idPrefix}-passport-number`}
-          className="block text-base font-medium text-primary-copy mb-2"
+          className="block text-base font-semibold text-primary-copy mb-2"
         >
           Passport number
         </label>
@@ -118,25 +123,23 @@ function PassportFields({
       <div>
         <label
           htmlFor={`${idPrefix}-passport-expiry-date`}
-          className="block text-base font-medium text-primary-copy mb-2"
+          className="block text-base font-semibold text-primary-copy mb-2"
         >
           Passport expiry date
         </label>
-        <Input
+        <DatePicker
           id={`${idPrefix}-passport-expiry-date`}
-          type="text"
-          placeholder="12 Mar 2035"
-          value={traveller.passportExpiryDate}
-          onChange={(e) => onUpdate({ passportExpiryDate: e.target.value })}
-          className={field("passportExpiryDate") ? "border-red-500" : ""}
-          aria-invalid={!!field("passportExpiryDate")}
+          value={traveller.passportExpiryDate ? parseISO(traveller.passportExpiryDate) : undefined}
+          onValueChange={(date) => onUpdate({ passportExpiryDate: date ? date.toISOString() : "" })}
+          placeholder="DD MM YYYY"
+          disableBeforeToday={true}
         />
         {field("passportExpiryDate") && (
           <p className="mt-1.5 text-sm text-red-600">{field("passportExpiryDate")}</p>
         )}
       </div>
       <div>
-        <label className="block text-base font-medium text-primary-copy mb-2">
+        <label className="block text-base font-semibold text-primary-copy mb-2">
           Country of birth
         </label>
         <CountryDropdown
@@ -144,6 +147,7 @@ function PassportFields({
           value={traveller.countryOfBirth || undefined}
           onValueChange={(value) => onUpdate({ countryOfBirth: value })}
           aria-label="Country of birth"
+          className="py-4"
         />
         {field("countryOfBirth") && (
           <p className="mt-1.5 text-sm text-red-600">{field("countryOfBirth")}</p>
@@ -152,7 +156,7 @@ function PassportFields({
       <div>
         <label
           htmlFor={`${idPrefix}-country-residence`}
-          className="block text-base font-medium text-primary-copy mb-2"
+          className="block text-base font-semibold text-primary-copy mb-2"
         >
           Country of residence
         </label>
@@ -161,6 +165,7 @@ function PassportFields({
           value={traveller.countryOfResidence || undefined}
           onValueChange={(value) => onUpdate({ countryOfResidence: value })}
           aria-label="Country of residence"
+          className="py-4"
         />
         {field("countryOfResidence") && (
           <p className="mt-1.5 text-sm text-red-600">{field("countryOfResidence")}</p>
@@ -204,19 +209,17 @@ export function Step3BusinessInfo({ onNext, onBack, errors }: Step3BusinessInfoP
         </p>
 
         <Accordion
-          type="single"
-          defaultValue="traveller-1"
-          collapsible
+          type="multiple"
+          defaultValue={["traveller-1"]}
           className="space-y-3"
         >
           {travellers.map((traveller, index) => (
-            <AccordionItem key={index} value={`traveller-${index + 1}`}>
-              <AccordionTrigger className="text-primary-copy font-bold">
-                Traveller #{index + 1}
+            <AccordionItem variant="variant-2" key={index} value={`traveller-${index + 1}`}>
+              <AccordionTrigger className="text-primary-copy font-bold text-lg">
                 {[traveller.firstName, traveller.lastName].filter(Boolean).length > 0 && (
-                  <span className="font-normal text-secondary-copy ml-2">
-                    — {[traveller.firstName, traveller.lastName].filter(Boolean).join(" ")}
-                  </span>
+                  <>
+                    {[traveller.firstName, traveller.lastName].filter(Boolean).join(" ")}
+                  </>
                 )}
               </AccordionTrigger>
               <AccordionContent>
@@ -250,14 +253,13 @@ export function Step3BusinessInfo({ onNext, onBack, errors }: Step3BusinessInfoP
             <span />
           )}
           {onNext && (
-            <Button
-              type="button"
+            <ArrowButton
+              variant="default"
+              className="text-base"
               onClick={onNext}
-              className="rounded-xl px-6 py-3 gap-2"
             >
               Save & continue
-              <ArrowRight className="size-5" aria-hidden />
-            </Button>
+            </ArrowButton>
           )}
         </div>
       </div>

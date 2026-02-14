@@ -6,7 +6,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ArrowLeft, ArrowRight, Calendar, Info, Plus } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar, Info, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -15,6 +15,12 @@ import {
   useApplicationOrder,
   type Traveller as TravellerType,
 } from "../ApplicationOrderContext";
+import { DatePicker } from "@/components/ui/date-picker";
+import { parseISO } from "date-fns";
+import { YesNoRadioGroup } from "@/components/YesNoRadioGroup";
+import TipCard from "@/components/TipCard";
+import { Separator } from "@/components/ui/separator";
+import ArrowButton from "@/components/ArrowButton";
 
 interface Step2PersonalInfoProps {
   onNext?: () => void;
@@ -28,24 +34,23 @@ function ApplicationSidebar({
   travellerCount?: number;
 }) {
   return (
-    <div className="lg:col-span-1">
-      <h3 className="text-2xl font-bold text-primary-copy mb-6">
-        Additional costs
-      </h3>
-      <div className="space-y-2 text-primary-copy">
+    <div className="space-y-5">
+      <div className="bg-white rounded-2xl p-5 border border-border-default/50 shadow-sm">
+
+        <h3 className="text-xl font-bold text-primary-copy mb-2">
+          Additional costs
+        </h3>
+
         <p className="text-base">{travellerCount} of traveller/s</p>
+        <Separator className="mt-2 mb-4" />
+
         <div className="flex justify-between text-base">
-          <span className="text-secondary-copy">Visa fee</span>
-          <span className="font-medium">£—</span>
+          <span className="text-secondary-copy">{'{fee-detail}'}</span>
+          <span className="font-medium">£{'{cost}'}</span>
         </div>
       </div>
-      <div
-        className={cn(
-          "mt-6 flex gap-3 rounded-xl border-2 border-primary/30",
-          "bg-primary/5 px-4 py-4"
-        )}
-      >
-        <Info className="size-5 shrink-0 text-primary mt-0.5" aria-hidden />
+
+      <TipCard>
         <p className="text-sm text-primary-copy">
           <a
             href="#"
@@ -55,7 +60,7 @@ function ApplicationSidebar({
           </a>{" "}
           about how we keep your information safe.
         </p>
-      </div>
+      </TipCard>
     </div>
   );
 }
@@ -86,7 +91,7 @@ function TravellerFields({
         <Input
           id={`${idPrefix}-first-name`}
           type="text"
-          placeholder="Josh"
+          placeholder="Joe"
           value={traveller.firstName}
           onChange={(e) => onUpdate({ firstName: e.target.value })}
           className={field("firstName") ? "border-red-500" : ""}
@@ -106,7 +111,7 @@ function TravellerFields({
         <Input
           id={`${idPrefix}-last-name`}
           type="text"
-          placeholder="Hadley"
+          placeholder="Smith"
           value={traveller.lastName}
           onChange={(e) => onUpdate({ lastName: e.target.value })}
           className={field("lastName") ? "border-red-500" : ""}
@@ -124,18 +129,13 @@ function TravellerFields({
           Date of birth
         </label>
         <div className="relative">
-          <Input
+          <DatePicker
             id={`${idPrefix}-dob`}
-            type="text"
-            placeholder="09 Jun 1997"
-            value={traveller.dateOfBirth}
-            onChange={(e) => onUpdate({ dateOfBirth: e.target.value })}
-            className={cn("pr-12", field("dateOfBirth") && "border-red-500")}
-            aria-invalid={!!field("dateOfBirth")}
+            value={traveller.dateOfBirth ? parseISO(traveller.dateOfBirth) : undefined}
+            onValueChange={(date) => onUpdate({ dateOfBirth: date ? date.toISOString() : "" })}
+            placeholder="DD MM YYYY"
+            disableAfterToday={true}
           />
-          <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-secondary-copy">
-            <Calendar className="size-5" aria-hidden />
-          </div>
         </div>
         {field("dateOfBirth") && (
           <p className="mt-1.5 text-sm text-red-600">{field("dateOfBirth")}</p>
@@ -145,30 +145,13 @@ function TravellerFields({
         <p className="block text-base font-medium text-primary-copy mb-3">
           Have you been denied a visa in the last 6 months?
         </p>
-        <fieldset className="flex gap-6" role="radiogroup" aria-label="Visa denial in last 6 months">
-          <label className="flex cursor-pointer items-center gap-2">
-            <input
-              type="radio"
-              name={`${idPrefix}-denied`}
-              value="yes"
-              checked={traveller.deniedVisaLast6Months === "yes"}
-              onChange={() => onUpdate({ deniedVisaLast6Months: "yes" })}
-              className="size-4 border-2 border-gray-300 text-primary focus:ring-primary"
-            />
-            <span className="text-primary-copy">Yes</span>
-          </label>
-          <label className="flex cursor-pointer items-center gap-2">
-            <input
-              type="radio"
-              name={`${idPrefix}-denied`}
-              value="no"
-              checked={traveller.deniedVisaLast6Months === "no"}
-              onChange={() => onUpdate({ deniedVisaLast6Months: "no" })}
-              className="size-4 border-2 border-gray-300 text-primary focus:ring-primary"
-            />
-            <span className="text-primary-copy">No</span>
-          </label>
-        </fieldset>
+        <YesNoRadioGroup
+          value={traveller.deniedVisaLast6Months}
+          onChange={(value) => onUpdate({ deniedVisaLast6Months: value })}
+        />
+        {field("deniedVisaLast6Months") && (
+          <p className="mt-1.5 text-sm text-red-600">{field("deniedVisaLast6Months")}</p>
+        )}
       </div>
     </div>
   );
@@ -190,6 +173,12 @@ export function Step2PersonalInfo({ onNext, onBack, errors }: Step2PersonalInfoP
     });
   };
 
+  const removeTraveller = (index: number) => {
+    updateOrder({
+      travellers: travellers.filter((_, i) => i !== index),
+    });
+  };
+
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
       <div className="lg:col-span-2">
@@ -202,14 +191,13 @@ export function Step2PersonalInfo({ onNext, onBack, errors }: Step2PersonalInfoP
         </p>
 
         <Accordion
-          type="single"
-          defaultValue="traveller-1"
-          collapsible
+          type="multiple"
+          defaultValue={["traveller-1"]}
           className="space-y-3"
         >
           {travellers.map((traveller, index) => (
-            <AccordionItem key={index} value={`traveller-${index + 1}`}>
-              <AccordionTrigger className="text-primary-copy font-bold">
+            <AccordionItem variant="variant-2" key={index} value={`traveller-${index + 1}`}>
+              <AccordionTrigger className="text-lg text-primary-copy font-bold">
                 Traveller #{index + 1}
               </AccordionTrigger>
               <AccordionContent>
@@ -220,28 +208,37 @@ export function Step2PersonalInfo({ onNext, onBack, errors }: Step2PersonalInfoP
                   onUpdate={(patch) => updateTraveller(index, patch)}
                   errors={errors}
                 />
+                {
+                  index > 0 && (
+                    <div className="mt-4 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => removeTraveller(index)}
+                        disabled={index === 0}
+                        className="flex text-red-500 items-center gap-2 hover:underline"
+                        aria-label="Remove traveller"
+                      >
+                        <Trash2 className="size-4" aria-hidden />
+                        Remove traveller
+                      </button>
+                    </div>
+                  )
+                }
               </AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>
 
-        <div className="mt-6 flex items-center gap-3">
-          <button
-            type="button"
-            onClick={addTraveller}
-            className="inline-flex items-center gap-2 rounded-xl border-2 border-dashed border-primary px-4 py-3 text-primary font-semibold hover:bg-primary/5 transition-colors"
-          >
-            Add traveller
-          </button>
-          <button
-            type="button"
-            onClick={addTraveller}
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary text-white hover:bg-primary-dark/90 transition-colors"
-            aria-label="Add traveller"
-          >
-            <Plus className="size-6" aria-hidden />
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={addTraveller}
+          className="inline-flex items-center bg-[#F0FAFF] justify-between gap-2 mt-3 rounded-xl border-3 border-dashed px-4 py-3 text-primary font-semibold hover:bg-primary/5 transition-colors w-full"
+        >
+          <span className="text-primary-copy font-bold text-lg">Add traveller</span>
+          <div className="flex items-center justify-center bg-primary rounded-lg size-10">
+            <Plus className="size-6 text-white" aria-hidden />
+          </div>
+        </button>
 
         <div className="mt-10 flex items-center justify-between">
           {onBack ? (
@@ -260,14 +257,13 @@ export function Step2PersonalInfo({ onNext, onBack, errors }: Step2PersonalInfoP
             <span />
           )}
           {onNext && (
-            <Button
-              type="button"
+            <ArrowButton
+              variant="default"
+              className="text-base"
               onClick={onNext}
-              className="rounded-xl px-6 py-3 gap-2"
             >
               Save & continue
-              <ArrowRight className="size-5" aria-hidden />
-            </Button>
+            </ArrowButton>
           )}
         </div>
       </div>

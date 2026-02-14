@@ -47,7 +47,7 @@ export interface Traveller {
   firstName: string;
   lastName: string;
   dateOfBirth: string;
-  deniedVisaLast6Months: "yes" | "no";
+  deniedVisaLast6Months: boolean;
   // Passport info (same person)
   passportDestination: string;
   passportNumber: string;
@@ -83,7 +83,7 @@ export const defaultTraveller: Traveller = {
   firstName: "",
   lastName: "",
   dateOfBirth: "",
-  deniedVisaLast6Months: "no",
+  deniedVisaLast6Months: false,
   passportDestination: "",
   passportNumber: "",
   passportExpiryDate: "",

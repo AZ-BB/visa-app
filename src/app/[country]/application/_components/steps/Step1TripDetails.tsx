@@ -63,6 +63,7 @@ export function Step1TripDetails({
                   })
                 }
                 placeholder="DD MM YYYY"
+                disableBeforeToday={true}
               />
             </div>
             {errors?.arrivalDate && (
@@ -137,7 +138,7 @@ export function Step1TripDetails({
 
       {/* Right: sidebar — ~1/3 */}
       <div className="space-y-5">
-        <div className="bg-white rounded-2xl p-5 border border-border-default shadow-sm">
+        <div className="bg-white rounded-2xl p-5 border border-border-default/50 shadow-sm">
 
           <h3 className="text-xl font-bold text-primary-copy mb-2">
             Additional costs

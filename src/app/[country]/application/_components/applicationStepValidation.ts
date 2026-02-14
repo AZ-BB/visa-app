@@ -35,6 +35,10 @@ export function validateStep(
       if (!t.dateOfBirth?.trim()) {
         errors[`traveller_${i}_dateOfBirth`] = "Date of birth is required";
       }
+      if (t.deniedVisaLast6Months === true) {
+        errors[`traveller_${i}_deniedVisaLast6Months`] =
+          "Applicants who have been denied a visa in the last 6 months are not eligible to apply.";
+      }
     });
   }
 

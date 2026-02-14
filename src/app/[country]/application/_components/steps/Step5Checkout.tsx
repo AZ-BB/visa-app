@@ -4,6 +4,11 @@ import { ArrowLeft, ArrowRight, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useApplicationOrder } from "../ApplicationOrderContext";
+import TipCard from "@/components/TipCard";
+import ArrowButton from "@/components/ArrowButton";
+import { getCountryNameFromCode } from "@/lib/contries-name";
+import { Separator } from "@/components/ui/separator";
+import InfoIcon from "@/components/svgs/info";
 
 const TURNAROUND_LABELS: Record<string, string> = {
   standard: "Standard",
@@ -24,114 +29,128 @@ interface Step5CheckoutProps {
 }
 
 export function Step5Checkout({
-  country = "United States",
-  visaType = "Tourist eVisa",
+  country,
+  visaType,
   onBack,
   onContinueToPayment,
 }: Step5CheckoutProps) {
   const { order } = useApplicationOrder();
   const { readyByDate, travellers, turnaroundTime, costs } = order;
 
+  const countryName = getCountryNameFromCode(country || "");
+
   return (
-    <div className="max-w-3xl mx-auto">
-      <h2 className="text-2xl font-bold text-primary-copy mb-6">
+    <div className="max-w-2xl mx-auto space-y-5 min-h-screen">
+      <h2 className="text-2xl font-bold text-primary-copy">
         Checkout
       </h2>
 
       {/* Application readiness */}
-      <div
-        className={cn(
-          "mb-8 flex gap-3 rounded-xl border-2 border-primary/30",
-          "bg-primary/5 px-4 py-4"
-        )}
-      >
-        <Info className="size-5 shrink-0 text-primary mt-0.5" aria-hidden />
-        <p className="text-sm text-primary-copy">
+      <TipCard>
+        <p className="text-base">
           Your application will be ready by the{" "}
-          <strong>{readyByDate || "—"}</strong>. We&apos;ll make sure to
+          <strong>{readyByDate || "{date}"}</strong>. We&apos;ll make sure to
           contact you and let you know.
         </p>
-      </div>
+      </TipCard>
 
-      {/* Visa details summary */}
-      <section className="mb-8">
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-          <h3 className="text-xl font-bold text-primary-copy">
-            {country} {visaType}
-          </h3>
-          <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-secondary-copy">
-            {TURNAROUND_LABELS[turnaroundTime] ?? turnaroundTime}
-          </span>
-        </div>
-        <dl className="space-y-2 text-primary-copy">
-          <div className="flex justify-between gap-4">
-            <dt className="text-secondary-copy">Valid for</dt>
-            <dd className="font-medium">3 months after issue</dd>
+      <div className="bg-white rounded-2xl p-5 border border-border-default shadow-sm">
+        {/* Visa details summary */}
+        <section className="mb-8">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <h3 className="text-xl font-bold text-primary-copy">
+              {countryName} {visaType}
+            </h3>
+            <span className="rounded-full text-primary bg-primary/5 px-3 py-1 text-base font-semibold">
+              {TURNAROUND_LABELS[turnaroundTime] ?? turnaroundTime}
+            </span>
           </div>
-          <div className="flex justify-between gap-4">
-            <dt className="text-secondary-copy">Number of entries</dt>
-            <dd className="font-medium">Single entry</dd>
-          </div>
-          <div className="flex justify-between gap-4">
-            <dt className="text-secondary-copy">Max stay</dt>
-            <dd className="font-medium">30 days per entry</dd>
-          </div>
-        </dl>
-      </section>
 
-      {/* Travellers */}
-      <section className="mb-8">
-        <h3 className="text-xl font-bold text-primary-copy mb-3">
-          Travellers
-        </h3>
-        <ul className="space-y-2 text-primary-copy">
-          {travellers.map((t, i) => (
-            <li key={i}>
-              Traveller #{i + 1}: {[t.firstName, t.lastName].filter(Boolean).join(" ") || "—"}
-            </li>
-          ))}
-        </ul>
-      </section>
 
-      {/* Additional costs */}
-      <section className="mb-8">
-        <h3 className="text-xl font-bold text-primary-copy mb-4">
-          Additional costs
-        </h3>
-        <div className="space-y-2 text-primary-copy">
-          <div className="flex justify-between">
-            <span className="text-secondary-copy">Visa fee</span>
-            <span className="font-medium">{formatCost(costs.visaFee)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-secondary-copy">Turnaround time</span>
-            <span className="font-medium">{formatCost(costs.turnaroundCost)}</span>
-          </div>
-        </div>
-        <div className="mt-4 pt-4 border-t border-border-default">
-          <div className="flex justify-between items-baseline">
-            <div>
-              <p className="font-bold text-primary-copy">Total</p>
-              <p className="text-sm text-secondary-copy">
-                Including taxes & fees
-              </p>
+          <Separator className="my-4" />
+
+          <dl className="space-y-2 text-primary-copy">
+            <div className="flex justify-between gap-4">
+              <dt className="text-secondary-copy">Valid for</dt>
+              <dd className="font-semibold">3 months after issue</dd>
             </div>
-            <span className="text-xl font-bold text-primary-copy">{formatCost(costs.total)}</span>
-          </div>
-        </div>
-      </section>
+            <div className="flex justify-between gap-4">
+              <dt className="text-secondary-copy">Number of entries</dt>
+              <dd className="font-semibold">Single entry</dd>
+            </div>
+            <div className="flex justify-between gap-4">
+              <dt className="text-secondary-copy">Max stay</dt>
+              <dd className="font-semibold">30 days per entry</dd>
+            </div>
+          </dl>
+        </section>
 
-      {/* Privacy link */}
-      <p className="text-sm text-primary-copy mb-10">
-        <Info className="inline-block size-4 text-primary align-middle mr-1.5" aria-hidden />
-        <a
-          href="#"
-          className="font-semibold text-primary underline-offset-2 hover:underline"
-        >
-          Find out more
-        </a>{" "}
-        about how we keep your information safe.
-      </p>
+        <Separator className="my-4" />
+
+        {/* Travellers */}
+        <section className="mb-8">
+          <h3 className="text-xl font-bold text-primary-copy mb-3">
+            Travellers
+          </h3>
+          <ul className="space-y-2 text-primary-copy">
+            {travellers.map((t, i) => (
+              <li key={i} className="flex justify-between items-center">
+                <div className="text-secondary-copy">
+                  Traveller #{i + 1}
+                </div>
+                <div className="font-semibold">
+                  {[t.firstName, t.lastName].filter(Boolean).join(" ") || "—"}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <Separator className="my-4" />
+
+
+        {/* Additional costs */}
+        <section className="mb-8">
+          <h3 className="text-xl font-bold text-primary-copy mb-4">
+            Additional costs
+          </h3>
+          <div className="space-y-2 text-primary-copy">
+            <div className="flex justify-between">
+              <span className="text-secondary-copy">Visa fee</span>
+              <span className="font-semibold">{formatCost(costs.visaFee)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-secondary-copy">Turnaround time</span>
+              <span className="font-semibold">{formatCost(costs.turnaroundCost)}</span>
+            </div>
+          </div>
+          <div className="mt-4 pt-4">
+            <div className="flex justify-between items-baseline">
+              <div>
+                <p className="font-semibold text-primary-copy">Total</p>
+                <p className="text-sm text-secondary-copy">
+                  Including taxes & fees
+                </p>
+              </div>
+              <span className="text-xl font-bold text-primary-copy">{formatCost(costs.total)}</span>
+            </div>
+          </div>
+        </section>
+
+        <Separator className="my-4" />
+
+        {/* Privacy link */}
+        <p className="text-base text-primary-copy flex items-center gap-2">
+          <InfoIcon className="inline-block size-5 fill-primary" aria-hidden />
+          <a
+            href="#"
+            className="font-semibold underline underline-offset-2 hover:text-primary"
+          >
+            Find out more
+          </a>{" "}
+          about how we keep your information safe.
+        </p>
+      </div>
 
       {/* Navigation */}
       <div className="flex items-center justify-between">
@@ -151,14 +170,13 @@ export function Step5Checkout({
           <span />
         )}
         {onContinueToPayment && (
-          <Button
-            type="button"
+          <ArrowButton
+            variant="default"
+            className="text-base"
             onClick={onContinueToPayment}
-            className="rounded-xl px-6 py-3 gap-2"
           >
             Continue to payment
-            <ArrowRight className="size-5" aria-hidden />
-          </Button>
+          </ArrowButton>
         )}
       </div>
     </div>
