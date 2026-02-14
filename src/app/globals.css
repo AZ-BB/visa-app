@@ -42,3 +42,7 @@ body {
 body.sticky-visa-bar-active #hero-visa-selector {
   visibility: hidden;
 }
+
+button {
+  cursor: pointer;
+}
