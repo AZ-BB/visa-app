@@ -106,7 +106,7 @@ export function CountryDropdown({
   );
 
   return (
-    <div className={cn("flex flex-col", className)}>
+    <div className={cn("flex flex-col")}>
       {label ? (
         <span className="mb-2 block text-base font-semibold text-primary-copy">
           {label}
@@ -120,8 +120,9 @@ export function CountryDropdown({
             className={cn(
               "h-auto min-h-12 w-full rounded-xl border border-[#DAE0E5] bg-white px-4 py-2.5",
               "flex items-center justify-between gap-3 text-base text-primary-copy text-left",
-              "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-0",
-              "hover:border-gray-300 transition-colors"
+              "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-0",
+              "hover:border-gray-300 transition-colors",
+              className
             )}
             aria-label={ariaLabel ?? label}
             aria-haspopup="listbox"
@@ -142,7 +143,7 @@ export function CountryDropdown({
           <Popover.Content
             sideOffset={4}
             align="start"
-            className="z-50 rounded-xl border border-gray-100 bg-white p-2 shadow-lg focus:outline-none"
+            className="z-50 rounded-xl border border-[#DAE0E5]/50 bg-white p-2 shadow-lg focus:outline-none"
             style={{ width: "var(--radix-popover-trigger-width, 280px)" }}
             onOpenAutoFocus={(e) => e.preventDefault()}
             onKeyDown={handleKeyDown}

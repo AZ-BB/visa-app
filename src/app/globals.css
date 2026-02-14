@@ -8,6 +8,7 @@
   --muted: #6b7280;
   --accent: #ea580c;
   --primary: #279bff;
+  --light-primary: #F0FAFF;
   --primary-dark: #00315c;
   --primary-copy: #111827;
   --secondary-copy: #6e7787;
@@ -30,6 +31,7 @@
   --color-bg-light-grey: var(--bg-light-grey);
   --color-white: var(--white);
   --font-poppins: var(--font-poppins), system-ui, sans-serif;
+  --shadow-sm: 0px 2px 4px 0px #0000000A;
 }
 
 body {
