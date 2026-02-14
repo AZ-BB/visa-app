@@ -31,7 +31,7 @@ const faqs = [
 
 export function QA() {
     return (
-        <section id="qa" className="py-12 md:py-20 mx-auto max-w-7xl space-y-8 md:space-y-10 px-4 sm:px-6">
+        <section id="faqs" className="py-12 md:py-20 mx-auto max-w-7xl space-y-8 md:space-y-10 px-4 sm:px-6">
             <div className="flex flex-col md:flex-row gap-6 md:gap-10 md:items-center md:justify-between">
                 <div className="w-full  space-y-4">
                     <h2 className="text-3xl sm:text-3xl md:text-4xl font-bold text-primary-copy text-center sm:text-left">
@@ -42,22 +42,24 @@ export function QA() {
                     </p>
                 </div>
 
-                <Link href="/contact-us" className="w-full flex justify-end">
-                    <Button
-                        variant="outline"
-                        className="rounded-full sm:w-fit w-full flex justify-between items-center pl-6 pr-4 py-3 group text-base"
-                    >
-                        <div className="w-9 h-9 sm:hidden">
+                <div className="w-full flex justify-end">
+                    <Link href="/contact-us" className="">
+                        <Button
+                            variant="outline"
+                            className="rounded-full sm:w-fit w-full flex justify-between items-center pl-6 pr-4 py-3 group text-base"
+                        >
+                            <div className="w-9 h-9 sm:hidden">
 
-                        </div>
-                        <span>
-                            Contact us
-                        </span>
-                        <div className="w-9 h-9 rounded-full bg-[#F3F6FC] group-hover:bg-transparent transition-colors duration-100 flex items-center justify-center">
-                            <ChevronRightIcon className="size-6" />
-                        </div>
-                    </Button>
-                </Link>
+                            </div>
+                            <span>
+                                Contact us
+                            </span>
+                            <div className="w-9 h-9 rounded-full bg-[#F3F6FC] group-hover:bg-transparent transition-colors duration-100 flex items-center justify-center">
+                                <ChevronRightIcon className="size-6" />
+                            </div>
+                        </Button>
+                    </Link>
+                </div>
             </div>
 
             <div className="flex flex-col md:flex-row gap-4 w-full">
