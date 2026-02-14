@@ -47,7 +47,7 @@ export function ResumeApplicationBanner() {
         <Button
           type="button"
           variant="outline"
-          className="border-white text-white bg-light-primary py-4 px-4 rounded-full hover:bg-white/20"
+          className="border-white text-white bg-light-primary py-6 px-4 rounded-full hover:bg-white/20"
           onClick={() => setDismissed(true)}
         >
           Dismiss
@@ -55,7 +55,7 @@ export function ResumeApplicationBanner() {
         <Link href={applicationHref}>
           <ArrowButton
             variant="outline"
-            className="text-sm py-2 border-border-default px-4 hover:text-white"
+            className="text-sm py-6 pl-4 pr-2 border-border-default hover:text-white"
             iconContainerClassName="scale-80"
           >
             Continue

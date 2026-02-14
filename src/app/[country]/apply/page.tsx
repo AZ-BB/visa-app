@@ -73,13 +73,6 @@ export default async function ApplyPage({ params, searchParams }: { params: Prom
 
             <ResumeApplicationBanner />
 
-            <div className="border-2 border-primary/75 rounded-2xl p-5 text-base flex items-start gap-2 shadow-sm">
-                <InfoIcon className="size-5 fill-primary mt-0.5" />
-                <span>
-                    A visa is <span className="font-semibold">required</span> when travelling to {countryName} with a passport from {nationality}.
-                </span>
-            </div>
-
             <ApplyFormSection
                 country={country}
                 countryName={countryName}

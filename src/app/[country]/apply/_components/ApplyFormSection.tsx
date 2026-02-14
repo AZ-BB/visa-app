@@ -17,6 +17,7 @@ import {
   setStoredOrder,
   type ApplicationOrder,
 } from "@/app/[country]/application/_components/ApplicationOrderContext";
+import TipCard from "@/components/TipCard";
 
 const VISA_OPTIONS = [
   { value: "tourist", label: "Tourist visa" },
@@ -59,7 +60,13 @@ export function ApplyFormSection({
   return (
     <>
       <div className="flex gap-12">
-        <div className="w-2/3 space-y-9">
+        <div className="w-2/3 space-y-8">
+          <TipCard>
+            <span>
+              A visa is <span className="font-semibold">required</span> when travelling to {countryName} with a passport from {nationality}.
+            </span>
+          </TipCard>
+
           <div className="space-y-3">
             <div className="space-y-1">
               <h3 className="text-lg font-semibold">Where am I from?</h3>
@@ -95,6 +102,12 @@ export function ApplyFormSection({
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="w-full flex items-center justify-end">
+            <ArrowButton className="" type="button" onClick={handleStartApplication}>
+              Start your application
+            </ArrowButton>
           </div>
         </div>
 
@@ -212,12 +225,6 @@ export function ApplyFormSection({
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="w-full flex items-center justify-center">
-        <ArrowButton className="" type="button" onClick={handleStartApplication}>
-          Start your application
-        </ArrowButton>
       </div>
     </>
   );
