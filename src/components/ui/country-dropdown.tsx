@@ -22,7 +22,7 @@ function getCountryName(code: string): string {
 const COMMON_COUNTRY_CODES = [
   "GB", "US", "CA", "AU", "IE", "FR", "DE", "ES", "IT", "NL", "PT", "BE", "CH", "AT", "PL", "SE", "NO", "DK", "FI",
   "GR", "TR", "CZ", "RO", "HU", "AE", "SA", "EG", "ZA", "NG", "KE", "MA", "IN", "PK", "BD", "CN", "JP", "KR", "TH",
-  "VN", "ID", "MY", "SG", "PH", "NZ", "BR", "MX", "AR", "CL", "CO", "PE", "EC", "JM", "TT", "BS", "IL", "RU", "UA",
+  "VN", "ID", "MY", "SG", "PH", "NZ", "BR", "MX", "CL", "CO", "PE", "EC", "JM", "TT", "BS", "RU", "UA",
 ];
 
 const COUNTRY_OPTIONS = COMMON_COUNTRY_CODES
