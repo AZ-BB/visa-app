@@ -46,7 +46,7 @@ export function QA() {
                     <Link href="/contact-us" className="">
                         <Button
                             variant="outline"
-                            className="rounded-full sm:w-fit w-full flex justify-between items-center pl-6 pr-4 py-3 group text-base"
+                            className="rounded-full sm:w-fit w-full flex justify-between items-center pl-6 pr-4 py-8 group text-base"
                         >
                             <div className="w-9 h-9 sm:hidden">
 

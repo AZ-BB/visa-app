@@ -37,6 +37,7 @@ type CountryDropdownProps = {
   label?: string;
   "aria-label"?: string;
   className?: string;
+  contentClassName?: string;
 };
 
 export function CountryDropdown({
@@ -46,6 +47,7 @@ export function CountryDropdown({
   label,
   "aria-label": ariaLabel,
   className,
+  contentClassName,
 }: CountryDropdownProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -106,7 +108,7 @@ export function CountryDropdown({
   );
 
   return (
-    <div className={cn("flex flex-col")}>
+    <div className={cn("flex flex-col", contentClassName)}>
       {label ? (
         <span className="mb-2 block text-base font-semibold text-primary-copy">
           {label}
