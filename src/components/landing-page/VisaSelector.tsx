@@ -26,7 +26,8 @@ export function VisaSelector({ rounded = true, shadow = true }: { rounded?: bool
             onValueChange={setFromCountry}
             placeholder="Choose country"
             aria-label="Country of origin"
-            className="w-full"
+            className=""
+            contentClassName="w-full"
           />
         </div>
 
@@ -41,7 +42,8 @@ export function VisaSelector({ rounded = true, shadow = true }: { rounded?: bool
             onValueChange={(v) => setToCountry(v || undefined)}
             placeholder="Choose location"
             aria-label="Destination country"
-            className="w-full"
+            className=""
+            contentClassName="w-full"
           />
         </div>
 
