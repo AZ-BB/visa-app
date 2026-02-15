@@ -84,11 +84,19 @@ export default function getVisaSearchResult(
   return {
     data: {
       id: "1",
-      fromCountry: "AR",
-      toCountry: "AR",
+      fromCountry: passportCountry,
+      toCountry: destinationCountry,
       isVisaRequired: true,
-      isSupported: false,
-      visaTypes: [],
+      isSupported: true,
+      visaTypes: [
+        {
+          id: "1",
+          name: "Tourist visa",
+          validFor: "3 months",
+          numberOfEntries: "1",
+          maxStay: "30 days",
+        },
+      ],
     },
   }
 }
