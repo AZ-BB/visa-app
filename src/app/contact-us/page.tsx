@@ -101,7 +101,7 @@ export default function ContactUs() {
 
                     <section className="w-full flex justify-end">
                         <Button
-                            className="flex gap-3 group items-center pl-6 pr-4 py-4 rounded-full text-lg"
+                            className="flex gap-3 group items-center pl-6 pr-4 py-8 rounded-full text-lg"
                         >
                             Send email
                             <div className="w-9 h-9 rounded-full bg-[#0A8EFF] group-hover:bg-[#0A8EFF]/10 transition-colors duration-200 flex items-center justify-center">
