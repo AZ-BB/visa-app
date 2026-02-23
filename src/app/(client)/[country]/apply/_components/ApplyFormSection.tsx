@@ -17,7 +17,7 @@ import {
   defaultTraveller,
   setStoredOrder,
   type ApplicationOrder,
-} from "@/app/[country]/application/_components/ApplicationOrderContext"
+} from "@/app/(client)/[country]/application/_components/ApplicationOrderContext"
 import { Minus, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"

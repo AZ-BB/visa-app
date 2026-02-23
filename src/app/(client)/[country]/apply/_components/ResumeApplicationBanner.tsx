@@ -7,7 +7,7 @@ import ArrowButton from "@/components/ArrowButton";
 import {
   getStoredOrder,
   type ApplicationOrder,
-} from "@/app/[country]/application/_components/ApplicationOrderContext";
+} from "@/app/(client)/[country]/application/_components/ApplicationOrderContext";
 
 /** Banner only shows when the stored order has Step 2 (personal info) data. */
 function hasStep2Data(order: ApplicationOrder | null): boolean {
