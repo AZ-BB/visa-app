@@ -7,9 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "biome check",
-    "format": "biome format --write"
+    "format": "biome format --write",
+    "db:gen": "supabase gen types typescript --project-id \"atutbgvourzqqheunkhk\" --schema public > src/database.types.ts"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.8.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "country-flag-icons": "^1.6.13",
