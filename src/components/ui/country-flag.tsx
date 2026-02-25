@@ -3,7 +3,7 @@
 import { hasFlag } from "country-flag-icons";
 import { cn } from "@/lib/utils";
 
-const FLAG_CDN = "https://catamphetamine.github.io/country-flag-icons/3x2";
+const FLAG_CDN = "https://purecatamphetamine.github.io/country-flag-icons/3x2";
 
 type CountryFlagProps = {
   code: string;
