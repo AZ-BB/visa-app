@@ -29,15 +29,25 @@ export default async function VisaDetailPage({
         }
       />
       <div className="mb-6 flex items-center gap-3">
-        <CountryFlag
-          code={visa.destination_country}
-          className="size-10 shrink-0 rounded"
-          round={false}
-        />
+        <Link
+          href={`/admin/countries/${visa.destination_country}`}
+          className="flex items-center gap-2 text-primary hover:underline"
+        >
+          <CountryFlag
+            code={visa.destination_country}
+            className="size-10 rounded-sm"
+            round={false}
+          />
+        </Link>
         <div>
-          <p className="font-medium text-primary-copy">
-            {visa.destination_country_data?.name ?? visa.destination_country}
-          </p>
+          <Link
+            href={`/admin/countries/${visa.destination_country}`}
+            className="flex items-center gap-2 text-primary hover:underline"
+          >
+            <p className="font-medium text-primary-copy">
+              {visa.destination_country_data?.name ?? visa.destination_country}
+            </p>
+          </Link>
           <p className="text-sm text-secondary-copy">
             Valid for: {visa.valid_for} · Max stay: {visa.max_stay} days
           </p>
@@ -71,24 +81,6 @@ export default async function VisaDetailPage({
                 {visa.is_disabled ? "Disabled" : "Active"}
               </span>
             </div>
-          </CardContent>
-        </Card>
-        <Card className="border-border-default bg-white shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-base">Destination</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Link
-              href={`/admin/countries/${visa.destination_country}`}
-              className="flex items-center gap-2 text-primary hover:underline"
-            >
-              <CountryFlag
-                code={visa.destination_country}
-                className="size-6 rounded-sm"
-                round={false}
-              />
-              {visa.destination_country_data?.name ?? visa.destination_country}
-            </Link>
           </CardContent>
         </Card>
       </div>
