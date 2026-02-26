@@ -1,5 +1,17 @@
 import Link from "next/link"
+import {
+  Globe,
+  CheckCircle2,
+  XCircle,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  Eye,
+  Search as SearchIcon,
+} from "lucide-react"
 import { fetchCountries } from "@/actions/countries"
+import { PageHeader } from "@/components/admin-layout/page-header"
 import { CountriesSearchForm } from "./_components/countries-search-form"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -10,163 +22,304 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
 import { CountryFlag } from "@/components/ui/country-flag"
+import { CountryStatusToggle } from "./_components/country-status-toggle"
 
 export default async function CountriesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; page?: string; pageSize?: string }>
+  searchParams: Promise<{
+    search?: string
+    page?: string
+    pageSize?: string
+    status?: string
+  }>
 }) {
-  const { search, page, pageSize } = await searchParams
+  const { search, page, pageSize, status } = await searchParams
   const parsedPage = Number(page)
   const parsedPageSize = Number(pageSize)
-  const countriesPageData = await fetchCountries({
+  const statusFilter =
+    status === "active" || status === "disabled" ? status : "all"
+
+  const countriesResponse = await fetchCountries({
     search,
     page: Number.isFinite(parsedPage) ? parsedPage : undefined,
     pageSize: Number.isFinite(parsedPageSize) ? parsedPageSize : undefined,
+    status: statusFilter,
   })
-  const { countries, total, page: currentPage, totalPages, pageSize: currentPageSize } =
-    countriesPageData
-  const shownActiveCount = countries.filter((country) => !country.is_disabled).length
-  const shownDisabledCount = countries.length - shownActiveCount
-  const fromItem = countries.length === 0 ? 0 : (currentPage - 1) * currentPageSize + 1
-  const toItem = countries.length === 0 ? 0 : fromItem + countries.length - 1
+
+  if (countriesResponse.error || !countriesResponse.data) {
+    throw new Error(countriesResponse.error ?? "Failed to fetch countries")
+  }
+
+  const {
+    countries,
+    total,
+    page: currentPage,
+    totalPages,
+    pageSize: currentPageSize,
+  } = countriesResponse.data
+
+  const activeCount = countries.filter((c) => !c.is_disabled).length
+  const disabledCount = countries.length - activeCount
+  const fromItem =
+    countries.length === 0 ? 0 : (currentPage - 1) * currentPageSize + 1
+  const toItem =
+    countries.length === 0 ? 0 : fromItem + countries.length - 1
 
   const getPageHref = (targetPage: number) => {
     const params = new URLSearchParams()
-    if (search?.trim()) {
-      params.set("search", search.trim())
-    }
-    if (currentPageSize !== 20) {
-      params.set("pageSize", String(currentPageSize))
-    }
-    if (targetPage > 1) {
-      params.set("page", String(targetPage))
-    }
-    const queryString = params.toString()
-    return queryString ? `/admin/countries?${queryString}` : "/admin/countries"
+    if (search?.trim()) params.set("search", search.trim())
+    if (statusFilter !== "all") params.set("status", statusFilter)
+    if (currentPageSize !== 20) params.set("pageSize", String(currentPageSize))
+    if (targetPage > 1) params.set("page", String(targetPage))
+    const qs = params.toString()
+    return qs ? `/admin/countries?${qs}` : "/admin/countries"
   }
 
+  const getVisiblePages = () => {
+    const pages: number[] = []
+    const maxVisible = 5
+    let start = Math.max(1, currentPage - Math.floor(maxVisible / 2))
+    const end = Math.min(totalPages, start + maxVisible - 1)
+    start = Math.max(1, end - maxVisible + 1)
+    for (let i = start; i <= end; i++) pages.push(i)
+    return pages
+  }
+
+  const visiblePages = getVisiblePages()
+
   return (
-    <div className="space-y-6 w-full overflow-x-hidden">
-      <Card className="overflow-hidden rounded-2xl border-slate-200/80 bg-white shadow-sm">
-        <div className="border-b border-slate-200 bg-slate-50/70 px-4 py-4 md:px-6">
-          <CountriesSearchForm key={search ?? ""} defaultValue={search ?? ""} />
+    <div className="space-y-6">
+      {/* Table card */}
+      <Card className="overflow-hidden rounded-xl border-border-default bg-white shadow-sm">
+        {/* Toolbar */}
+        <div className="flex flex-col gap-3 border-b border-border-default bg-white px-4 pb-5 sm:flex-row sm:items-center sm:justify-between md:px-5">
+          <CountriesSearchForm
+            key={`${search ?? ""}-${statusFilter}`}
+            defaultValue={search ?? ""}
+            defaultStatus={statusFilter}
+          />
         </div>
+
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-slate-200 hover:bg-transparent">
-                <TableHead className="h-11 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-                  Country
-                </TableHead>
-                <TableHead className="h-11 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-                  Code
-                </TableHead>
-                <TableHead className="h-11 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-                  Status
-                </TableHead>
-                <TableHead className="h-11 w-[96px] text-right text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-                  Actions
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {countries.length === 0 ? (
-                <TableRow className="hover:bg-transparent">
-                  <TableCell colSpan={4} className="py-16 text-center">
-                    <div className="mx-auto max-w-sm space-y-2">
-                      <p className="text-base font-semibold text-slate-800">No countries found</p>
-                      <p className="text-sm text-slate-500">
-                        Try adjusting your search term or clear the filter to see all countries.
-                      </p>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                countries.map((country) => (
-                  <TableRow
-                    key={country.id}
-                    className="border-slate-100 transition-colors hover:bg-slate-50/70"
-                  >
-                    <TableCell className="py-3.5">
-                      <Link
-                        href={`/admin/countries/${country.id}`}
-                        className="group inline-flex items-center gap-3 font-medium text-slate-900"
-                      >
-                        <CountryFlag code={country.id} className="size-6 shrink-0 rounded-sm" round={false} />
-                        <span className="transition-colors group-hover:text-primary">{country.name}</span>
-                      </Link>
-                    </TableCell>
-                    <TableCell className="py-3.5">
-                      <span className="inline-flex rounded-md border border-slate-200 bg-slate-50 px-2 py-1 font-mono text-xs font-semibold tracking-wide text-slate-700">
-                        {country.id}
-                      </span>
-                    </TableCell>
-                    <TableCell className="py-3.5">
-                      <span
-                        className={
-                          country.is_disabled
-                            ? "inline-flex rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700"
-                            : "inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700"
-                        }
-                      >
-                        {country.is_disabled ? "Disabled" : "Active"}
-                      </span>
-                    </TableCell>
-                    <TableCell className="py-3.5 text-right">
-                      <Link
-                        href={`/admin/countries/${country.id}`}
-                        className="rounded-md px-2 py-1 text-sm font-medium text-primary transition-colors hover:bg-primary/10"
-                      >
-                        View
-                      </Link>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-          <div className="flex flex-col gap-3 border-t border-slate-200 bg-slate-50/60 px-4 py-3 text-sm md:flex-row md:items-center md:justify-between md:px-6">
-            <p className="text-slate-600">
-              Showing{" "}
-              <span className="font-semibold text-slate-900">
-                {fromItem}-{toItem}
-              </span>{" "}
-              of <span className="font-semibold text-slate-900">{total}</span>
-            </p>
-            <div className="flex items-center gap-2">
-              <span className="mr-1 text-slate-500">
-                Page {currentPage} of {totalPages}
-              </span>
-              {currentPage > 1 ? (
-                <Link
-                  href={getPageHref(currentPage - 1)}
-                  className="inline-flex h-9 items-center rounded-md border border-slate-200 bg-white px-3 font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
-                >
-                  Previous
-                </Link>
-              ) : (
-                <span className="inline-flex h-9 items-center rounded-md border border-slate-200 bg-slate-100 px-3 font-medium text-slate-400">
-                  Previous
-                </span>
-              )}
-              {currentPage < totalPages ? (
-                <Link
-                  href={getPageHref(currentPage + 1)}
-                  className="inline-flex h-9 items-center rounded-md border border-slate-900 bg-slate-900 px-3 font-medium text-white shadow-sm transition hover:bg-slate-800"
-                >
-                  Next
-                </Link>
-              ) : (
-                <span className="inline-flex h-9 items-center rounded-md border border-slate-200 bg-slate-100 px-3 font-medium text-slate-400">
-                  Next
-                </span>
-              )}
+          {countries.length === 0 ? (
+            <div className="flex flex-col items-center justify-center px-6 py-20 text-center">
+              <div className="mb-4 flex size-14 items-center justify-center rounded-full bg-muted/20 text-secondary-copy">
+                <SearchIcon className="size-6" />
+              </div>
+              <h3 className="text-sm font-semibold text-primary-copy">
+                No countries found
+              </h3>
+              <p className="mt-1 max-w-xs text-sm text-secondary-copy">
+                Try adjusting your search term or filters to find what you&apos;re
+                looking for.
+              </p>
             </div>
-          </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow className="border-border-default bg-bg-light-grey/60 hover:bg-bg-light-grey/60">
+                  <TableHead className="w-[50px] pl-4 text-[11px] font-semibold uppercase tracking-widest text-secondary-copy md:pl-5">
+                    #
+                  </TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-widest text-secondary-copy">
+                    Country
+                  </TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-widest text-secondary-copy">
+                    Code
+                  </TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-widest text-secondary-copy">
+                    Status
+                  </TableHead>
+                  <TableHead className="hidden text-[11px] font-semibold uppercase tracking-widest text-secondary-copy lg:table-cell">
+                    Last Updated
+                  </TableHead>
+                  <TableHead className="w-[100px] pr-4 text-right text-[11px] font-semibold uppercase tracking-widest text-secondary-copy md:pr-5">
+                    Actions
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {countries.map((country, index) => {
+                  const rowNumber = fromItem + index
+                  const updatedDate = country.updated_at
+                    ? new Date(country.updated_at)
+                    : null
+
+                  return (
+                    <TableRow
+                      key={country.id}
+                      className="group border-border-default/60 transition-colors hover:bg-primary/[0.02]"
+                    >
+                      <TableCell className="w-[50px] pl-4 text-xs tabular-nums text-secondary-copy md:pl-5">
+                        {rowNumber}
+                      </TableCell>
+                      <TableCell className="py-3">
+                        <Link
+                          href={`/admin/countries/${country.id}`}
+                          className="group/link inline-flex items-center gap-3"
+                        >
+                          <CountryFlag
+                            code={country.id}
+                            className="size-7 shrink-0 rounded shadow-sm ring-1 ring-black/5"
+                            round={false}
+                          />
+                          <span className="font-medium text-primary-copy transition-colors group-hover/link:text-primary">
+                            {country.name}
+                          </span>
+                        </Link>
+                      </TableCell>
+                      <TableCell className="py-3">
+                        <code className="rounded bg-bg-light-grey px-1.5 py-0.5 font-mono text-xs font-medium text-secondary-copy">
+                          {country.id}
+                        </code>
+                      </TableCell>
+                      <TableCell className="py-3">
+                        <CountryStatusToggle
+                          countryId={country.id}
+                          countryName={country.name}
+                          isDisabled={country.is_disabled}
+                        />
+                      </TableCell>
+                      <TableCell className="hidden py-3 lg:table-cell">
+                        {updatedDate ? (
+                          <span
+                            className="text-xs text-secondary-copy"
+                            title={updatedDate.toISOString()}
+                          >
+                            {updatedDate.toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-secondary-copy/50">
+                            &mdash;
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell className="py-3 pr-4 text-right md:pr-5">
+                        <Link
+                          href={`/admin/countries/${country.id}`}
+                          className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border-default bg-white px-3 text-xs font-medium text-primary-copy shadow-sm transition-all hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
+                        >
+                          <Eye className="size-3.5" />
+                          <span className="hidden sm:inline">View</span>
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          )}
+
+          {/* Pagination */}
+          {countries.length > 0 && (
+            <div className="flex flex-col gap-3 border-t border-border-default bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between md:px-5">
+              <p className="text-xs text-secondary-copy">
+                Showing{" "}
+                <span className="font-medium text-primary-copy">
+                  {fromItem}&ndash;{toItem}
+                </span>{" "}
+                of{" "}
+                <span className="font-medium text-primary-copy">{total}</span>{" "}
+                countries
+              </p>
+              <div className="flex items-center gap-1">
+                {/* First page */}
+                {currentPage > 2 && (
+                  <PaginationLink href={getPageHref(1)} disabled={false}>
+                    <ChevronsLeft className="size-4" />
+                  </PaginationLink>
+                )}
+                {/* Prev */}
+                <PaginationLink
+                  href={getPageHref(currentPage - 1)}
+                  disabled={currentPage <= 1}
+                >
+                  <ChevronLeft className="size-4" />
+                </PaginationLink>
+
+                {/* Page numbers */}
+                {visiblePages[0] > 1 && (
+                  <span className="flex size-8 items-center justify-center text-xs text-secondary-copy">
+                    ...
+                  </span>
+                )}
+                {visiblePages.map((p) => (
+                  <PaginationLink
+                    key={p}
+                    href={getPageHref(p)}
+                    disabled={false}
+                    active={p === currentPage}
+                  >
+                    {p}
+                  </PaginationLink>
+                ))}
+                {visiblePages[visiblePages.length - 1] < totalPages && (
+                  <span className="flex size-8 items-center justify-center text-xs text-secondary-copy">
+                    ...
+                  </span>
+                )}
+
+                {/* Next */}
+                <PaginationLink
+                  href={getPageHref(currentPage + 1)}
+                  disabled={currentPage >= totalPages}
+                >
+                  <ChevronRight className="size-4" />
+                </PaginationLink>
+                {/* Last page */}
+                {currentPage < totalPages - 1 && (
+                  <PaginationLink
+                    href={getPageHref(totalPages)}
+                    disabled={false}
+                  >
+                    <ChevronsRight className="size-4" />
+                  </PaginationLink>
+                )}
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+function PaginationLink({
+  href,
+  disabled,
+  active,
+  children,
+}: {
+  href: string
+  disabled: boolean
+  active?: boolean
+  children: React.ReactNode
+}) {
+  if (disabled) {
+    return (
+      <span className="flex size-8 items-center justify-center rounded-lg text-xs text-secondary-copy/40">
+        {children}
+      </span>
+    )
+  }
+
+  return (
+    <Link
+      href={href}
+      className={
+        active
+          ? "flex size-8 items-center justify-center rounded-lg bg-primary text-xs font-semibold text-white shadow-sm"
+          : "flex size-8 items-center justify-center rounded-lg border border-transparent text-xs font-medium text-primary-copy transition-colors hover:border-border-default hover:bg-bg-light-grey"
+      }
+    >
+      {children}
+    </Link>
   )
 }

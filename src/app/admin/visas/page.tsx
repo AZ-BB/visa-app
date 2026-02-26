@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { CountryFlag } from "@/components/ui/country-flag"
+import { VisaStatusToggle } from "./_components/visa-status-toggle"
 
 export default async function VisasPage({
   searchParams,
@@ -128,15 +129,11 @@ export default async function VisasPage({
                       / {visa.max_stay} days
                     </TableCell>
                     <TableCell className="py-3">
-                      <span
-                        className={
-                          visa.is_disabled
-                            ? "text-amber-600"
-                            : "text-emerald-600"
-                        }
-                      >
-                        {visa.is_disabled ? "Disabled" : "Active"}
-                      </span>
+                      <VisaStatusToggle
+                        visaId={visa.id}
+                        visaName={visa.name}
+                        isDisabled={visa.is_disabled}
+                      />
                     </TableCell>
                     <TableCell className="py-3 text-right">
                       <Link
