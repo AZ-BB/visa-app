@@ -27,31 +27,51 @@ export function CountriesSearchForm({
     } else {
       params.delete("search")
     }
-    router.push(`/admin/countries?${params.toString()}`)
+    const queryString = params.toString()
+    router.push(queryString ? `/admin/countries?${queryString}` : "/admin/countries")
   }, [value, router, searchParams])
 
   return (
     <form
-      className={cn("flex gap-2", className)}
+      className={cn("flex flex-col gap-3 sm:flex-row sm:items-center", className)}
       onSubmit={(e) => {
         e.preventDefault()
         submit()
       }}
     >
-      <div className="relative flex-1 max-w-sm">
-        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+      <div className="relative flex-1 sm:max-w-md">
+        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
         <Input
           type="search"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="Search by name or code..."
           aria-label="Search countries"
-          className="h-9 pl-9"
+          className="h-10 rounded-lg border-slate-200 bg-white pl-9 shadow-sm transition focus-visible:border-primary/60 focus-visible:ring-primary/20"
         />
       </div>
-      <Button type="submit" size="sm">
+      <Button
+        type="submit"
+        className="h-10 rounded-lg bg-slate-900 px-4 text-white shadow-sm transition hover:bg-slate-800"
+      >
         Search
       </Button>
+      {value ? (
+        <Button
+          type="button"
+          variant="ghost"
+          className="h-10 rounded-lg px-3 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+          onClick={() => {
+            setValue("")
+            const params = new URLSearchParams(searchParams.toString())
+            params.delete("search")
+            const queryString = params.toString()
+            router.push(queryString ? `/admin/countries?${queryString}` : "/admin/countries")
+          }}
+        >
+          Clear
+        </Button>
+      ) : null}
     </form>
   )
 }
