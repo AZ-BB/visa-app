@@ -1,5 +1,13 @@
 "use server"
+import { Tables } from "@/database.types";
 import { createSupabaseServerClient } from "./supabase/supabase-server"
+
+export type AuthUser = {
+    authUser: Awaited<ReturnType<Awaited<ReturnType<typeof createSupabaseServerClient>>["auth"]["getUser"]>>["data"]["user"];
+    profile: Tables<"profiles"> | null;
+    admin: Tables<"admin"> | null;
+    role: string | null;
+} | null
 
 export async function getUser() {
     const supabase = await createSupabaseServerClient()
@@ -46,7 +54,7 @@ export async function getUser() {
 
     return {
         authUser: user,
-        profile: profileData,
+        profile: profileData[0] ?? null,
         admin: admin,
         role: role,
     }

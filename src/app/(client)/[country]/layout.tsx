@@ -1,8 +1,7 @@
 import { createSupabaseServerClient } from "@/lib/supabase/supabase-server";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
-export default async function CountryPage({ params }: { params: Promise<{ country: string }> }) {
-
+export default async function CountryLayout({ children, params }: { children: React.ReactNode, params: Promise<{ country: string }> }) {
     const { country } = await params;
 
     const supabase = await createSupabaseServerClient();
@@ -13,5 +12,9 @@ export default async function CountryPage({ params }: { params: Promise<{ countr
         return notFound();
     }
 
-    return redirect(`/${country}/apply`);
+    return (
+        <div>
+            {children}
+        </div>
+    )
 }

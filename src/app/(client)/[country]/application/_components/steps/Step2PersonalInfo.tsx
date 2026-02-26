@@ -13,11 +13,10 @@ import { cn } from "@/lib/utils";
 import {
   defaultTraveller,
   useApplicationOrder,
-  type Traveller as TravellerType,
+  type TempTraveller,
 } from "../ApplicationOrderContext";
 import { DatePicker } from "@/components/ui/date-picker";
 import { parseISO } from "date-fns";
-import { YesNoRadioGroup } from "@/components/YesNoRadioGroup";
 import TipCard from "@/components/TipCard";
 import { Separator } from "@/components/ui/separator";
 import ArrowButton from "@/components/ArrowButton";
@@ -74,8 +73,8 @@ function TravellerFields({
 }: {
   idPrefix: string;
   index: number;
-  traveller: TravellerType;
-  onUpdate: (patch: Partial<TravellerType>) => void;
+  traveller: TempTraveller;
+  onUpdate: (patch: Partial<TempTraveller>) => void;
   errors?: Record<string, string> | null;
 }) {
   const field = (key: string) => errors?.[`traveller_${index}_${key}`];
@@ -92,13 +91,13 @@ function TravellerFields({
           id={`${idPrefix}-first-name`}
           type="text"
           placeholder="Joe"
-          value={traveller.firstName}
-          onChange={(e) => onUpdate({ firstName: e.target.value })}
-          className={field("firstName") ? "border-red-500" : ""}
-          aria-invalid={!!field("firstName")}
+          value={traveller.first_name}
+          onChange={(e) => onUpdate({ first_name: e.target.value })}
+          className={field("first_name") ? "border-red-500" : ""}
+          aria-invalid={!!field("first_name")}
         />
-        {field("firstName") && (
-          <p className="mt-1.5 text-sm text-red-600">{field("firstName")}</p>
+        {field("first_name") && (
+          <p className="mt-1.5 text-sm text-red-600">{field("first_name")}</p>
         )}
       </div>
       <div>
@@ -112,13 +111,13 @@ function TravellerFields({
           id={`${idPrefix}-last-name`}
           type="text"
           placeholder="Smith"
-          value={traveller.lastName}
-          onChange={(e) => onUpdate({ lastName: e.target.value })}
-          className={field("lastName") ? "border-red-500" : ""}
-          aria-invalid={!!field("lastName")}
+          value={traveller.last_name}
+          onChange={(e) => onUpdate({ last_name: e.target.value })}
+          className={field("last_name") ? "border-red-500" : ""}
+          aria-invalid={!!field("last_name")}
         />
-        {field("lastName") && (
-          <p className="mt-1.5 text-sm text-red-600">{field("lastName")}</p>
+        {field("last_name") && (
+          <p className="mt-1.5 text-sm text-red-600">{field("last_name")}</p>
         )}
       </div>
       <div>
@@ -131,26 +130,14 @@ function TravellerFields({
         <div className="relative">
           <DatePicker
             id={`${idPrefix}-dob`}
-            value={traveller.dateOfBirth ? parseISO(traveller.dateOfBirth) : undefined}
-            onValueChange={(date) => onUpdate({ dateOfBirth: date ? date.toISOString() : "" })}
+            value={traveller.date_of_birth ? parseISO(traveller.date_of_birth) : undefined}
+            onValueChange={(date) => onUpdate({ date_of_birth: date ? date.toISOString().split("T")[0] ?? "" : "" })}
             placeholder="DD MM YYYY"
             disableAfterToday={true}
           />
         </div>
-        {field("dateOfBirth") && (
-          <p className="mt-1.5 text-sm text-red-600">{field("dateOfBirth")}</p>
-        )}
-      </div>
-      <div>
-        <p className="block text-base font-medium text-primary-copy mb-3">
-          Have you been denied a visa in the last 6 months?
-        </p>
-        <YesNoRadioGroup
-          value={traveller.deniedVisaLast6Months}
-          onChange={(value) => onUpdate({ deniedVisaLast6Months: value })}
-        />
-        {field("deniedVisaLast6Months") && (
-          <p className="mt-1.5 text-sm text-red-600">{field("deniedVisaLast6Months")}</p>
+        {field("date_of_birth") && (
+          <p className="mt-1.5 text-sm text-red-600">{field("date_of_birth")}</p>
         )}
       </div>
     </div>
@@ -161,7 +148,7 @@ export function Step2PersonalInfo({ onNext, onBack, errors }: Step2PersonalInfoP
   const { order, updateOrder } = useApplicationOrder();
   const { travellers } = order;
 
-  const updateTraveller = (index: number, patch: Partial<TravellerType>) => {
+  const updateTraveller = (index: number, patch: Partial<TempTraveller>) => {
     updateOrder({
       travellers: travellers.map((t, i) => (i === index ? { ...t, ...patch } : t)),
     });

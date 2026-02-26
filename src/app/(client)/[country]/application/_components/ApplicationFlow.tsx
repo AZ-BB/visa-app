@@ -9,6 +9,7 @@ import { Step4TurnaroundTime } from "./steps/Step4TurnaroundTime"
 import { Step3BusinessInfo } from "./steps/Step3BusinessInfo"
 import { Step5Checkout } from "./steps/Step5Checkout"
 import { validateStep, type StepId as ValidationStepId } from "./applicationStepValidation"
+import { AuthUser } from "@/lib/get-user"
 
 const MIN_STEP = 1
 const MAX_STEP = 5

@@ -26,7 +26,6 @@ export function Step1TripDetails({
   errors,
 }: Step1TripDetailsProps) {
   const { order, updateOrder } = useApplicationOrder()
-  const { tripDetails } = order
 
   const countryName = getCountryNameFromCode(country)
 
@@ -50,16 +49,13 @@ export function Step1TripDetails({
               <DatePicker
                 id="arrival-date"
                 value={
-                  tripDetails.arrivalDate
-                    ? parseISO(tripDetails.arrivalDate)
+                  order.arrival_date
+                    ? parseISO(order.arrival_date)
                     : undefined
                 }
                 onValueChange={(date) =>
                   updateOrder({
-                    tripDetails: {
-                      ...tripDetails,
-                      arrivalDate: date ? date.toISOString() : "",
-                    },
+                    arrival_date: date ? date.toISOString().split("T")[0] ?? "" : "",
                   })
                 }
                 placeholder="DD MM YYYY"
@@ -90,10 +86,10 @@ export function Step1TripDetails({
               id="email"
               type="email"
               placeholder="josh.hadley@company.co.uk"
-              value={tripDetails.email}
+              value={order.contact_email}
               onChange={(e) =>
                 updateOrder({
-                  tripDetails: { ...tripDetails, email: e.target.value },
+                  contact_email: e.target.value,
                 })
               }
               className={errors?.email ? "border-red-500" : ""}
@@ -149,7 +145,7 @@ export function Step1TripDetails({
 
           <div className="flex justify-between text-base">
             <span className="text-secondary-copy">Visa fee</span>
-            <span className="font-medium">£{order.costs.visaFee || 50}</span>
+            <span className="font-medium">£{order.price || 50}</span>
           </div>
         </div>
 

@@ -299,7 +299,7 @@ export default async function ApplicationDetailPage({
     const travellers = application?.travellers ?? [];
 
     return (
-        <div className="min-h-screen bg-bg-light-grey pt-6 sm:pt-16 pb-12 px-6">
+        <div className="min-h-screen bg-bg-light-grey pt-6 sm:pt-12 pb-12 px-6">
             <div className="max-w-3xl mx-auto">
                 <Link
                     href="/applications"

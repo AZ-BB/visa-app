@@ -22,66 +22,65 @@ import { Minus, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import TipCard from "@/components/TipCard"
-import { VisaType } from "@/actions/visas"
 import { ResumeApplicationBanner } from "./ResumeApplicationBanner"
-
-const VISA_OPTIONS = [
-  { value: "tourist", label: "Tourist visa" },
-  { value: "business", label: "Business visa" },
-] as const
+import { Tables } from "@/database.types"
+import { AuthUser } from "@/lib/get-user"
 
 interface ApplyFormSectionProps {
-  destinationCountry: string
-  destinationCountryName: string
-  passportCountry: string
-  passportCountryName: string
-  validFor: string
-  numberOfEntries: string
-  maxStay: string
-  visaOptions: VisaType[]
+  user: AuthUser;
+  products: (Tables<"products"> & { visa: Tables<"visa_types"> })[]
+  destinationCountry: Tables<"countries">
+  passportCountry: Tables<"countries">
+  rules: Tables<"visa_rules">
 }
 
 export function ApplyFormSection({
+  user,
   destinationCountry,
-  destinationCountryName,
   passportCountry,
-  passportCountryName,
-  visaOptions,
+  rules,
+  products,
 }: ApplyFormSectionProps) {
   const router = useRouter()
-  const [nationality, setNationality] = useState<string>(passportCountry ?? "")
-  const [visaTypeValue, setVisaTypeValue] = useState<string>(
-    visaOptions[0]?.id ?? "",
-  )
+
+  const [selectedProductId, setSelectedProductId] = useState<string>(products[0]?.id.toString() ?? "")
   const [numberOfTravellers, setNumberOfTravellers] = useState<number>(1)
-  const selectedVisa = visaOptions.find((o) => o.id === visaTypeValue)
 
   const handleStartApplication = () => {
+    const selectedProduct = products.find((p) => p.id.toString() === selectedProductId)
     const count = Math.min(20, Math.max(1, numberOfTravellers))
     const travellers = Array.from({ length: count }, () => ({
       ...defaultTraveller,
-      passportDestination: destinationCountry,
+      nationality: passportCountry.id,
     }))
+
+    if (user?.profile) {
+      travellers[0].first_name = user.profile.first_name
+      travellers[0].last_name = user.profile.last_name
+    }
+
     const order: ApplicationOrder = {
       ...defaultOrder,
-      destinationCountry: destinationCountry,
-      nationality,
-      visaType: selectedVisa?.name ?? "",
+      product_id: selectedProduct?.id ?? null,
+      destination_country: destinationCountry.id,
+      nationality: passportCountry.id,
+      price: selectedProduct?.price ?? 0,
       travellers,
+      contact_email: user?.authUser?.email ?? "",
     }
     setStoredOrder(order)
-    router.push(`/${destinationCountry}/application`)
+    router.push(`/${destinationCountry.id}/application`)
   }
+
   function handleNationalityChange(value: string) {
-    setNationality(value)
-    router.push(`/${destinationCountry}/apply?from=${value}`)
+    router.push(`/${destinationCountry.id}/apply?from=${value}`)
   }
 
   return (
     <>
       <h2 className="text-2xl md:text-4xl font-bold">
-        Apply for your {destinationCountryName}{" "}
-        {selectedVisa?.name ?? ""}
+        Apply for your {destinationCountry.name}{" "}
+        {products[0]?.visa?.name ?? ""}
       </h2>
 
       <ResumeApplicationBanner />
@@ -90,8 +89,8 @@ export function ApplyFormSection({
           <TipCard>
             <span>
               A visa is <span className="font-semibold">required</span> when
-              travelling to {destinationCountryName} with a passport from{" "}
-              {passportCountryName}.
+              travelling to {destinationCountry.name} with a passport from{" "}
+              {passportCountry.name}.
             </span>
           </TipCard>
 
@@ -105,7 +104,7 @@ export function ApplyFormSection({
             </div>
             <CountryDropdown
               className="py-4"
-              value={nationality}
+              value={passportCountry.id}
               onValueChange={handleNationalityChange}
               placeholder="Choose nationality"
             />
@@ -113,14 +112,14 @@ export function ApplyFormSection({
 
           <div className="space-y-3">
             <h3 className="text-lg font-semibold">Which visa do you need?</h3>
-            <Select value={visaTypeValue} onValueChange={setVisaTypeValue}>
+            <Select value={selectedProductId} onValueChange={setSelectedProductId}>
               <SelectTrigger className="py-4">
                 <SelectValue placeholder="Select a visa" />
               </SelectTrigger>
               <SelectContent>
-                {visaOptions.map((opt) => (
-                  <SelectItem key={opt.id} value={opt.id}>
-                    {opt.name}
+                {products.map((product) => (
+                  <SelectItem key={`product-${product.id}`} value={product.id.toString()}>
+                    {product.visa.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -140,9 +139,9 @@ export function ApplyFormSection({
                 disabled={numberOfTravellers <= 1}
                 onClick={() => setNumberOfTravellers((n) => Math.max(1, n - 1))}
                 className={cn(
-                  "size-12 rounded-2xl border-2 border-border-default shadow-sm",
+                  "size-12 rounded-2xl border-2 border-border-default shadow-sm hover:text-primary",
                   numberOfTravellers <= 1
-                    ? "bg-muted/50 text-muted-foreground border-border-default/50"
+                    ? "bg-muted/30 text-muted-foreground border-border-default/70"
                     : "bg-white hover:bg-gray-50 text-primary-copy",
                 )}
               >
@@ -164,7 +163,7 @@ export function ApplyFormSection({
                   setNumberOfTravellers((n) => Math.min(20, n + 1))
                 }
                 className={cn(
-                  "size-12 rounded-2xl border-2 border-border-default bg-white shadow-sm hover:bg-gray-50 text-primary-copy",
+                  "size-12 rounded-2xl border-2 border-border-default bg-white shadow-sm hover:bg-gray-50 text-primary-copy hover:text-primary",
                   numberOfTravellers >= 20 && "opacity-50",
                 )}
               >
@@ -187,7 +186,7 @@ export function ApplyFormSection({
         <div className="w-1/3">
           <div className="bg-white rounded-2xl p-5 shadow-sm border border-border-default/50">
             <h3 className="text-xl font-semibold">
-              {destinationCountryName} {selectedVisa?.name ?? ""}
+              {destinationCountry.name} {products[0]?.visa?.name ?? ""}
             </h3>
             <Separator className="my-4" />
             <div className="space-y-5">
@@ -221,7 +220,7 @@ export function ApplyFormSection({
                 <div>
                   <p className="text-secondary-copy text-sm">Valid for</p>
                   <p className="text-base font-semibold">
-                    {selectedVisa?.validFor ?? ""} after issue
+                    {products.find((product) => product.id.toString() === selectedProductId)?.visa.valid_for ?? ""} after issue
                   </p>
                 </div>
               </div>
@@ -257,7 +256,7 @@ export function ApplyFormSection({
                     Number of entries
                   </p>
                   <p className="text-base font-semibold">
-                    {selectedVisa?.numberOfEntries ?? ""}
+                    {products.find((product) => product.id.toString() === selectedProductId)?.visa.number_of_entries ?? ""}
                   </p>
                 </div>
               </div>
@@ -291,7 +290,7 @@ export function ApplyFormSection({
                 <div>
                   <p className="text-secondary-copy text-sm">Max stay</p>
                   <p className="text-base font-semibold">
-                    {selectedVisa?.maxStay ?? ""} per entry
+                    {products.find((product) => product.id.toString() === selectedProductId)?.visa.max_stay ?? ""} per entry
                   </p>
                 </div>
               </div>

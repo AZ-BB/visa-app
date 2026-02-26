@@ -9,8 +9,82 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import type { Tables, Enums } from "@/database.types";
 
 const APPLICATION_ORDER_STORAGE_KEY = "visa-application-order";
+
+/** Temp traveller: DB travellers table without id, application_id */
+export type TempTraveller = Omit<Tables<"travellers">, "id" | "application_id" | "created_at" | "updated_at">;
+
+export type ApplicationStepId = 1 | 2 | 3 | 4 | 5;
+
+/** Temp order: DB applications fields (no id, profile_id) + destination_country, nationality for routing + travellers + currentStep */
+export interface ApplicationOrder {
+  product_id: number | null;
+  assigned_to: string | null;
+  turnaround_time_id: number;
+  turnaround_time_cost: number;
+  price: number;
+  contact_email: string;
+  status: Enums<"application_status">;
+  arrival_date: string;
+  /** For routing (from apply flow). */
+  destination_country: string;
+  /** For default traveller nationality (from apply flow). */
+  nationality: string;
+  travellers: TempTraveller[];
+  currentStep?: ApplicationStepId;
+}
+
+/** Migrate old stored shape to new DB-aligned shape */
+function migrateStoredOrder(parsed: unknown): ApplicationOrder {
+  const raw = parsed as Record<string, unknown>;
+  const order = { ...defaultOrder, ...raw } as ApplicationOrder;
+  if (order.travellers?.length) {
+    order.travellers = order.travellers.map((t) => {
+      const traveller = t as unknown as Record<string, unknown>;
+      // Migrate camelCase -> snake_case
+      if (traveller.firstName != null && traveller.first_name == null) {
+        return {
+          nationality: traveller.nationality ?? "",
+          first_name: traveller.firstName ?? "",
+          last_name: traveller.lastName ?? "",
+          date_of_birth: traveller.dateOfBirth ?? "",
+          passport_number: traveller.passportNumber ?? "",
+          passport_expiry_date: traveller.passportExpiryDate ?? "",
+          country_of_birth: traveller.countryOfBirth ?? "",
+          country_of_residence: traveller.countryOfResidence ?? "",
+        } as TempTraveller;
+      }
+      // Migrate passportDestination -> nationality
+      if (traveller.passportDestination != null && traveller.nationality == null) {
+        return { ...traveller, nationality: traveller.passportDestination } as unknown as TempTraveller;
+      }
+      return t as TempTraveller;
+    });
+  }
+  if (order.product_id == null && (raw as { productId?: number }).productId != null) {
+    order.product_id = (raw as { productId: number }).productId;
+  }
+  if (order.destination_country == null && (raw as { destinationCountry?: string }).destinationCountry != null) {
+    order.destination_country = (raw as { destinationCountry: string }).destinationCountry;
+  }
+  const tripDetails = (raw as { tripDetails?: { arrivalDate?: string; email?: string } }).tripDetails;
+  if (tripDetails) {
+    if (tripDetails.arrivalDate && !order.arrival_date) {
+      order.arrival_date = tripDetails.arrivalDate.split("T")[0] ?? tripDetails.arrivalDate;
+    }
+    if (tripDetails.email && !order.contact_email) {
+      order.contact_email = tripDetails.email;
+    }
+  }
+  const oldTurnaround = (raw as { turnaroundTime?: string }).turnaroundTime;
+  if (oldTurnaround && order.turnaround_time_id === 1) {
+    const map: Record<string, number> = { standard: 1, fast: 2, superfast: 3 };
+    order.turnaround_time_id = map[oldTurnaround] ?? 1;
+  }
+  return order;
+}
 
 export function getStoredOrder(): ApplicationOrder | null {
   if (typeof window === "undefined") return null;
@@ -18,7 +92,9 @@ export function getStoredOrder(): ApplicationOrder | null {
     const raw = localStorage.getItem(APPLICATION_ORDER_STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as unknown;
-    if (parsed && typeof parsed === "object") return parsed as ApplicationOrder;
+    if (parsed && typeof parsed === "object") {
+      return migrateStoredOrder(parsed);
+    }
   } catch {
     // ignore
   }
@@ -34,79 +110,29 @@ export function setStoredOrder(order: ApplicationOrder): void {
   }
 }
 
-// --- Order type: one object for the whole application flow
-
-export interface TripDetails {
-  arrivalDate: string;
-  email: string;
-}
-
-/** One traveller: personal info (Step 2) + passport info (Step 3) for the same person */
-export interface Traveller {
-  // Personal info
-  firstName: string;
-  lastName: string;
-  dateOfBirth: string;
-  deniedVisaLast6Months: boolean;
-  // Passport info (same person)
-  passportDestination: string;
-  passportNumber: string;
-  passportExpiryDate: string;
-  countryOfBirth: string;
-  countryOfResidence: string;
-}
-
-export type TurnaroundTimeId = "standard" | "fast" | "superfast";
-
-export interface Costs {
-  visaFee: number | null;
-  turnaroundCost: number | null;
-  total: number | null;
-}
-
-export type ApplicationStepId = 1 | 2 | 3 | 4 | 5;
-
-export interface ApplicationOrder {
-  destinationCountry: string;
-  nationality: string;
-  visaType: string;
-  tripDetails: TripDetails;
-  travellers: Traveller[];
-  turnaroundTime: TurnaroundTimeId;
-  costs: Costs;
-  readyByDate: string;
-  /** Last step the user was on (1–5). Used to resume application. */
-  currentStep?: ApplicationStepId;
-}
-
-export const defaultTraveller: Traveller = {
-  firstName: "",
-  lastName: "",
-  dateOfBirth: "",
-  deniedVisaLast6Months: false,
-  passportDestination: "",
-  passportNumber: "",
-  passportExpiryDate: "",
-  countryOfBirth: "",
-  countryOfResidence: "",
+export const defaultTraveller: TempTraveller = {
+  nationality: "",
+  first_name: "",
+  last_name: "",
+  date_of_birth: "",
+  passport_number: "",
+  passport_expiry_date: "",
+  country_of_birth: "",
+  country_of_residence: "",
 };
 
 export const defaultOrder: ApplicationOrder = {
-  destinationCountry: "",
+  product_id: null,
+  assigned_to: null,
+  turnaround_time_id: 1,
+  turnaround_time_cost: 0,
+  price: 0,
+  contact_email: "",
+  status: "NOT_STARTED",
+  arrival_date: new Date().toISOString().split("T")[0] ?? "",
+  destination_country: "",
   nationality: "",
-  visaType: "",
-  tripDetails: {
-    arrivalDate: new Date().toISOString(),
-    email: "",
-  },
   travellers: [{ ...defaultTraveller }],
-  turnaroundTime: "standard",
-  costs: {
-    visaFee: null,
-    turnaroundCost: null,
-    total: null,
-  },
-  readyByDate: "",
   currentStep: 1,
 };
 
