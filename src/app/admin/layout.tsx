@@ -6,9 +6,9 @@ export default function AdminLayout({
   children: React.ReactNode
 }>) {
   return (
-    <main className="min-h-screen bg-bg-light-grey">
+    <main className="min-h-screen w-full overflow-x-hidden bg-bg-light-grey ">
       <AdminNavbar />
-      <div className="mx-auto w-[100vw] px-4 py-6 sm:px-6">
+      <div className="mx-auto w-full px-4 py-6 sm:px-6">
         {children}
       </div>
     </main>
