@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
 import { Poppins } from "next/font/google"
 import "./globals.css"
-import { Footer } from "@/components/layout/Footer"
-import { Navbar } from "@/components/layout/Navbar"
+import { TooltipProvider } from "@/components/ui/tooltip"
+
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
@@ -23,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.variable} antialiased`}>
-        {children}
+        <TooltipProvider>{children}</TooltipProvider>
       </body>
     </html>
   )
