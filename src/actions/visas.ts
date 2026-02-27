@@ -35,6 +35,21 @@ export async function getAllVisaTypesForDestination(countryId: string): Promise<
     return { data: data.sort((a, b) => a.name.localeCompare(b.name)) };
 }
 
+export async function fetchVisaById(id: number): Promise<GeneralResponse<VisaType>> {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
+        .from("visa_types")
+        .select("*, destination_country_data:countries!destination_country(*)")
+        .eq("id", id)
+        .is("deleted_at", null)
+        .single();
+    if (error) {
+        return { error: error.message };
+    }
+    return { data: data };
+}
+
+
 export async function updateVisaTypeDisabledStatus(id: number, isDisabled: boolean): Promise<{ success: boolean; error?: string }> {
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase

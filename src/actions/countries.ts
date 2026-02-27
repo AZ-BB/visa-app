@@ -77,6 +77,18 @@ export async function fetchCountryById(id: string): Promise<GeneralResponse<Coun
   return { data }
 }
 
+// Not paginated list of all countries
+export async function fetchAllCountriesList(): Promise<GeneralResponse<{ id: string; name: string }[]>> {
+  const supabase = await createSupabaseServerClient()
+  const { data, error } = await supabase
+    .from("countries")
+    .select("id, name")
+    .order("name", { ascending: true })
+  if (error) {
+    return { error: error.message }
+  }
+  return { data: data ?? [] }
+}
 
 export async function updateCountryDisabledStatus(
   countryId: string,
