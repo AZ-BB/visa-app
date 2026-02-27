@@ -140,6 +140,8 @@ export default async function VisaDetailPage({
             {v.number_of_entries === -1 ? "Multiple" : v.number_of_entries}
           </DetailRow>
           <DetailRow label="Max stay">{v.max_stay} days</DetailRow>
+          <DetailRow label="Processing fee">{v.processing_fee}</DetailRow>
+          <DetailRow label="Gov fee">{v.gov_fee}</DetailRow>
           <DetailRow label="Status">
             <VisaStatusToggle
               visaId={v.id}
@@ -213,7 +215,13 @@ export default async function VisaDetailPage({
                     Nationality
                   </th>
                   <th className="py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
-                    Price
+                    Processing fee
+                  </th>
+                  <th className="py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                    Gov fee
+                  </th>
+                  <th className="py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                    Total price
                   </th>
                   <th className="py-3 pr-5 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     Product status
@@ -251,12 +259,24 @@ export default async function VisaDetailPage({
 
                       <td className="py-3.5 pr-2">
                         <span className="font-medium tabular-nums text-primary-copy">
-                          ${Number(product.price).toFixed(2)}
+                          ${product.gov_fee_override ? Number(product.gov_fee_override).toFixed(2) : v.gov_fee}
+                        </span>
+                      </td>
+
+                      <td className="py-3.5 pr-2">
+                        <span className="font-medium tabular-nums text-primary-copy">
+                          ${product.processing_fee_override ? Number(product.processing_fee_override).toFixed(2) : v.processing_fee}
                         </span>
                       </td>
 
 
-                      <td className="py-3.5 pr-5">
+                      <td className="py-3.5 pr-2">
+                        <span className="font-medium tabular-nums text-primary-copy">
+                          ${(product.gov_fee_override || v.gov_fee) + (product.processing_fee_override || v.processing_fee)}
+                        </span>
+                      </td>
+                      
+                      <td className="py-3.5 pr-5"> 
                         {product.is_disabled ? (
                           <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-200/80">
                             <span className="size-1.5 rounded-full bg-amber-500" />

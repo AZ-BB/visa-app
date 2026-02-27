@@ -139,9 +139,10 @@ export type Database = {
         Row: {
           created_at: string
           deleted_at: string | null
+          gov_fee_override: number | null
           id: number
           is_disabled: boolean
-          price: number
+          processing_fee_override: number | null
           updated_at: string
           visa_rule_id: number
           visa_type_id: number
@@ -149,9 +150,10 @@ export type Database = {
         Insert: {
           created_at?: string
           deleted_at?: string | null
+          gov_fee_override?: number | null
           id?: number
           is_disabled?: boolean
-          price: number
+          processing_fee_override?: number | null
           updated_at?: string
           visa_rule_id: number
           visa_type_id: number
@@ -159,9 +161,10 @@ export type Database = {
         Update: {
           created_at?: string
           deleted_at?: string | null
+          gov_fee_override?: number | null
           id?: number
           is_disabled?: boolean
-          price?: number
+          processing_fee_override?: number | null
           updated_at?: string
           visa_rule_id?: number
           visa_type_id?: number
@@ -304,6 +307,7 @@ export type Database = {
         Row: {
           cost: number
           created_at: string
+          fee: number
           id: number
           is_disabled: boolean
           name: string
@@ -312,6 +316,7 @@ export type Database = {
         Insert: {
           cost: number
           created_at?: string
+          fee?: number
           id?: number
           is_disabled?: boolean
           name: string
@@ -320,6 +325,7 @@ export type Database = {
         Update: {
           cost?: number
           created_at?: string
+          fee?: number
           id?: number
           is_disabled?: boolean
           name?: string
@@ -377,11 +383,13 @@ export type Database = {
           created_at: string
           deleted_at: string | null
           destination_country: string
+          gov_fee: number
           id: number
           is_disabled: boolean
           max_stay: number
           name: string
           number_of_entries: number
+          processing_fee: number
           updated_at: string
           valid_for: string
         }
@@ -389,11 +397,13 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           destination_country: string
+          gov_fee?: number
           id?: number
           is_disabled?: boolean
           max_stay: number
           name: string
           number_of_entries: number
+          processing_fee?: number
           updated_at?: string
           valid_for: string
         }
@@ -401,11 +411,13 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           destination_country?: string
+          gov_fee?: number
           id?: number
           is_disabled?: boolean
           max_stay?: number
           name?: string
           number_of_entries?: number
+          processing_fee?: number
           updated_at?: string
           valid_for?: string
         }
