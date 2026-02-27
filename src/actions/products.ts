@@ -7,7 +7,8 @@ import GeneralResponse from "@/types/general";
 
 export interface VisaProduct {
     id: number;
-    price: number;
+    processing_fee_override: number | null;
+    gov_fee_override: number | null;
     is_disabled: boolean;
     created_at: string;
     updated_at: string;
@@ -26,7 +27,7 @@ export async function fetchProductsByVisaType(visaTypeId: number): Promise<Gener
     const { data, error } = await supabase
         .from("products")
         .select(`
-            id, price, is_disabled, created_at, updated_at,
+            id, processing_fee_override, gov_fee_override, is_disabled, created_at, updated_at,
             visa_rule:visa_rules!visa_rule_id(
                 id, nationality, destination_country, is_supported, is_visa_required,
                 nationality_country:countries!nationality(id, name, is_disabled)
