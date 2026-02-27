@@ -24,9 +24,6 @@ const STATUS_STYLES: Record<string, string> = {
     REJECTED: "bg-red-100 text-red-800 border-2 border-red-200",
 };
 
-// TODO: Remove when real data is available
-const USE_MOCK_DATA = true;
-
 function formatCreatedAt(dateStr: string | undefined) {
     if (!dateStr) return "—";
     try {
@@ -40,69 +37,6 @@ function formatCreatedAt(dateStr: string | undefined) {
         return "—";
     }
 }
-
-const MOCK_APPLICATIONS = [
-    {
-        id: "mock-1",
-        status: "COMPLETED" as const,
-        price: 85,
-        turnaround_time_cost: 25,
-        created_at: "2025-02-20T10:30:00Z",
-        products: {
-            visa_types: {
-                name: "Tourist eVisa",
-                countries: { id: "US", name: "United States" },
-            },
-        },
-        turnaround_times: { name: "Standard" },
-        travellers: [{}, {}],
-    },
-    {
-        id: "mock-2",
-        status: "IN_PROGRESS" as const,
-        price: 120,
-        turnaround_time_cost: 45,
-        created_at: "2025-02-18T14:00:00Z",
-        products: {
-            visa_types: {
-                name: "Business Visa",
-                countries: { id: "AR", name: "Argentina" },
-            },
-        },
-        turnaround_times: { name: "Fast" },
-        travellers: [{}],
-    },
-    {
-        id: "mock-3",
-        status: "NOT_STARTED" as const,
-        price: 65,
-        turnaround_time_cost: 15,
-        created_at: "2025-02-22T09:15:00Z",
-        products: {
-            visa_types: {
-                name: "Tourist Visa",
-                countries: { id: "EG", name: "Egypt" },
-            },
-        },
-        turnaround_times: { name: "Super Fast" },
-        travellers: [{}, {}, {}],
-    },
-    {
-        id: "mock-4",
-        status: "REJECTED" as const,
-        price: 95,
-        turnaround_time_cost: 30,
-        created_at: "2025-02-15T16:45:00Z",
-        products: {
-            visa_types: {
-                name: "Transit Visa",
-                countries: { id: "GB", name: "United Kingdom" },
-            },
-        },
-        turnaround_times: { name: "Express" },
-        travellers: [{}],
-    },
-];
 
 export default async function ApplicationsPage() {
     const user = await getUser();
@@ -130,7 +64,7 @@ export default async function ApplicationsPage() {
         .eq("profile_id", user.authUser.id)
         .order("created_at", { ascending: false });
 
-    const displayApplications = USE_MOCK_DATA ? MOCK_APPLICATIONS : applications ?? [];
+    const displayApplications = applications ?? [];
 
     type AppItem = (typeof displayApplications)[number];
 

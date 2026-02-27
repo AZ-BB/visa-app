@@ -35,9 +35,8 @@ export function Step5Checkout({
   onContinueToPayment,
 }: Step5CheckoutProps) {
   const { order } = useApplicationOrder();
-  const { arrival_date, travellers, turnaround_time_id, price, turnaround_time_cost } = order;
+  const { arrival_date, travellers, turnaround_time_id } = order;
   const readyByDate = arrival_date ? new Date(arrival_date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : "";
-  const total = price + turnaround_time_cost;
 
   const countryName = getCountryNameFromCode(country || "");
 
@@ -64,7 +63,7 @@ export function Step5Checkout({
               {countryName} {visaType}
             </h3>
             <span className="rounded-full text-primary bg-primary/5 px-3 py-1 text-base font-semibold">
-              {TURNAROUND_LABELS[turnaround_time_id] ?? "—"}
+              {TURNAROUND_LABELS[turnaround_time_id ?? 0] ?? "—"}
             </span>
           </div>
 
@@ -119,11 +118,11 @@ export function Step5Checkout({
           <div className="space-y-2 text-primary-copy">
             <div className="flex justify-between">
               <span className="text-secondary-copy">Visa fee</span>
-              <span className="font-semibold">{formatCost(price)}</span>
+              <span className="font-semibold">{formatCost(0)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-secondary-copy">Turnaround time</span>
-              <span className="font-semibold">{formatCost(turnaround_time_cost)}</span>
+              <span className="font-semibold">{formatCost(0)}</span>
             </div>
           </div>
           <div className="mt-4 pt-4">
@@ -134,7 +133,7 @@ export function Step5Checkout({
                   Including taxes & fees
                 </p>
               </div>
-              <span className="text-xl font-bold text-primary-copy">{formatCost(total)}</span>
+              <span className="text-xl font-bold text-primary-copy">{formatCost(0)}</span>
             </div>
           </div>
         </section>

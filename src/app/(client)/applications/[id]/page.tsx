@@ -27,175 +27,30 @@ const STATUS_STYLES: Record<string, string> = {
     REJECTED: "bg-red-100 text-red-800 border-2 border-red-200",
 };
 
-// TODO: Remove when real data is available - must match applications page mock IDs
-const USE_MOCK_DATA = true;
-
-const MOCK_APPLICATIONS: Record<
-    string,
-    {
-        id: string;
-        status: string;
-        price: number;
-        turnaround_time_cost: number;
-        contact_email: string;
-        arrival_date: string;
-        products: {
-            visa_types: {
-                name: string;
-                countries: { id: string; name: string };
-            };
+type ApplicationWithRelations = {
+    id: string;
+    status: string;
+    price: number;
+    turnaround_time_cost: number;
+    contact_email: string;
+    arrival_date: string;
+    products?: {
+        visa_types?: {
+            name: string;
+            countries?: { id?: string; name: string };
         };
-        turnaround_times: { name: string };
-        travellers: Array<{
-            first_name: string;
-            last_name: string;
-            date_of_birth: string;
-            nationality: string;
-            country_of_birth: string;
-            country_of_residence: string;
-            passport_number: string;
-            passport_expiry_date: string;
-        }>;
-    }
-> = {
-    "mock-1": {
-        id: "mock-1",
-        status: "COMPLETED",
-        price: 85,
-        turnaround_time_cost: 25,
-        contact_email: "john@example.com",
-        arrival_date: "2025-04-15",
-        products: {
-            visa_types: {
-                name: "Tourist eVisa",
-                countries: { id: "US", name: "United States" },
-            },
-        },
-        turnaround_times: { name: "Standard" },
-        travellers: [
-            {
-                first_name: "John",
-                last_name: "Doe",
-                date_of_birth: "1990-05-20",
-                nationality: "GB",
-                country_of_birth: "GB",
-                country_of_residence: "GB",
-                passport_number: "AB1234567",
-                passport_expiry_date: "2030-12-31",
-            },
-            {
-                first_name: "Jane",
-                last_name: "Doe",
-                date_of_birth: "1992-08-14",
-                nationality: "GB",
-                country_of_birth: "GB",
-                country_of_residence: "GB",
-                passport_number: "AB7654321",
-                passport_expiry_date: "2029-06-15",
-            },
-        ],
-    },
-    "mock-2": {
-        id: "mock-2",
-        status: "IN_PROGRESS",
-        price: 120,
-        turnaround_time_cost: 45,
-        contact_email: "alex@example.com",
-        arrival_date: "2025-06-01",
-        products: {
-            visa_types: {
-                name: "Business Visa",
-                countries: { id: "AR", name: "Argentina" },
-            },
-        },
-        turnaround_times: { name: "Fast" },
-        travellers: [
-            {
-                first_name: "Alex",
-                last_name: "Smith",
-                date_of_birth: "1985-03-10",
-                nationality: "US",
-                country_of_birth: "US",
-                country_of_residence: "US",
-                passport_number: "US9876543",
-                passport_expiry_date: "2028-03-20",
-            },
-        ],
-    },
-    "mock-3": {
-        id: "mock-3",
-        status: "NOT_STARTED",
-        price: 65,
-        turnaround_time_cost: 15,
-        contact_email: "sarah@example.com",
-        arrival_date: "2025-07-20",
-        products: {
-            visa_types: {
-                name: "Tourist Visa",
-                countries: { id: "EG", name: "Egypt" },
-            },
-        },
-        turnaround_times: { name: "Super Fast" },
-        travellers: [
-            {
-                first_name: "Sarah",
-                last_name: "Wilson",
-                date_of_birth: "1995-11-25",
-                nationality: "CA",
-                country_of_birth: "CA",
-                country_of_residence: "CA",
-                passport_number: "CA1112222",
-                passport_expiry_date: "2027-09-10",
-            },
-            {
-                first_name: "Mike",
-                last_name: "Wilson",
-                date_of_birth: "1993-02-08",
-                nationality: "CA",
-                country_of_birth: "CA",
-                country_of_residence: "CA",
-                passport_number: "CA3334444",
-                passport_expiry_date: "2026-11-30",
-            },
-            {
-                first_name: "Emma",
-                last_name: "Wilson",
-                date_of_birth: "2018-07-04",
-                nationality: "CA",
-                country_of_birth: "CA",
-                country_of_residence: "CA",
-                passport_number: "CA5556666",
-                passport_expiry_date: "2025-08-15",
-            },
-        ],
-    },
-    "mock-4": {
-        id: "mock-4",
-        status: "REJECTED",
-        price: 95,
-        turnaround_time_cost: 30,
-        contact_email: "david@example.com",
-        arrival_date: "2025-05-10",
-        products: {
-            visa_types: {
-                name: "Transit Visa",
-                countries: { id: "GB", name: "United Kingdom" },
-            },
-        },
-        turnaround_times: { name: "Express" },
-        travellers: [
-            {
-                first_name: "David",
-                last_name: "Brown",
-                date_of_birth: "1988-09-12",
-                nationality: "AU",
-                country_of_birth: "AU",
-                country_of_residence: "AU",
-                passport_number: "AU7778888",
-                passport_expiry_date: "2031-01-05",
-            },
-        ],
-    },
+    };
+    turnaround_times?: { name?: string };
+    travellers?: Array<{
+        first_name: string;
+        last_name: string;
+        date_of_birth: string;
+        nationality: string;
+        country_of_birth: string;
+        country_of_residence: string;
+        passport_number: string;
+        passport_expiry_date: string;
+    }>;
 };
 
 function formatDate(dateStr: string) {
@@ -220,60 +75,29 @@ export default async function ApplicationDetailPage({
     if (!user?.authUser?.id) {
         redirect("/login");
     }
-
     const { id } = await params;
 
-    let application: {
-        id: string;
-        status: string;
-        price: number;
-        turnaround_time_cost: number;
-        contact_email: string;
-        arrival_date: string;
-        products?: {
-            visa_types?: {
-                name: string;
-                countries?: { id?: string; name: string };
-            };
-        };
-        turnaround_times?: { name?: string };
-        travellers?: Array<{
-            first_name: string;
-            last_name: string;
-            date_of_birth: string;
-            nationality: string;
-            country_of_birth: string;
-            country_of_residence: string;
-            passport_number: string;
-            passport_expiry_date: string;
-        }>;
-    } | null = null;
-
-    if (USE_MOCK_DATA && MOCK_APPLICATIONS[id]) {
-        application = MOCK_APPLICATIONS[id];
-    } else {
-        const supabase = await createSupabaseServerClient();
-        const { data } = await supabase
-            .from("applications")
-            .select(
-                `
-                *,
-                products(
-                    visa_types(
-                        name,
-                        countries(id, name)
-                    )
-                ),
-                turnaround_times(name),
-                travellers(*)
+    const supabase = await createSupabaseServerClient();
+    const { data } = await supabase
+        .from("applications")
+        .select(
             `
-            )
-            .eq("id", id)
-            .eq("profile_id", user.authUser.id)
-            .single();
+            *,
+            products(
+                visa_types(
+                    name,
+                    countries(id, name)
+                )
+            ),
+            turnaround_times(name),
+            travellers(*)
+        `
+        )
+        .eq("id", id)
+        .eq("profile_id", user.authUser.id)
+        .single();
 
-        application = data;
-    }
+    const application: ApplicationWithRelations | null = data as ApplicationWithRelations | null;
 
     if (!application) {
         notFound();
