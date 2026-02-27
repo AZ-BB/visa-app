@@ -1,15 +1,7 @@
 import ArrowButton from "@/components/ArrowButton";
 import Image from "next/image";
 import Link from "next/link";
-import { getCountryNameFromCode } from "@/lib/contries-name";
-import InfoIcon from "@/components/svgs/info";
 import { ApplyFormSection } from "./_components/ApplyFormSection";
-import { ResumeApplicationBanner } from "./_components/ResumeApplicationBanner";
-import { CountryDropdown } from "@/components/ui/country-dropdown";
-import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import TipCard from "@/components/TipCard";
-import getVisaSearchResult from "@/actions/visas";
 import { createSupabaseServerClient } from "@/lib/supabase/supabase-server";
 import { notFound } from "next/navigation";
 import { getUser } from "@/lib/get-user";
@@ -17,7 +9,6 @@ import { getUser } from "@/lib/get-user";
 export default async function ApplyPage({ params, searchParams }: { params: Promise<{ country: string }>, searchParams: Promise<{ from: string }> }) {
     const { country } = await params;
     const { from } = await searchParams;
-
 
     const supabase = await createSupabaseServerClient();
     const { data: destinationCountry, error: destinationCountryError } = await supabase
@@ -120,14 +111,32 @@ export default async function ApplyPage({ params, searchParams }: { params: Prom
         visa:visa_types(*)
         `)
         .eq("visa_rule_id", visaRules.id)
-        .eq("is_disabled", false);
+        .eq("is_disabled", false)
+        .is("deleted_at", null);
 
+    if (productsError) {
+        return notFound();
+    }
 
-    console.log("products", products);
-    console.log("productsError", productsError);
+    if (products && products.length === 0) {
+        return (
+            <div className="w-full flex flex-col items-center justify-start min-h-screen px-4 sm:px-0">
+                <div className="bg-red-50 mt-24 flex flex-col items-center justify-center gap-4 pt-10 pb-10 px-10 rounded-lg border border-red-200">
+                    <h2 className="text-2xl md:text-4xl font-bold text-center">
+                        We currently don&apos;t support this trip
+                    </h2>
+
+                    <Link href="/">
+                        <ArrowButton>
+                            Try somewhere else
+                        </ArrowButton>
+                    </Link>
+                </div>
+            </div>
+        )
+    }
 
     const user = await getUser();
-
 
     return (
         <div className="max-w-7xl mx-auto min-h-screen px-6 pt-10 space-y-10">

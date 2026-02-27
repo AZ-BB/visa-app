@@ -16,7 +16,6 @@ import {
   type TempTraveller,
 } from "../ApplicationOrderContext";
 import { DatePicker } from "@/components/ui/date-picker";
-import { parseISO } from "date-fns";
 import TipCard from "@/components/TipCard";
 import { Separator } from "@/components/ui/separator";
 import ArrowButton from "@/components/ArrowButton";
@@ -44,8 +43,8 @@ function ApplicationSidebar({
         <Separator className="mt-2 mb-4" />
 
         <div className="flex justify-between text-base">
-          <span className="text-secondary-copy">{'{fee-detail}'}</span>
-          <span className="font-medium">£{'{cost}'}</span>
+          <span className="text-secondary-copy">Total</span>
+          <span className="font-medium">Calculated at checkout</span>
         </div>
       </div>
 
@@ -130,7 +129,7 @@ function TravellerFields({
         <div className="relative">
           <DatePicker
             id={`${idPrefix}-dob`}
-            value={traveller.date_of_birth ? parseISO(traveller.date_of_birth) : undefined}
+            value={traveller.date_of_birth || undefined}
             onValueChange={(date) => onUpdate({ date_of_birth: date ? date.toISOString().split("T")[0] ?? "" : "" })}
             placeholder="DD MM YYYY"
             disableAfterToday={true}

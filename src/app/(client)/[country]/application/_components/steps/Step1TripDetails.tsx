@@ -1,7 +1,6 @@
 "use client"
 
 import { ArrowLeft, ArrowRight, Info } from "lucide-react"
-import { format, parseISO } from "date-fns"
 import { Button } from "@/components/ui/button"
 import { DatePicker } from "@/components/ui/date-picker"
 import { Input } from "@/components/ui/input"
@@ -48,11 +47,7 @@ export function Step1TripDetails({
             <div className="relative">
               <DatePicker
                 id="arrival-date"
-                value={
-                  order.arrival_date
-                    ? parseISO(order.arrival_date)
-                    : undefined
-                }
+                value={order.arrival_date || undefined}
                 onValueChange={(date) =>
                   updateOrder({
                     arrival_date: date ? date.toISOString().split("T")[0] ?? "" : "",
@@ -144,8 +139,8 @@ export function Step1TripDetails({
           <Separator className="mt-2 mb-4" />
 
           <div className="flex justify-between text-base">
-            <span className="text-secondary-copy">Visa fee</span>
-            <span className="font-medium">£{order.price || 50}</span>
+            <span className="text-secondary-copy">Total</span>
+            <span className="font-medium">Calculated at checkout</span>
           </div>
         </div>
 

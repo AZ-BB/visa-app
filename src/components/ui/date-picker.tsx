@@ -12,8 +12,31 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
+/** Parse YYYY-MM-DD as local date at noon. Noon avoids timezone boundary shifts. */
+function parseLocalDate(dateString: string): Date {
+  const [y, m, d] = dateString.split("-").map(Number);
+  return new Date(y, m - 1, d, 12, 0, 0, 0);
+}
+
+/**
+ * Normalize to local date at noon. Handles:
+ * - Dates from parseISO("YYYY-MM-DD") which are UTC midnight (shows as previous day in western TZ)
+ * - Any Date - extracts the intended calendar day in local time
+ */
+function toLocalDate(date: Date): Date {
+  const isUtcMidnight =
+    date.getUTCHours() === 0 &&
+    date.getUTCMinutes() === 0 &&
+    date.getUTCSeconds() === 0 &&
+    date.getUTCMilliseconds() === 0;
+  const y = isUtcMidnight ? date.getUTCFullYear() : date.getFullYear();
+  const m = isUtcMidnight ? date.getUTCMonth() : date.getMonth();
+  const d = isUtcMidnight ? date.getUTCDate() : date.getDate();
+  return new Date(y, m, d, 12, 0, 0, 0);
+}
+
 interface DatePickerProps {
-  value?: Date;
+  value?: Date | string;
   onValueChange?: (date: Date | undefined) => void;
   placeholder?: string;
   id?: string;
@@ -35,6 +58,15 @@ export function DatePicker({
 }: DatePickerProps) {
   const [open, setOpen] = useState(false);
 
+  const localDate =
+    value === undefined
+      ? undefined
+      : typeof value === "string"
+        ? /^\d{4}-\d{2}-\d{2}$/.test(value)
+          ? parseLocalDate(value)
+          : undefined
+        : toLocalDate(value);
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -44,7 +76,7 @@ export function DatePicker({
             type="text"
             placeholder={placeholder}
             className="pr-12"
-            value={value ? format(value, "dd MMM yyyy") : ""}
+            value={localDate ? format(localDate, "dd MMM yyyy") : ""}
             readOnly
             disabled={disabled}
           />
@@ -55,10 +87,12 @@ export function DatePicker({
       </PopoverTrigger>
       <PopoverContent align="start" className="w-auto p-0 border-border-default shadow-sm">
         <Calendar
+          key={open ? "open" : "closed"}
           mode="single"
-          selected={value}
+          selected={localDate}
+          defaultMonth={localDate ?? new Date()}
           onSelect={(date) => {
-            onValueChange?.(date);
+            onValueChange?.(date ? toLocalDate(date) : undefined);
             setOpen(false);
           }}
           disableAfterToday={disableAfterToday}

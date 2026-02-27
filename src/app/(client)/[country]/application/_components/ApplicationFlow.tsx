@@ -30,7 +30,8 @@ function ApplicationFlowContent({
   country: string;
   initialStep?: StepId | null;
 }) {
-  const { order, updateOrder } = useApplicationOrder()
+  const { order, updateOrder, visaError } = useApplicationOrder()
+
   const [currentStep, setCurrentStep] = useState<StepId>(() => {
     const step = initialStep ?? order.currentStep ?? 1
     return Math.min(MAX_STEP, Math.max(MIN_STEP, step)) as StepId

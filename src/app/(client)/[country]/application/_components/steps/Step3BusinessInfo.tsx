@@ -17,7 +17,6 @@ import { useApplicationOrder } from "../ApplicationOrderContext";
 import { Separator } from "@/components/ui/separator";
 import TipCard from "@/components/TipCard";
 import { DatePicker } from "@/components/ui/date-picker";
-import { parseISO } from "date-fns";
 import ArrowButton from "@/components/ArrowButton";
 
 interface Step3BusinessInfoProps {
@@ -43,8 +42,8 @@ function ApplicationSidebar({
         <Separator className="mt-2 mb-4" />
 
         <div className="flex justify-between text-base">
-          <span className="text-secondary-copy">{'{fee-detail}'}</span>
-          <span className="font-medium">£{'{cost}'}</span>
+          <span className="text-secondary-copy">Total</span>
+          <span className="font-medium">Calculated at checkout</span>
         </div>
       </div>
 
@@ -129,7 +128,7 @@ function PassportFields({
         </label>
         <DatePicker
           id={`${idPrefix}-passport-expiry-date`}
-          value={traveller.passport_expiry_date ? parseISO(traveller.passport_expiry_date) : undefined}
+          value={traveller.passport_expiry_date || undefined}
           onValueChange={(date) => onUpdate({ passport_expiry_date: date ? date.toISOString().split("T")[0] ?? "" : "" })}
           placeholder="DD MM YYYY"
           disableBeforeToday={true}

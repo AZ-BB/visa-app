@@ -46,12 +46,18 @@ export function ApplyFormSection({
   const [selectedProductId, setSelectedProductId] = useState<string>(products[0]?.id.toString() ?? "")
   const [numberOfTravellers, setNumberOfTravellers] = useState<number>(1)
 
+  useEffect(() => {
+    const firstId = products[0]?.id.toString() ?? ""
+    setSelectedProductId(firstId)
+  }, [products])
+
   const handleStartApplication = () => {
     const selectedProduct = products.find((p) => p.id.toString() === selectedProductId)
     const count = Math.min(20, Math.max(1, numberOfTravellers))
     const travellers = Array.from({ length: count }, () => ({
       ...defaultTraveller,
       nationality: passportCountry.id,
+      product_id: selectedProduct?.id ?? 0,
     }))
 
     if (user?.profile) {
@@ -61,10 +67,9 @@ export function ApplyFormSection({
 
     const order: ApplicationOrder = {
       ...defaultOrder,
-      product_id: selectedProduct?.id ?? null,
+      visa_type_id: products.find((p) => p.id.toString() === selectedProductId)?.visa_type_id ?? 0,
       destination_country: destinationCountry.id,
       nationality: passportCountry.id,
-      price: selectedProduct?.price ?? 0,
       travellers,
       contact_email: user?.authUser?.email ?? "",
     }
@@ -80,7 +85,7 @@ export function ApplyFormSection({
     <>
       <h2 className="text-2xl md:text-4xl font-bold">
         Apply for your {destinationCountry.name}{" "}
-        {products[0]?.visa?.name ?? ""}
+        {products.find((p) => p.id.toString() === selectedProductId)?.visa?.name ?? ""}
       </h2>
 
       <ResumeApplicationBanner />
@@ -111,19 +116,24 @@ export function ApplyFormSection({
           </div>
 
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold">Which visa do you need?</h3>
-            <Select value={selectedProductId} onValueChange={setSelectedProductId}>
-              <SelectTrigger className="py-4">
-                <SelectValue placeholder="Select a visa" />
-              </SelectTrigger>
-              <SelectContent>
-                {products.map((product) => (
-                  <SelectItem key={`product-${product.id}`} value={product.id.toString()}>
-                    {product.visa.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {products.length !== 1 &&
+              (
+                <>
+                  <h3 className="text-lg font-semibold">Which visa do you need?</h3>
+                  <Select value={selectedProductId} onValueChange={setSelectedProductId}>
+                    <SelectTrigger className="py-4">
+                      <SelectValue placeholder="Select a visa" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {products.map((product) => (
+                        <SelectItem key={`product-${product.id}`} value={product.id.toString()}>
+                          {product.visa.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </>
+              )}
           </div>
 
           <div className="space-y-3">

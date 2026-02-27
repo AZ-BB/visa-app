@@ -55,7 +55,6 @@ export type Database = {
           created_at: string
           id: string
           price: number
-          product_id: number
           profile_id: string
           status: Database["public"]["Enums"]["application_status"]
           turnaround_time_cost: number
@@ -69,7 +68,6 @@ export type Database = {
           created_at?: string
           id?: string
           price: number
-          product_id: number
           profile_id: string
           status: Database["public"]["Enums"]["application_status"]
           turnaround_time_cost: number
@@ -83,7 +81,6 @@ export type Database = {
           created_at?: string
           id?: string
           price?: number
-          product_id?: number
           profile_id?: string
           status?: Database["public"]["Enums"]["application_status"]
           turnaround_time_cost?: number
@@ -96,13 +93,6 @@ export type Database = {
             columns: ["assigned_to"]
             isOneToOne: false
             referencedRelation: "admin"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "applications_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
             referencedColumns: ["id"]
           },
           {
@@ -239,6 +229,7 @@ export type Database = {
           nationality: string
           passport_expiry_date: string
           passport_number: string
+          product_id: number
           updated_at: string
         }
         Insert: {
@@ -253,6 +244,7 @@ export type Database = {
           nationality: string
           passport_expiry_date: string
           passport_number: string
+          product_id: number
           updated_at?: string
         }
         Update: {
@@ -267,9 +259,17 @@ export type Database = {
           nationality?: string
           passport_expiry_date?: string
           passport_number?: string
+          product_id?: number
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_travellers_product_id"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "travellers_application_id_fkey"
             columns: ["application_id"]
