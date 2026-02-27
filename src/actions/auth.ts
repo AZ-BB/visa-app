@@ -40,7 +40,6 @@ export async function signUp(
             first_name: firstName.trim(),
             last_name: lastName.trim(),
         },
-        role: "user",
         email_confirm: true,
     });
 

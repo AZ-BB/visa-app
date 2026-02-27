@@ -5,7 +5,6 @@ import { Menu, X, LogOut, ChevronDown, User, FileText } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback } from "../ui/avatar";
 import { DropdownMenu } from "radix-ui";
 import { logout } from "@/actions/auth";
 import { createSupabaseBrowserClient } from "@/lib/supabase/supabase-browser";
@@ -22,14 +21,6 @@ export type AuthUser = {
   user_metadata?: { first_name?: string; last_name?: string };
   email?: string;
 };
-
-function getInitials(user: AuthUser): string {
-  const firstName = (user.user_metadata?.first_name as string) || "";
-  const lastName = (user.user_metadata?.last_name as string) || "";
-  const first = firstName.charAt(0)?.toUpperCase() || "";
-  const last = lastName.charAt(0)?.toUpperCase() || "";
-  return first + last || user.email?.charAt(0)?.toUpperCase() || "?";
-}
 
 type NavbarClientProps = {
   user: AuthUser | null;
@@ -170,33 +161,57 @@ export function NavbarClient({ user }: NavbarClientProps) {
         aria-label="Navigation menu"
         className={cn(
           "md:hidden overflow-hidden transition-[max-height] duration-300 ease-in-out border-b border-gray-100 bg-white",
-          menuOpen ? "max-h-[350px]" : "max-h-0"
+          menuOpen ? "max-h-[500px]" : "max-h-0"
         )}
       >
         <nav className="flex flex-col px-6 py-4 gap-1">
-          {NAV_LINKS.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={() => setMenuOpen(false)}
-              className="py-3 text-base font-semibold text-primary-copy hover:text-gray-600"
-            >
-              {link.label}
-            </a>
-          ))}
-          <div className="pt-3 mt-2 border-t border-gray-100 flex flex-col gap-2">
+          {pathname === "/" && (
+            <div className="mb-2 pb-2 border-b border-gray-100 flex flex-col">
+              {
+                NAV_LINKS.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMenuOpen(false)}
+                    className="py-3 text-base font-semibold text-primary-copy hover:text-gray-600"
+                  >
+                    {link.label}
+                  </a>
+                ))
+              }
+            </div>
+          )}
+
+          <div className="flex flex-col gap-2">
             {user ? (
-              <div className="flex items-center gap-3">
-                <Avatar size="default" className="size-10">
-                  <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                    {getInitials(user)}
-                  </AvatarFallback>
-                </Avatar>
-                <form action={logout} className="flex-1">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-4 py-2 text-lg font-semibold text-gray-900">
+                  <div className="size-8 flex items-center justify-center rounded-full bg-gray-100">
+                    <User className="size-5 text-gray-500" />
+                  </div>
+                  {user.user_metadata?.first_name} {user.user_metadata?.last_name}
+                </div>
+                <Link
+                  href="/applications"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex w-full items-center gap-2 rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  <FileText className="size-4" />
+                  My Applications
+                </Link>
+                <Link
+                  href="/account"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex w-full items-center gap-2 rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  <User className="size-4" />
+                  My Account
+                </Link>
+                <form action={logout} className="w-full">
                   <button
                     type="submit"
                     onClick={() => setMenuOpen(false)}
-                    className="flex w-full items-center gap-2 rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    className="flex w-full items-center gap-2 rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50"
                   >
                     <LogOut className="size-4" />
                     Logout
@@ -210,8 +225,8 @@ export function NavbarClient({ user }: NavbarClientProps) {
                   className="w-full rounded-lg px-5 py-2.5 text-sm"
                   asChild
                 >
-                  <Link href="/sign-up" onClick={() => setMenuOpen(false)}>
-                    Sign Up
+                  <Link href="/login" onClick={() => setMenuOpen(false)}>
+                    Login
                   </Link>
                 </Button>
                 <Button

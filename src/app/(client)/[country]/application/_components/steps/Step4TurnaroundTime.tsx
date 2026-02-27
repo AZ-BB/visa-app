@@ -3,7 +3,6 @@
 import { ArrowLeft, ArrowRight, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { TurnaroundTimeId } from "../ApplicationOrderContext";
 import { useApplicationOrder } from "../ApplicationOrderContext";
 import { Separator } from "@/components/ui/separator";
 import TipCard from "@/components/TipCard";
@@ -15,29 +14,14 @@ interface Step4TurnaroundTimeProps {
 }
 
 const TURNAROUND_OPTIONS = [
-  {
-    id: "standard",
-    label: "Standard",
-    description: "Takes 2 days",
-    cost: "£—",
-  },
-  {
-    id: "fast",
-    label: "Fast",
-    description: "Takes 24 hours",
-    cost: "£—",
-  },
-  {
-    id: "superfast",
-    label: "Super Fast",
-    description: "Takes 12 hours",
-    cost: "£—",
-  },
+  { id: 1, label: "Standard", description: "Takes 2 days", cost: 0 },
+  { id: 2, label: "Fast", description: "Takes 24 hours", cost: 10 },
+  { id: 3, label: "Super Fast", description: "Takes 12 hours", cost: 20 },
 ] as const;
 
 export function Step4TurnaroundTime({ onNext, onBack }: Step4TurnaroundTimeProps) {
   const { order, updateOrder } = useApplicationOrder();
-  const selected = order.turnaroundTime;
+  const selected = order.turnaround_time_id;
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -61,7 +45,7 @@ export function Step4TurnaroundTime({ onNext, onBack }: Step4TurnaroundTimeProps
               >
                 <div className="min-w-0">
                   <p className="font-bold text-primary-copy text-lg">
-                    {option.cost} – {option.label}
+                    £{option.cost} – {option.label}
                   </p>
                   <p className="text-base text-secondary-copy font-medium mt-0.5">
                     {option.description}
@@ -85,7 +69,7 @@ export function Step4TurnaroundTime({ onNext, onBack }: Step4TurnaroundTimeProps
                   name="turnaround"
                   value={option.id}
                   checked={isSelected}
-                  onChange={() => updateOrder({ turnaroundTime: option.id as TurnaroundTimeId })}
+                  onChange={() => updateOrder({ turnaround_time_id: option.id, turnaround_time_cost: option.cost })}
                   className="sr-only"
                 />
               </label>

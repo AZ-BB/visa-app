@@ -9,8 +9,32 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import type { Tables, Enums } from "@/database.types";
+import { usePathname, useRouter } from "next/navigation";
+import isVisaAvailable from "@/actions/visas";
+import Link from "next/link";
+import ArrowButton from "@/components/ArrowButton";
 
 const APPLICATION_ORDER_STORAGE_KEY = "visa-application-order";
+
+/** Temp traveller: DB travellers table without id, application_id */
+export type TempTraveller = Omit<Tables<"travellers">, "id" | "application_id" | "created_at" | "updated_at">;
+
+export type ApplicationStepId = 1 | 2 | 3 | 4 | 5;
+
+/** Temp order: DB applications fields (no id, profile_id) + destination_country, nationality for routing + travellers + currentStep */
+export interface ApplicationOrder {
+  turnaround_time_id: number | null;
+  contact_email: string;
+  arrival_date: string;
+  /** For routing (from apply flow). */
+  destination_country: string;
+  /** For default traveller nationality (from apply flow). */
+  nationality: string;
+  visa_type_id: number;
+  travellers: TempTraveller[];
+  currentStep?: ApplicationStepId;
+}
 
 export function getStoredOrder(): ApplicationOrder | null {
   if (typeof window === "undefined") return null;
@@ -18,7 +42,9 @@ export function getStoredOrder(): ApplicationOrder | null {
     const raw = localStorage.getItem(APPLICATION_ORDER_STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as unknown;
-    if (parsed && typeof parsed === "object") return parsed as ApplicationOrder;
+    if (parsed && typeof parsed === "object") {
+      return { ...defaultOrder, ...parsed } as ApplicationOrder;
+    }
   } catch {
     // ignore
   }
@@ -34,79 +60,26 @@ export function setStoredOrder(order: ApplicationOrder): void {
   }
 }
 
-// --- Order type: one object for the whole application flow
-
-export interface TripDetails {
-  arrivalDate: string;
-  email: string;
-}
-
-/** One traveller: personal info (Step 2) + passport info (Step 3) for the same person */
-export interface Traveller {
-  // Personal info
-  firstName: string;
-  lastName: string;
-  dateOfBirth: string;
-  deniedVisaLast6Months: boolean;
-  // Passport info (same person)
-  passportDestination: string;
-  passportNumber: string;
-  passportExpiryDate: string;
-  countryOfBirth: string;
-  countryOfResidence: string;
-}
-
-export type TurnaroundTimeId = "standard" | "fast" | "superfast";
-
-export interface Costs {
-  visaFee: number | null;
-  turnaroundCost: number | null;
-  total: number | null;
-}
-
-export type ApplicationStepId = 1 | 2 | 3 | 4 | 5;
-
-export interface ApplicationOrder {
-  destinationCountry: string;
-  nationality: string;
-  visaType: string;
-  tripDetails: TripDetails;
-  travellers: Traveller[];
-  turnaroundTime: TurnaroundTimeId;
-  costs: Costs;
-  readyByDate: string;
-  /** Last step the user was on (1–5). Used to resume application. */
-  currentStep?: ApplicationStepId;
-}
-
-export const defaultTraveller: Traveller = {
-  firstName: "",
-  lastName: "",
-  dateOfBirth: "",
-  deniedVisaLast6Months: false,
-  passportDestination: "",
-  passportNumber: "",
-  passportExpiryDate: "",
-  countryOfBirth: "",
-  countryOfResidence: "",
+export const defaultTraveller: TempTraveller = {
+  product_id: 0,
+  nationality: "",
+  first_name: "",
+  last_name: "",
+  date_of_birth: "",
+  passport_number: "",
+  passport_expiry_date: "",
+  country_of_birth: "",
+  country_of_residence: "",
 };
 
 export const defaultOrder: ApplicationOrder = {
-  destinationCountry: "",
+  turnaround_time_id: null,
+  visa_type_id: 0,
+  contact_email: "",
+  arrival_date: new Date().toISOString().split("T")[0] ?? "",
+  destination_country: "",
   nationality: "",
-  visaType: "",
-  tripDetails: {
-    arrivalDate: new Date().toISOString(),
-    email: "",
-  },
   travellers: [{ ...defaultTraveller }],
-  turnaroundTime: "standard",
-  costs: {
-    visaFee: null,
-    turnaroundCost: null,
-    total: null,
-  },
-  readyByDate: "",
   currentStep: 1,
 };
 
@@ -115,26 +88,103 @@ export type OrderUpdate = Partial<ApplicationOrder> | ((prev: ApplicationOrder) 
 interface ApplicationOrderContextValue {
   order: ApplicationOrder;
   updateOrder: (update: OrderUpdate) => void;
+  isLoading: boolean;
+  visaError: string | null;
 }
 
 const ApplicationOrderContext = createContext<ApplicationOrderContextValue | null>(null);
 
 export function ApplicationOrderProvider({
   children,
-  initialOrder,
 }: {
   children: ReactNode;
   initialOrder?: Partial<ApplicationOrder>;
 }) {
-  const [order, setOrder] = useState<ApplicationOrder>(() => {
-    const stored = getStoredOrder();
-    const base = stored ? { ...defaultOrder, ...stored } : { ...defaultOrder, ...initialOrder };
-    return base;
-  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [order, setOrder] = useState<ApplicationOrder>(defaultOrder);
+
+  const [visaError, setVisaError] = useState<string | null>(null);
+
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
+    async function validateOrder() {
+      const stored = getStoredOrder();
+
+      if (!stored) {
+        router.push("/");
+        return;
+      }
+
+      // Validate the initial order
+      if (!stored.destination_country || !stored.nationality) {
+        router.push("/");
+        return;
+      }
+
+      if (pathname !== `/${stored.destination_country}/application` || stored.visa_type_id === 0) {
+        router.push(`/${stored.destination_country}/apply?from=${stored.nationality}`);
+        return;
+      }
+
+      // Validate the arrival date
+      if (stored.arrival_date && new Date(stored.arrival_date) < new Date()) {
+        stored.arrival_date = "";
+        setStoredOrder(stored);
+      }
+
+      // Validate the travellers
+      if (stored.travellers.length === 0) {
+        router.push(`/${stored.destination_country}/apply?from=${stored.nationality}`);
+        return;
+      }
+
+      if (stored.currentStep === 2 && (!stored.contact_email || !stored.arrival_date)) {
+        stored.currentStep = 1;
+        setStoredOrder(stored);
+      }
+
+      if (stored.currentStep === 3 && (!stored.travellers.every((t) => t.first_name && t.last_name && t.date_of_birth))) {
+        stored.currentStep = 2;
+        setStoredOrder(stored);
+      }
+
+      if (stored.currentStep === 4 && (!stored.turnaround_time_id)) {
+        stored.currentStep = 3;
+        setStoredOrder(stored);
+      }
+
+      if (stored.currentStep === 5 && (!stored.travellers.every((t) => t.first_name &&
+        t.last_name &&
+        t.date_of_birth &&
+        t.nationality &&
+        t.passport_number &&
+        t.passport_expiry_date &&
+        t.country_of_birth &&
+        t.country_of_residence))
+      ) {
+        stored.currentStep = 4;
+        setStoredOrder(stored);
+      }
+
+      setOrder(stored);
+      setIsLoading(false);
+
+      const { error: visaError, status } = await isVisaAvailable(stored.destination_country, stored.nationality, stored.visa_type_id);
+      console.log(visaError, status);
+      if (!status) {
+        setVisaError(visaError ?? null);
+      }
+    }
+
+    validateOrder();
+  }, [pathname, router]);
+
+  useEffect(() => {
+    if (isLoading) return;
     setStoredOrder(order);
-  }, [order]);
+  }, [order, isLoading]);
 
   const updateOrder = useCallback((update: OrderUpdate) => {
     setOrder((prev) => {
@@ -144,13 +194,31 @@ export function ApplicationOrderProvider({
   }, []);
 
   const value = useMemo(
-    () => ({ order, updateOrder }),
-    [order, updateOrder]
+    () => ({ order, updateOrder, isLoading, visaError }),
+    [order, updateOrder, isLoading]
   );
 
   return (
     <ApplicationOrderContext.Provider value={value}>
-      {children}
+      {isLoading ? (
+        <div className="flex min-h-[400px] items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        </div>
+      ) : (
+        visaError ? (
+          <div className="flex min-h-[400px] flex-col items-center justify-center gap-10">
+            <div className="text-xl font-bold text-center">{visaError}</div>
+
+            <Link href={`/${order.destination_country}/apply?from=${order.nationality}`}>
+              <ArrowButton>
+                Try another visa
+              </ArrowButton>
+            </Link>
+          </div>
+        ) : (
+          children
+        )
+      )}
     </ApplicationOrderContext.Provider>
   );
 }

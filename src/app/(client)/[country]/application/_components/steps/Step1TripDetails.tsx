@@ -1,7 +1,6 @@
 "use client"
 
 import { ArrowLeft, ArrowRight, Info } from "lucide-react"
-import { format, parseISO } from "date-fns"
 import { Button } from "@/components/ui/button"
 import { DatePicker } from "@/components/ui/date-picker"
 import { Input } from "@/components/ui/input"
@@ -26,7 +25,6 @@ export function Step1TripDetails({
   errors,
 }: Step1TripDetailsProps) {
   const { order, updateOrder } = useApplicationOrder()
-  const { tripDetails } = order
 
   const countryName = getCountryNameFromCode(country)
 
@@ -49,17 +47,10 @@ export function Step1TripDetails({
             <div className="relative">
               <DatePicker
                 id="arrival-date"
-                value={
-                  tripDetails.arrivalDate
-                    ? parseISO(tripDetails.arrivalDate)
-                    : undefined
-                }
+                value={order.arrival_date || undefined}
                 onValueChange={(date) =>
                   updateOrder({
-                    tripDetails: {
-                      ...tripDetails,
-                      arrivalDate: date ? date.toISOString() : "",
-                    },
+                    arrival_date: date ? date.toISOString().split("T")[0] ?? "" : "",
                   })
                 }
                 placeholder="DD MM YYYY"
@@ -90,10 +81,10 @@ export function Step1TripDetails({
               id="email"
               type="email"
               placeholder="josh.hadley@company.co.uk"
-              value={tripDetails.email}
+              value={order.contact_email}
               onChange={(e) =>
                 updateOrder({
-                  tripDetails: { ...tripDetails, email: e.target.value },
+                  contact_email: e.target.value,
                 })
               }
               className={errors?.email ? "border-red-500" : ""}
@@ -148,8 +139,8 @@ export function Step1TripDetails({
           <Separator className="mt-2 mb-4" />
 
           <div className="flex justify-between text-base">
-            <span className="text-secondary-copy">Visa fee</span>
-            <span className="font-medium">£{order.costs.visaFee || 50}</span>
+            <span className="text-secondary-copy">Total</span>
+            <span className="font-medium">Calculated at checkout</span>
           </div>
         </div>
 

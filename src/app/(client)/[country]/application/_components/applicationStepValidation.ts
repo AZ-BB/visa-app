@@ -10,15 +10,15 @@ export function validateStep(
   const errors: Record<string, string> = {};
 
   if (stepId === 1) {
-    if (!order.tripDetails.arrivalDate?.trim()) {
+    if (!order.arrival_date?.trim()) {
       errors.arrivalDate = "Arrival date is required";
     }
-    if (!order.tripDetails.email?.trim()) {
+    if (!order.contact_email?.trim()) {
       errors.email = "Email is required";
     }
     if (
-      order.tripDetails.email?.trim() &&
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(order.tripDetails.email)
+      order.contact_email?.trim() &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(order.contact_email)
     ) {
       errors.email = "Please enter a valid email address";
     }
@@ -26,38 +26,34 @@ export function validateStep(
 
   if (stepId === 2) {
     order.travellers.forEach((t, i) => {
-      if (!t.firstName?.trim()) {
-        errors[`traveller_${i}_firstName`] = "First name is required";
+      if (!t.first_name?.trim()) {
+        errors[`traveller_${i}_first_name`] = "First name is required";
       }
-      if (!t.lastName?.trim()) {
-        errors[`traveller_${i}_lastName`] = "Last name is required";
+      if (!t.last_name?.trim()) {
+        errors[`traveller_${i}_last_name`] = "Last name is required";
       }
-      if (!t.dateOfBirth?.trim()) {
-        errors[`traveller_${i}_dateOfBirth`] = "Date of birth is required";
-      }
-      if (t.deniedVisaLast6Months === true) {
-        errors[`traveller_${i}_deniedVisaLast6Months`] =
-          "Applicants who have been denied a visa in the last 6 months are not eligible to apply.";
+      if (!t.date_of_birth?.trim()) {
+        errors[`traveller_${i}_date_of_birth`] = "Date of birth is required";
       }
     });
   }
 
   if (stepId === 3) {
     order.travellers.forEach((t, i) => {
-      if (!t.passportDestination?.trim()) {
-        errors[`traveller_${i}_passportDestination`] = "Passport destination is required";
+      if (!t.nationality?.trim()) {
+        errors[`traveller_${i}_nationality`] = "Passport nationality is required";
       }
-      if (!t.passportNumber?.trim()) {
-        errors[`traveller_${i}_passportNumber`] = "Passport number is required";
+      if (!t.passport_number?.trim()) {
+        errors[`traveller_${i}_passport_number`] = "Passport number is required";
       }
-      if (!t.passportExpiryDate?.trim()) {
-        errors[`traveller_${i}_passportExpiryDate`] = "Passport expiry date is required";
+      if (!t.passport_expiry_date?.trim()) {
+        errors[`traveller_${i}_passport_expiry_date`] = "Passport expiry date is required";
       }
-      if (!t.countryOfBirth?.trim()) {
-        errors[`traveller_${i}_countryOfBirth`] = "Country of birth is required";
+      if (!t.country_of_birth?.trim()) {
+        errors[`traveller_${i}_country_of_birth`] = "Country of birth is required";
       }
-      if (!t.countryOfResidence?.trim()) {
-        errors[`traveller_${i}_countryOfResidence`] = "Country of residence is required";
+      if (!t.country_of_residence?.trim()) {
+        errors[`traveller_${i}_country_of_residence`] = "Country of residence is required";
       }
     });
   }

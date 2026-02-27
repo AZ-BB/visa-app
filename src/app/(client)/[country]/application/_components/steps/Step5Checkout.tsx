@@ -10,10 +10,10 @@ import { getCountryNameFromCode } from "@/lib/contries-name";
 import { Separator } from "@/components/ui/separator";
 import InfoIcon from "@/components/svgs/info";
 
-const TURNAROUND_LABELS: Record<string, string> = {
-  standard: "Standard",
-  fast: "Fast",
-  superfast: "Super Fast",
+const TURNAROUND_LABELS: Record<number, string> = {
+  1: "Standard",
+  2: "Fast",
+  3: "Super Fast",
 };
 
 function formatCost(value: number | null): string {
@@ -35,7 +35,9 @@ export function Step5Checkout({
   onContinueToPayment,
 }: Step5CheckoutProps) {
   const { order } = useApplicationOrder();
-  const { readyByDate, travellers, turnaroundTime, costs } = order;
+  const { arrival_date, travellers, turnaround_time_id, price, turnaround_time_cost } = order;
+  const readyByDate = arrival_date ? new Date(arrival_date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : "";
+  const total = price + turnaround_time_cost;
 
   const countryName = getCountryNameFromCode(country || "");
 
@@ -49,7 +51,7 @@ export function Step5Checkout({
       <TipCard>
         <p className="text-base">
           Your application will be ready by the{" "}
-          <strong>{readyByDate || "{date}"}</strong>. We&apos;ll make sure to
+          <strong>{readyByDate || "—"}</strong>. We&apos;ll make sure to
           contact you and let you know.
         </p>
       </TipCard>
@@ -62,7 +64,7 @@ export function Step5Checkout({
               {countryName} {visaType}
             </h3>
             <span className="rounded-full text-primary bg-primary/5 px-3 py-1 text-base font-semibold">
-              {TURNAROUND_LABELS[turnaroundTime] ?? turnaroundTime}
+              {TURNAROUND_LABELS[turnaround_time_id] ?? "—"}
             </span>
           </div>
 
@@ -99,7 +101,7 @@ export function Step5Checkout({
                   Traveller #{i + 1}
                 </div>
                 <div className="font-semibold">
-                  {[t.firstName, t.lastName].filter(Boolean).join(" ") || "—"}
+                  {[t.first_name, t.last_name].filter(Boolean).join(" ") || "—"}
                 </div>
               </li>
             ))}
@@ -117,11 +119,11 @@ export function Step5Checkout({
           <div className="space-y-2 text-primary-copy">
             <div className="flex justify-between">
               <span className="text-secondary-copy">Visa fee</span>
-              <span className="font-semibold">{formatCost(costs.visaFee)}</span>
+              <span className="font-semibold">{formatCost(price)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-secondary-copy">Turnaround time</span>
-              <span className="font-semibold">{formatCost(costs.turnaroundCost)}</span>
+              <span className="font-semibold">{formatCost(turnaround_time_cost)}</span>
             </div>
           </div>
           <div className="mt-4 pt-4">
@@ -132,7 +134,7 @@ export function Step5Checkout({
                   Including taxes & fees
                 </p>
               </div>
-              <span className="text-xl font-bold text-primary-copy">{formatCost(costs.total)}</span>
+              <span className="text-xl font-bold text-primary-copy">{formatCost(total)}</span>
             </div>
           </div>
         </section>

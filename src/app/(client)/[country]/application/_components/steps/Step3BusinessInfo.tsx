@@ -12,12 +12,11 @@ import { ArrowLeft, ArrowRight, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import type { Traveller } from "../ApplicationOrderContext";
+import type { TempTraveller } from "../ApplicationOrderContext";
 import { useApplicationOrder } from "../ApplicationOrderContext";
 import { Separator } from "@/components/ui/separator";
 import TipCard from "@/components/TipCard";
 import { DatePicker } from "@/components/ui/date-picker";
-import { parseISO } from "date-fns";
 import ArrowButton from "@/components/ArrowButton";
 
 interface Step3BusinessInfoProps {
@@ -43,8 +42,8 @@ function ApplicationSidebar({
         <Separator className="mt-2 mb-4" />
 
         <div className="flex justify-between text-base">
-          <span className="text-secondary-copy">{'{fee-detail}'}</span>
-          <span className="font-medium">£{'{cost}'}</span>
+          <span className="text-secondary-copy">Total</span>
+          <span className="font-medium">Calculated at checkout</span>
         </div>
       </div>
 
@@ -69,35 +68,35 @@ function PassportFields({
   traveller,
   onUpdate,
   errors,
-  defaultPassportDestination,
+  defaultNationality,
 }: {
   idPrefix: string;
   index: number;
-  traveller: Traveller;
-  onUpdate: (patch: Partial<Traveller>) => void;
+  traveller: TempTraveller;
+  onUpdate: (patch: Partial<TempTraveller>) => void;
   errors?: Record<string, string> | null;
-  defaultPassportDestination?: string;
+  defaultNationality?: string;
 }) {
   const field = (key: string) => errors?.[`traveller_${index}_${key}`];
-  const passportDestinationValue =
-    traveller.passportDestination || defaultPassportDestination || undefined;
+  const nationalityValue =
+    traveller.nationality || defaultNationality || undefined;
   return (
     <div className="space-y-5 pt-5">
       <div>
         <label
-          htmlFor={`${idPrefix}-passport-destination`}
+          htmlFor={`${idPrefix}-nationality`}
           className="block text-base font-semibold text-primary-copy mb-2"
         >
-          Passport destination
+          Passport nationality
         </label>
         <CountryDropdown
-          placeholder="Select destination"
-          value={passportDestinationValue}
+          placeholder="Select nationality"
+          value={nationalityValue}
           className="py-4"
-          onValueChange={(value) => onUpdate({ passportDestination: value })}
+          onValueChange={(value) => onUpdate({ nationality: value })}
         />
-        {field("passportDestination") && (
-          <p className="mt-1.5 text-sm text-red-600">{field("passportDestination")}</p>
+        {field("nationality") && (
+          <p className="mt-1.5 text-sm text-red-600">{field("nationality")}</p>
         )}
       </div>
       <div>
@@ -111,13 +110,13 @@ function PassportFields({
           id={`${idPrefix}-passport-number`}
           type="text"
           placeholder="12345678"
-          value={traveller.passportNumber}
-          onChange={(e) => onUpdate({ passportNumber: e.target.value })}
-          className={field("passportNumber") ? "border-red-500" : ""}
-          aria-invalid={!!field("passportNumber")}
+          value={traveller.passport_number}
+          onChange={(e) => onUpdate({ passport_number: e.target.value })}
+          className={field("passport_number") ? "border-red-500" : ""}
+          aria-invalid={!!field("passport_number")}
         />
-        {field("passportNumber") && (
-          <p className="mt-1.5 text-sm text-red-600">{field("passportNumber")}</p>
+        {field("passport_number") && (
+          <p className="mt-1.5 text-sm text-red-600">{field("passport_number")}</p>
         )}
       </div>
       <div>
@@ -129,13 +128,13 @@ function PassportFields({
         </label>
         <DatePicker
           id={`${idPrefix}-passport-expiry-date`}
-          value={traveller.passportExpiryDate ? parseISO(traveller.passportExpiryDate) : undefined}
-          onValueChange={(date) => onUpdate({ passportExpiryDate: date ? date.toISOString() : "" })}
+          value={traveller.passport_expiry_date || undefined}
+          onValueChange={(date) => onUpdate({ passport_expiry_date: date ? date.toISOString().split("T")[0] ?? "" : "" })}
           placeholder="DD MM YYYY"
           disableBeforeToday={true}
         />
-        {field("passportExpiryDate") && (
-          <p className="mt-1.5 text-sm text-red-600">{field("passportExpiryDate")}</p>
+        {field("passport_expiry_date") && (
+          <p className="mt-1.5 text-sm text-red-600">{field("passport_expiry_date")}</p>
         )}
       </div>
       <div>
@@ -144,13 +143,13 @@ function PassportFields({
         </label>
         <CountryDropdown
           placeholder="Select country of birth"
-          value={traveller.countryOfBirth || undefined}
-          onValueChange={(value) => onUpdate({ countryOfBirth: value })}
+          value={traveller.country_of_birth || undefined}
+          onValueChange={(value) => onUpdate({ country_of_birth: value })}
           aria-label="Country of birth"
           className="py-4"
         />
-        {field("countryOfBirth") && (
-          <p className="mt-1.5 text-sm text-red-600">{field("countryOfBirth")}</p>
+        {field("country_of_birth") && (
+          <p className="mt-1.5 text-sm text-red-600">{field("country_of_birth")}</p>
         )}
       </div>
       <div>
@@ -162,13 +161,13 @@ function PassportFields({
         </label>
         <CountryDropdown
           placeholder="Select country of residence"
-          value={traveller.countryOfResidence || undefined}
-          onValueChange={(value) => onUpdate({ countryOfResidence: value })}
+          value={traveller.country_of_residence || undefined}
+          onValueChange={(value) => onUpdate({ country_of_residence: value })}
           aria-label="Country of residence"
           className="py-4"
         />
-        {field("countryOfResidence") && (
-          <p className="mt-1.5 text-sm text-red-600">{field("countryOfResidence")}</p>
+        {field("country_of_residence") && (
+          <p className="mt-1.5 text-sm text-red-600">{field("country_of_residence")}</p>
         )}
       </div>
     </div>
@@ -177,22 +176,22 @@ function PassportFields({
 
 export function Step3BusinessInfo({ onNext, onBack, errors }: Step3BusinessInfoProps) {
   const { order, updateOrder } = useApplicationOrder();
-  const { travellers, destinationCountry } = order;
+  const { travellers } = order;
 
   useEffect(() => {
-    if (!destinationCountry?.trim()) return;
-    const needsDefault = travellers.some((t) => !t.passportDestination?.trim());
+    if (!order.nationality?.trim()) return;
+    const needsDefault = travellers.some((t) => !t.nationality?.trim());
     if (!needsDefault) return;
     updateOrder({
       travellers: travellers.map((t) =>
-        t.passportDestination?.trim()
+        t.nationality?.trim()
           ? t
-          : { ...t, passportDestination: destinationCountry }
+          : { ...t, nationality: order.nationality }
       ),
     });
-  }, [destinationCountry]);
+  }, [order.nationality, travellers, updateOrder]);
 
-  const updateTraveller = (index: number, patch: Partial<Traveller>) => {
+  const updateTraveller = (index: number, patch: Partial<TempTraveller>) => {
     updateOrder({
       travellers: travellers.map((t, i) => (i === index ? { ...t, ...patch } : t)),
     });
@@ -216,9 +215,9 @@ export function Step3BusinessInfo({ onNext, onBack, errors }: Step3BusinessInfoP
           {travellers.map((traveller, index) => (
             <AccordionItem variant="variant-2" key={index} value={`traveller-${index + 1}`}>
               <AccordionTrigger className="text-primary-copy font-bold text-lg">
-                {[traveller.firstName, traveller.lastName].filter(Boolean).length > 0 && (
+                {[traveller.first_name, traveller.last_name].filter(Boolean).length > 0 && (
                   <>
-                    {[traveller.firstName, traveller.lastName].filter(Boolean).join(" ")}
+                    {[traveller.first_name, traveller.last_name].filter(Boolean).join(" ")}
                   </>
                 )}
               </AccordionTrigger>
@@ -229,7 +228,7 @@ export function Step3BusinessInfo({ onNext, onBack, errors }: Step3BusinessInfoP
                   traveller={traveller}
                   onUpdate={(patch) => updateTraveller(index, patch)}
                   errors={errors}
-                  defaultPassportDestination={order.destinationCountry}
+                  defaultNationality={order.nationality}
                 />
               </AccordionContent>
             </AccordionItem>

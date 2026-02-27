@@ -12,12 +12,12 @@ import {
 /** Banner only shows when the stored order has Step 2 (personal info) data. */
 function hasStep2Data(order: ApplicationOrder | null): boolean {
   if (!order || typeof order !== "object") return false;
-  if (!order.destinationCountry?.trim()) return false;
+  if (!order.destination_country?.trim()) return false;
   const travellers = order.travellers;
   if (!Array.isArray(travellers) || travellers.length === 0) return false;
   return travellers.some(
     (t) =>
-      t.firstName?.trim() || t.lastName?.trim() || t.dateOfBirth?.trim()
+      t.first_name?.trim() || t.last_name?.trim() || t.date_of_birth?.trim()
   );
 }
 
@@ -32,8 +32,8 @@ export function ResumeApplicationBanner() {
   if (dismissed || !hasStep2Data(storedOrder)) return null;
 
   const step = storedOrder?.currentStep ?? 1;
-  const applicationHref = storedOrder?.destinationCountry
-    ? `/${storedOrder.destinationCountry}/application?step=${step}`
+  const applicationHref = storedOrder?.destination_country
+    ? `/${storedOrder.destination_country}/application?step=${step}`
     : "#";
 
   return (
