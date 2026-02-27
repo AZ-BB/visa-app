@@ -69,7 +69,7 @@ export function Step4TurnaroundTime({ onNext, onBack }: Step4TurnaroundTimeProps
                   name="turnaround"
                   value={option.id}
                   checked={isSelected}
-                  onChange={() => updateOrder({ turnaround_time_id: option.id, turnaround_time_cost: option.cost })}
+                  onChange={() => updateOrder({ turnaround_time_id: option.id })}
                   className="sr-only"
                 />
               </label>
