@@ -1,7 +1,8 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Info } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useApplicationOrder } from "../ApplicationOrderContext";
 import TipCard from "@/components/TipCard";
@@ -9,6 +10,8 @@ import ArrowButton from "@/components/ArrowButton";
 import { getCountryNameFromCode } from "@/lib/contries-name";
 import { Separator } from "@/components/ui/separator";
 import InfoIcon from "@/components/svgs/info";
+import { checkEmailExists } from "@/actions/auth";
+import { CheckoutAuthModal } from "../CheckoutAuthModal";
 
 const TURNAROUND_LABELS: Record<number, string> = {
   1: "Standard",
@@ -22,21 +25,49 @@ function formatCost(value: number | null): string {
 }
 
 interface Step5CheckoutProps {
-  country?: string;
-  visaType?: string;
+  country: string;
+  visaName: string;
+  isAuthenticated: boolean;
   onBack?: () => void;
   onContinueToPayment?: () => void;
 }
 
 export function Step5Checkout({
   country,
-  visaType,
+  visaName,
+  isAuthenticated,
   onBack,
   onContinueToPayment,
 }: Step5CheckoutProps) {
   const { order } = useApplicationOrder();
   const { arrival_date, travellers, turnaround_time_id } = order;
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [emailExists, setEmailExists] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (!isAuthenticated && order.contact_email) {
+      checkEmailExists(order.contact_email).then((result) => {
+        if ("exists" in result) {
+          setEmailExists(result.exists);
+        } else {
+          setEmailExists(false);
+        }
+      });
+    }
+  }, [isAuthenticated, order.contact_email]);
+
   const readyByDate = arrival_date ? new Date(arrival_date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : "";
+  const redirectUrl = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
+
+  const handleContinueClick = () => {
+    if (isAuthenticated) {
+      onContinueToPayment?.();
+    } else {
+      setAuthModalOpen(true);
+    }
+  };
 
   const countryName = getCountryNameFromCode(country || "");
 
@@ -60,7 +91,7 @@ export function Step5Checkout({
         <section className="mb-8">
           <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
             <h3 className="text-xl font-bold text-primary-copy">
-              {countryName} {visaType}
+              {countryName} {visaName}
             </h3>
             <span className="rounded-full text-primary bg-primary/5 px-3 py-1 text-base font-semibold">
               {TURNAROUND_LABELS[turnaround_time_id ?? 0] ?? "—"}
@@ -174,12 +205,22 @@ export function Step5Checkout({
           <ArrowButton
             variant="default"
             className="text-base"
-            onClick={onContinueToPayment}
+            onClick={handleContinueClick}
           >
             Continue to payment
           </ArrowButton>
         )}
       </div>
+
+      {!isAuthenticated && (
+        <CheckoutAuthModal
+          open={authModalOpen}
+          onOpenChange={setAuthModalOpen}
+          order={order}
+          redirectUrl={redirectUrl}
+          emailExists={emailExists}
+        />
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import isVisaAvailable from "@/actions/visas";
 import {
   Accordion,
   AccordionContent,
@@ -67,6 +68,7 @@ function PassportFields({
   index,
   traveller,
   onUpdate,
+  onNationalityChange,
   errors,
   defaultNationality,
 }: {
@@ -74,6 +76,7 @@ function PassportFields({
   index: number;
   traveller: TempTraveller;
   onUpdate: (patch: Partial<TempTraveller>) => void;
+  onNationalityChange?: (value: string) => void;
   errors?: Record<string, string> | null;
   defaultNationality?: string;
 }) {
@@ -93,7 +96,10 @@ function PassportFields({
           placeholder="Select nationality"
           value={nationalityValue}
           className="py-4"
-          onValueChange={(value) => onUpdate({ nationality: value })}
+          onValueChange={(value) => {
+            onUpdate({ nationality: value });
+            onNationalityChange?.(value ?? "");
+          }}
         />
         {field("nationality") && (
           <p className="mt-1.5 text-sm text-red-600">{field("nationality")}</p>
@@ -177,6 +183,30 @@ function PassportFields({
 export function Step3BusinessInfo({ onNext, onBack, errors }: Step3BusinessInfoProps) {
   const { order, updateOrder } = useApplicationOrder();
   const { travellers } = order;
+  const [isValidatingNationality, setIsValidatingNationality] = useState(false);
+  const [nationalityVisaErrors, setNationalityVisaErrors] = useState<Record<number, string>>({});
+  const validationRequestId = useRef(0);
+
+  const handleNationalityChange = (index: number, value: string) => {
+    setNationalityVisaErrors((prev) => {
+      const next = { ...prev };
+      delete next[index];
+      return next;
+    });
+    if (!value) {
+      setIsValidatingNationality(false);
+      return;
+    }
+    const requestId = ++validationRequestId.current;
+    setIsValidatingNationality(true);
+    isVisaAvailable(order.destination_country, value, order.visa_type_id).then((res) => {
+      if (requestId !== validationRequestId.current) return;
+      setIsValidatingNationality(false);
+      if (!res.status && res.error) {
+        setNationalityVisaErrors((prev) => ({ ...prev, [index]: res.error! }));
+      }
+    });
+  };
 
   useEffect(() => {
     if (!order.nationality?.trim()) return;
@@ -227,7 +257,16 @@ export function Step3BusinessInfo({ onNext, onBack, errors }: Step3BusinessInfoP
                   index={index}
                   traveller={traveller}
                   onUpdate={(patch) => updateTraveller(index, patch)}
-                  errors={errors}
+                  onNationalityChange={(value) => handleNationalityChange(index, value)}
+                  errors={{
+                    ...(errors ?? {}),
+                    ...Object.fromEntries(
+                      Object.entries(nationalityVisaErrors).map(([i, msg]) => [
+                        `traveller_${i}_nationality`,
+                        msg,
+                      ])
+                    ),
+                  }}
                   defaultNationality={order.nationality}
                 />
               </AccordionContent>
@@ -256,6 +295,7 @@ export function Step3BusinessInfo({ onNext, onBack, errors }: Step3BusinessInfoP
               variant="default"
               className="text-base"
               onClick={onNext}
+              disabled={isValidatingNationality || Object.keys(nationalityVisaErrors).length > 0}
             >
               Save & continue
             </ArrowButton>

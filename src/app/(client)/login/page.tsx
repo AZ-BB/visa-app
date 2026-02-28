@@ -38,7 +38,7 @@ export default function LoginPage() {
         const supabase = createSupabaseBrowserClient();
         const { error: signInError } = await supabase.auth.signInWithPassword({
             email: email.trim(),
-            password,
+            password
         });
 
         setIsPending(false);

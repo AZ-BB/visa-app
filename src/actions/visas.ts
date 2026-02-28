@@ -69,86 +69,6 @@ export async function updateVisaTypeDisabledStatus(id: number, isDisabled: boole
 
 
 
-// export default async function isVisaAvailableForNationality(destinationCountry: string, nationality: string, visaTypeId: number): Promise<GeneralResponse<boolean>> {
-//   const supabase = await createSupabaseServerClient();
-
-//   const { data: destinationCountryData, error: destinationCountryError } = await supabase
-//     .from("countries")
-//     .select("*")
-//     .eq("id", destinationCountry)
-//     .single();
-
-//   const { data: passportCountry, error: passportCountryError } = await supabase
-//     .from("countries")
-//     .select("*")
-//     .eq("id", nationality)
-//     .single();
-
-//   const { data: visaRules, error: visaRulesError } = await supabase
-//     .from("visa_rules")
-//     .select("*")
-//     .eq("destination_country", destinationCountry)
-//     .eq("nationality", nationality)
-//     .single();
-
-//   if (!visaRules || visaRulesError) {
-//     return {
-//       data: false,
-//       message: "Something went wrong."
-//     }
-//   }
-
-//   const isSupported = visaRules.is_supported;
-//   const isVisaRequired = visaRules.is_visa_required;
-
-//   if (!isVisaRequired) {
-//     return {
-//       data: false,
-//       message: `No visa is required for ${destinationCountryData?.name} from ${passportCountry?.name}.`
-//     }
-//   }
-
-//   if (!isSupported) {
-//     return {
-//       data: false,
-//       message: `Visa is not supported for ${destinationCountryData?.name} from ${passportCountry?.name}.`
-//     }
-//   }
-
-//   const { data: visaTypeData, error: visaTypeError } = await supabase
-//     .from("visa_types")
-//     .select("*")
-//     .eq("id", visaTypeId)
-//     .single();
-
-//   if (!visaTypeData || visaTypeError) {
-//     return {
-//       data: false,
-//       message: "Something went wrong."
-//     }
-//   }
-
-//   if(visaTypeData.is_disabled) {
-//     return {
-//       data: false,
-//       message: `The ${visaTypeData.name} is currently not available.`
-//     }
-//   }
-
-//   const { data: products, error: productsError } = await supabase
-//     .from("products")
-//     .select(`*,
-//       visa:visa_types(*)
-//       `)
-//     .eq("visa_rule_id", visaRules.id)
-//     .eq("visa_type_id", visaTypeId);
-
-
-
-
-// }
-
-
 export default async function isVisaAvailable(destinationCountry: string, nationality: string, visaTypeId: number): Promise<GeneralResponse<boolean>> {
     try {
         const supabase = await createSupabaseServerClient();
@@ -170,7 +90,7 @@ export default async function isVisaAvailable(destinationCountry: string, nation
             return {
                 data: false,
                 status: false,
-                error: "Destination country is disabled."
+                error: `Visa applications for ${destinationCountryData.name} are temporarily suspended. Please check back later or contact support for more information.`
             }
         }
 
@@ -184,7 +104,7 @@ export default async function isVisaAvailable(destinationCountry: string, nation
             return {
                 data: false,
                 status: false,
-                error: `The ${visaTypeData?.name} is currently unavailable.`
+                error: `The ${visaTypeData?.name} visa is not available at this time. It may have been discontinued or temporarily suspended.`
             }
         }
 
@@ -199,7 +119,7 @@ export default async function isVisaAvailable(destinationCountry: string, nation
             return {
                 data: false,
                 status: false,
-                error: "Something went wrong."
+                error: `We couldn't verify visa eligibility for ${nationalityData?.name} to ${destinationCountryData?.name}. Please try again or contact support if the issue persists.`
             }
         }
 
@@ -207,7 +127,7 @@ export default async function isVisaAvailable(destinationCountry: string, nation
             return {
                 data: false,
                 status: false,
-                error: `Visa is not supported for ${destinationCountryData?.name} from ${nationalityData?.name}.`
+                error: `Unfortunately, we don't support visa applications from ${nationalityData?.name} to ${destinationCountryData?.name} at this time.`
             }
         }
 
@@ -223,7 +143,7 @@ export default async function isVisaAvailable(destinationCountry: string, nation
             return {
                 data: false,
                 status: false,
-                error: `The ${visaTypeData?.name} is currently unavailable.`
+                error: `The ${visaTypeData?.name} is not available for ${nationalityData?.name} nationals at this time. Please check back later.`
             }
         }
 
@@ -231,7 +151,7 @@ export default async function isVisaAvailable(destinationCountry: string, nation
         return {
             data: true,
             status: true,
-            message: "The visa is available."
+            message: `The ${visaTypeData?.name} visa to ${destinationCountryData?.name} is available for ${nationalityData?.name} nationals. You can proceed with your application.`
         }
     }
     catch (error) {
@@ -239,7 +159,7 @@ export default async function isVisaAvailable(destinationCountry: string, nation
         return {
             data: false,
             status: false,
-            error: "Something went wrong."
+            error: "An unexpected error occurred. Please try again or contact support if the problem continues."
         }
     }
 }

@@ -1,0 +1,1 @@
+ALTER TABLE turnaround_times DROP COLUMN cost;
