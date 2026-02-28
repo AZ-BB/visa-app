@@ -72,6 +72,7 @@ export function ApplyFormSection({
       nationality: passportCountry.id,
       travellers,
       contact_email: user?.authUser?.email ?? "",
+      visa_name: products.find((p) => p.id.toString() === selectedProductId)?.visa?.name ?? "",
     }
     setStoredOrder(order)
     router.push(`/${destinationCountry.id}/application`)

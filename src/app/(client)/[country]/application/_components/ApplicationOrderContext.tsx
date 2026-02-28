@@ -9,7 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { Tables, Enums } from "@/database.types";
+import type { Tables } from "@/database.types";
 import { usePathname, useRouter } from "next/navigation";
 import isVisaAvailable from "@/actions/visas";
 import Link from "next/link";
@@ -25,6 +25,7 @@ export type ApplicationStepId = 1 | 2 | 3 | 4 | 5;
 /** Temp order: DB applications fields (no id, profile_id) + destination_country, nationality for routing + travellers + currentStep */
 export interface ApplicationOrder {
   turnaround_time_id: number | null;
+  visa_name: string;
   contact_email: string;
   arrival_date: string;
   /** For routing (from apply flow). */
@@ -75,6 +76,7 @@ export const defaultTraveller: TempTraveller = {
 export const defaultOrder: ApplicationOrder = {
   turnaround_time_id: null,
   visa_type_id: 0,
+  visa_name: "",
   contact_email: "",
   arrival_date: new Date().toISOString().split("T")[0] ?? "",
   destination_country: "",
@@ -89,21 +91,26 @@ interface ApplicationOrderContextValue {
   order: ApplicationOrder;
   updateOrder: (update: OrderUpdate) => void;
   isLoading: boolean;
-  visaError: string | null;
+  travellerVisaErrors: Record<number, string> | null;
+  turnaroundTimes: Tables<"turnaround_times">[];
 }
 
 const ApplicationOrderContext = createContext<ApplicationOrderContextValue | null>(null);
 
 export function ApplicationOrderProvider({
   children,
+  turnaroundTimes = [],
 }: {
   children: ReactNode;
   initialOrder?: Partial<ApplicationOrder>;
+  turnaroundTimes?: Tables<"turnaround_times">[];
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const [order, setOrder] = useState<ApplicationOrder>(defaultOrder);
 
   const [visaError, setVisaError] = useState<string | null>(null);
+
+  const [travellerVisaErrors, setTravellerVisaErrors] = useState<Record<number, string> | null>(null);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -140,34 +147,85 @@ export function ApplicationOrderProvider({
         return;
       }
 
-      if (stored.currentStep === 2 && (!stored.contact_email || !stored.arrival_date)) {
-        stored.currentStep = 1;
-        setStoredOrder(stored);
+      async function validateStep(stored: ApplicationOrder) {
+        // Step 2: Contact email and arrival date
+        if (!stored.contact_email || !stored.arrival_date) {
+          stored.currentStep = 1;
+          setStoredOrder(stored);
+          return;
+        }
+
+        if (stored.arrival_date && new Date(stored.arrival_date) < new Date()) {
+          stored.arrival_date = "";
+          stored.currentStep = 1;
+          setStoredOrder(stored);
+          return;
+        }
+
+        // Step 3: Travellers
+        if (!stored.travellers.every((t) => t.first_name && t.last_name && t.date_of_birth)) {
+          stored.currentStep = 2;
+          setStoredOrder(stored);
+          return;
+        }
+
+        if (stored.travellers.some((t) => t.date_of_birth && new Date(t.date_of_birth) > new Date())) {
+          console.log("travellers", stored.travellers);
+          stored.travellers = stored.travellers.map((t) => ({ ...t, date_of_birth: new Date(t.date_of_birth) > new Date() ? "" : t.date_of_birth }));
+          stored.currentStep = 2;
+          setStoredOrder(stored);
+          return;
+        }
+
+        // Step 4: Passport details
+        if (!stored.travellers.every((t) => t.nationality && t.passport_number && t.passport_expiry_date && t.country_of_birth && t.country_of_residence)) {
+          stored.currentStep = 3;
+          setStoredOrder(stored);
+          return;
+        }
+
+        if (stored.travellers.some((t) => t.passport_expiry_date && new Date(t.passport_expiry_date) < new Date())) {
+          stored.travellers = stored.travellers.map((t) => ({ ...t, passport_expiry_date: new Date(t.passport_expiry_date) < new Date() ? "" : t.passport_expiry_date }));
+          stored.currentStep = 3;
+          setStoredOrder(stored);
+          return;
+        }
+
+        if (stored.travellers.some((t) => t.nationality && t.nationality !== stored.nationality)) {
+          let i = 0;
+          for (const traveller of stored.travellers) {
+            if (traveller.nationality && traveller.nationality !== stored.nationality) {
+              const { error: visaError, status } = await isVisaAvailable(stored.destination_country, traveller.nationality, stored.visa_type_id);
+              console.log(visaError, status);
+              if (!status) {
+                setTravellerVisaErrors((prev) => ({ ...prev, [i]: visaError ?? "" }));
+              }
+            }
+
+            i++;
+          }
+
+          stored.currentStep = 3;
+          setStoredOrder(stored);
+          return;
+        }
+
+        // Step 4: Turnaround time
+        if (!stored.turnaround_time_id) {
+          stored.currentStep = 4;
+          setStoredOrder(stored);
+          return;
+        }
+
+        if (stored.turnaround_time_id && !turnaroundTimes.some((tt) => tt.id === stored.turnaround_time_id)) {
+          stored.turnaround_time_id = null;
+          stored.currentStep = 4;
+          setStoredOrder(stored);
+          return;
+        }
       }
 
-      if (stored.currentStep === 3 && (!stored.travellers.every((t) => t.first_name && t.last_name && t.date_of_birth))) {
-        stored.currentStep = 2;
-        setStoredOrder(stored);
-      }
-
-      if (stored.currentStep === 4 && (!stored.turnaround_time_id)) {
-        stored.currentStep = 3;
-        setStoredOrder(stored);
-      }
-
-      if (stored.currentStep === 5 && (!stored.travellers.every((t) => t.first_name &&
-        t.last_name &&
-        t.date_of_birth &&
-        t.nationality &&
-        t.passport_number &&
-        t.passport_expiry_date &&
-        t.country_of_birth &&
-        t.country_of_residence))
-      ) {
-        stored.currentStep = 4;
-        setStoredOrder(stored);
-      }
-
+      await validateStep(stored);
       setOrder(stored);
       setIsLoading(false);
 
@@ -194,8 +252,8 @@ export function ApplicationOrderProvider({
   }, []);
 
   const value = useMemo(
-    () => ({ order, updateOrder, isLoading, visaError }),
-    [order, updateOrder, isLoading]
+    () => ({ order, updateOrder, isLoading, visaError, travellerVisaErrors, turnaroundTimes }),
+    [order, updateOrder, isLoading, travellerVisaErrors, turnaroundTimes]
   );
 
   return (

@@ -4,6 +4,27 @@ import { createSupabaseAdminServerClient, createSupabaseServerClient } from "@/l
 import GeneralResponse from "@/types/general";
 import { redirect } from "next/navigation";
 
+export async function checkEmailExists(email: string): Promise<{ exists: boolean } | { error: string }> {
+    if (!email?.trim()) {
+        return { exists: false };
+    }
+    try {
+        const supabase = await createSupabaseAdminServerClient();
+        const { data, error } = await supabase
+            .from("profiles")
+            .select("id")
+            .eq("email", email.trim())
+            .limit(1)
+            .maybeSingle();
+
+        if (error) {
+            return { error: error.message };
+        }
+        return { exists: !!data };
+    } catch {
+        return { error: "Failed to check email" };
+    }
+}
 
 export async function signUp(
     _prevState: GeneralResponse<null> | null,
@@ -72,7 +93,8 @@ export async function signUp(
         return { error: signInError.message };
     }
 
-    redirect("/");
+    const redirectUrl = (formData.get("redirectUrl") as string)?.trim();
+    redirect(redirectUrl || "/");
 }
 
 export async function logout(): Promise<void> {

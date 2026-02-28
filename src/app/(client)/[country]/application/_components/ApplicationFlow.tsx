@@ -10,6 +10,8 @@ import { Step3BusinessInfo } from "./steps/Step3BusinessInfo"
 import { Step5Checkout } from "./steps/Step5Checkout"
 import { validateStep, type StepId as ValidationStepId } from "./applicationStepValidation"
 import { AuthUser } from "@/lib/get-user"
+import { Tables } from "@/database.types"
+import { getCountryNameFromCode } from "@/lib/contries-name"
 
 const MIN_STEP = 1
 const MAX_STEP = 5
@@ -26,25 +28,37 @@ export type StepValidationErrors = Record<string, string> | null
 function ApplicationFlowContent({
   country,
   initialStep,
+  isAuthenticated,
 }: {
   country: string;
   initialStep?: StepId | null;
+  isAuthenticated: boolean;
 }) {
-  const { order, updateOrder, visaError } = useApplicationOrder()
+  const { order, updateOrder, travellerVisaErrors } = useApplicationOrder()
 
   const [currentStep, setCurrentStep] = useState<StepId>(() => {
     const step = initialStep ?? order.currentStep ?? 1
     return Math.min(MAX_STEP, Math.max(MIN_STEP, step)) as StepId
   })
   const [validationErrors, setValidationErrors] = useState<StepValidationErrors>(null)
-  const countryDisplay = formatCountryDisplay(country)
+  const countryDisplay = getCountryNameFromCode(country)
+
+  useEffect(() => {
+    if (Object.keys(travellerVisaErrors ?? {}).length > 0) {
+      const errors: StepValidationErrors = {}
+      for (const [index, error] of Object.entries(travellerVisaErrors ?? {})) {
+        errors[`traveller_${index}_nationality`] = error
+      }
+      setValidationErrors(errors)
+    }
+  }, [travellerVisaErrors])
 
   useEffect(() => {
     updateOrder({ currentStep })
   }, [currentStep, updateOrder])
 
-  const handleNext = () => {
-    const errors = validateStep(currentStep as ValidationStepId, order)
+  const handleNext = async () => {
+    const errors = await validateStep(currentStep as ValidationStepId, order)
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors)
     } else {
@@ -60,7 +74,7 @@ function ApplicationFlowContent({
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 md:py-12">
-      <div className="text-[36px] font-bold mb-10 text-primary-copy">United States Tourist eVisa</div>
+      <div className="text-[36px] font-bold mb-10 text-primary-copy">{countryDisplay} {order.visa_name}</div>
       <ApplicationProgressBar currentStep={currentStep} className="mb-10" />
 
       <section
@@ -94,9 +108,10 @@ function ApplicationFlowContent({
         {currentStep === 5 && (
           <Step5Checkout
             country={countryDisplay}
-            visaType="Tourist eVisa"
+            visaName={order.visa_name}
             onBack={handleBack}
             onContinueToPayment={handleNext}
+            isAuthenticated={isAuthenticated}
           />
         )}
       </section>
@@ -107,13 +122,17 @@ function ApplicationFlowContent({
 export function ApplicationFlow({
   country,
   initialStep,
+  turnaroundTimes,
+  isAuthenticated,
 }: {
   country: string;
   initialStep?: StepId | null;
+  turnaroundTimes: Tables<"turnaround_times">[];
+  isAuthenticated: boolean;
 }) {
   return (
-    <ApplicationOrderProvider>
-      <ApplicationFlowContent country={country} initialStep={initialStep} />
+    <ApplicationOrderProvider turnaroundTimes={turnaroundTimes}>
+      <ApplicationFlowContent country={country} initialStep={initialStep} isAuthenticated={isAuthenticated} />
     </ApplicationOrderProvider>
   )
 }

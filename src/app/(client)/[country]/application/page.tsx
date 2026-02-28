@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/supabase-server";
 import { notFound } from "next/navigation";
 import ArrowButton from "@/components/ArrowButton";
 import Link from "next/link";
+import { getTurnaroundTimes } from "@/actions/turnaround_time";
 
 export default async function ApplicationPage({
   params,
@@ -51,11 +52,33 @@ export default async function ApplicationPage({
 
   const user = await getUser();
 
+  const { data: turnaroundTimes, status: turnaroundTimesStatus } = await getTurnaroundTimes();
+
+  if (!turnaroundTimes || !turnaroundTimesStatus) {
+    return (
+      <div className="w-full flex flex-col items-center justify-start min-h-screen px-4 sm:px-0">
+        <div className="bg-red-50 mt-24 flex flex-col items-center justify-center gap-4 pt-10 pb-10 px-10 rounded-lg border border-red-200">
+          <h2 className="text-2xl md:text-3xl font-bold text-center">
+            We are currently experiencing technical issues. Please try again later.
+          </h2>
+
+          <Link href="/">
+            <ArrowButton>
+              Try again
+            </ArrowButton>
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-bg-light-grey">
       <ApplicationFlow
         country={country}
         initialStep={initialStep}
+        turnaroundTimes={turnaroundTimes}
+        isAuthenticated={user != null}
       />
     </div>
   );

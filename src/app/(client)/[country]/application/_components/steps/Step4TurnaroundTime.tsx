@@ -1,7 +1,6 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Info } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useApplicationOrder } from "../ApplicationOrderContext";
 import { Separator } from "@/components/ui/separator";
@@ -13,15 +12,16 @@ interface Step4TurnaroundTimeProps {
   onBack?: () => void;
 }
 
-const TURNAROUND_OPTIONS = [
-  { id: 1, label: "Standard", description: "Takes 2 days", cost: 0 },
-  { id: 2, label: "Fast", description: "Takes 24 hours", cost: 10 },
-  { id: 3, label: "Super Fast", description: "Takes 12 hours", cost: 20 },
-] as const;
+function formatTurnaroundDescription(hours: number): string {
+  if (hours < 24) return `Takes ${hours} hours`;
+  const days = Math.round(hours / 24);
+  return days === 1 ? "Takes 1 day" : `Takes ${days} days`;
+}
 
 export function Step4TurnaroundTime({ onNext, onBack }: Step4TurnaroundTimeProps) {
-  const { order, updateOrder } = useApplicationOrder();
+  const { order, updateOrder, turnaroundTimes } = useApplicationOrder();
   const selected = order.turnaround_time_id;
+  const options = turnaroundTimes.filter((tt) => !tt.is_disabled);
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -31,8 +31,10 @@ export function Step4TurnaroundTime({ onNext, onBack }: Step4TurnaroundTimeProps
         </h2>
 
         <fieldset className="space-y-3" role="radiogroup" aria-label="Turnaround time">
-          {TURNAROUND_OPTIONS.map((option) => {
+          {options.map((option) => {
             const isSelected = selected === option.id;
+            const hours = (option as { turnaround_time_hours?: number }).turnaround_time_hours ?? 24;
+            const description = formatTurnaroundDescription(hours);
             return (
               <label
                 key={option.id}
@@ -44,11 +46,11 @@ export function Step4TurnaroundTime({ onNext, onBack }: Step4TurnaroundTimeProps
                 )}
               >
                 <div className="min-w-0">
-                  <p className="font-bold text-primary-copy text-lg">
-                    £{option.cost} – {option.label}
+                  <p className="font-bold text-primary-copy text-xl">
+                    {option.name}
                   </p>
                   <p className="text-base text-secondary-copy font-medium mt-0.5">
-                    {option.description}
+                    {description}
                   </p>
                 </div>
                 <span
@@ -98,6 +100,7 @@ export function Step4TurnaroundTime({ onNext, onBack }: Step4TurnaroundTimeProps
               variant="default"
               className="text-base"
               onClick={onNext}
+              disabled={selected == null}
             >
               Save & continue
             </ArrowButton>
@@ -113,12 +116,12 @@ export function Step4TurnaroundTime({ onNext, onBack }: Step4TurnaroundTimeProps
             Additional costs
           </h3>
 
-          <p className="text-base">{'{number}'} of traveller/s</p>
+          <p className="text-base">{order.travellers.length} of traveller/s</p>
           <Separator className="mt-2 mb-4" />
 
           <div className="flex justify-between text-base">
-            <span className="text-secondary-copy">{'{fee-detail}'}</span>
-            <span className="font-medium">£{'{cost}'}</span>
+            <span className="text-secondary-copy">Total</span>
+            <span className="font-medium">Calculated on checkout</span>
           </div>
         </div>
 
