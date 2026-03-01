@@ -17,6 +17,7 @@ import {
   Users,
 } from "lucide-react"
 
+
 export default async function VisaDetailPage({
   params,
 }: {
@@ -259,15 +260,16 @@ export default async function VisaDetailPage({
 
                       <td className="py-3.5 pr-2">
                         <span className="font-medium tabular-nums text-primary-copy">
-                          ${product.gov_fee_override ? Number(product.gov_fee_override).toFixed(2) : v.gov_fee}
+                          ${product.processing_fee_override ? Number(product.processing_fee_override).toFixed(2) : v.processing_fee}
                         </span>
                       </td>
 
                       <td className="py-3.5 pr-2">
                         <span className="font-medium tabular-nums text-primary-copy">
-                          ${product.processing_fee_override ? Number(product.processing_fee_override).toFixed(2) : v.processing_fee}
+                          ${product.gov_fee_override ? Number(product.gov_fee_override).toFixed(2) : v.gov_fee}
                         </span>
                       </td>
+
 
 
                       <td className="py-3.5 pr-2">
@@ -275,8 +277,8 @@ export default async function VisaDetailPage({
                           ${(product.gov_fee_override || v.gov_fee) + (product.processing_fee_override || v.processing_fee)}
                         </span>
                       </td>
-                      
-                      <td className="py-3.5 pr-5"> 
+
+                      <td className="py-3.5 pr-5">
                         {product.is_disabled ? (
                           <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-200/80">
                             <span className="size-1.5 rounded-full bg-amber-500" />

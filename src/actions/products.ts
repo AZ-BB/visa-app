@@ -94,6 +94,7 @@ export async function syncAllowedNationalities(
                     destination_country: destinationCountry,
                     is_supported: true,
                     is_visa_required: true,
+
                 })
                 .select("id")
                 .single();
@@ -109,7 +110,6 @@ export async function syncAllowedNationalities(
             .insert({
                 visa_rule_id: visaRuleId,
                 visa_type_id: visaTypeId,
-                price: defaultPrice,
             });
 
         if (productErr) {
