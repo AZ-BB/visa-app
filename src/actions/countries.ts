@@ -78,11 +78,11 @@ export async function fetchCountryById(id: string): Promise<GeneralResponse<Coun
 }
 
 // Not paginated list of all countries
-export async function fetchAllCountriesList(): Promise<GeneralResponse<{ id: string; name: string }[]>> {
+export async function fetchAllCountriesList(): Promise<GeneralResponse<{ id: string; name: string; is_disabled: boolean }[]>> {
   const supabase = await createSupabaseServerClient()
   const { data, error } = await supabase
     .from("countries")
-    .select("id, name")
+    .select("id, name, is_disabled")
     .order("name", { ascending: true })
   if (error) {
     return { error: error.message }

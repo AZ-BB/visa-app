@@ -1,13 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Separator } from "../ui/separator"
 import { CountryDropdown } from "../ui/country-dropdown"
 import { cn } from "@/lib/utils"
+import { fetchAllCountriesList } from "@/actions/countries";
 
 export function VisaSelector({ rounded = true, shadow = true }: { rounded?: boolean; shadow?: boolean }) {
   const [fromCountry, setFromCountry] = useState("GB");
   const [toCountry, setToCountry] = useState<string | undefined>(undefined);
+  const [countries, setCountries] = useState<{ id: string; name: string; is_disabled: boolean }[]>([]);
+
+  useEffect(() => {
+    fetchAllCountriesList().then((res) => {
+      if (res.data) setCountries(res.data);
+    });
+  }, []);
 
   return (
     <div
@@ -37,6 +45,7 @@ export function VisaSelector({ rounded = true, shadow = true }: { rounded?: bool
         {/* Where am I travelling? */}
         <div className="w-full flex flex-1 p-5 items-stretch justify-between">
           <CountryDropdown
+            values={countries.filter((c) => !c.is_disabled).map((c) => ({ id: c.id, name: c.name }))}
             label="Where am I travelling?"
             value={toCountry ?? ""}
             onValueChange={(v) => setToCountry(v || undefined)}
