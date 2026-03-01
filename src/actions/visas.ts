@@ -1,5 +1,6 @@
 "use server"
 
+import { Tables } from "@/database.types";
 import { createSupabaseServerClient } from "@/lib/supabase/supabase-server";
 import GeneralResponse from "@/types/general";
 
@@ -69,8 +70,9 @@ export async function updateVisaTypeDisabledStatus(id: number, isDisabled: boole
 
 
 
-export default async function isVisaAvailable(destinationCountry: string, nationality: string, visaTypeId: number): Promise<GeneralResponse<boolean>> {
+export default async function isVisaAvailable(destinationCountry: string, nationality: string, visaTypeId: number): Promise<GeneralResponse<Tables<"products"> | null>> {
     try {
+        console.log("isVisaAvailable", destinationCountry, nationality, visaTypeId);
         const supabase = await createSupabaseServerClient();
 
         const { data: destinationCountryData, error: destinationCountryError } = await supabase
@@ -88,7 +90,7 @@ export default async function isVisaAvailable(destinationCountry: string, nation
 
         if (destinationCountryData?.is_disabled) {
             return {
-                data: false,
+                data: null,
                 status: false,
                 error: `Visa applications for ${destinationCountryData.name} are temporarily suspended. Please check back later or contact support for more information.`
             }
@@ -102,7 +104,7 @@ export default async function isVisaAvailable(destinationCountry: string, nation
 
         if (visaTypeData?.is_disabled || visaTypeData?.deleted_at) {
             return {
-                data: false,
+                data: null,
                 status: false,
                 error: `The ${visaTypeData?.name} visa is not available at this time. It may have been discontinued or temporarily suspended.`
             }
@@ -117,15 +119,25 @@ export default async function isVisaAvailable(destinationCountry: string, nation
 
         if (visaRuleError || !visaRuleData) {
             return {
-                data: false,
+                data: null,
                 status: false,
                 error: `We couldn't verify visa eligibility for ${nationalityData?.name} to ${destinationCountryData?.name}. Please try again or contact support if the issue persists.`
             }
         }
 
+        console.log("visaRuleData", visaRuleData);
+
+        if(!visaRuleData.is_visa_required) {
+            return {
+                data: null,
+                status: false,
+                error: `A visa is not required to travel to ${destinationCountryData?.name} from ${nationalityData?.name}`
+            }
+        }
+
         if (!visaRuleData.is_supported) {
             return {
-                data: false,
+                data: null,
                 status: false,
                 error: `Unfortunately, we don't support visa applications from ${nationalityData?.name} to ${destinationCountryData?.name} at this time.`
             }
@@ -141,7 +153,7 @@ export default async function isVisaAvailable(destinationCountry: string, nation
 
         if (products?.is_disabled || products?.deleted_at) {
             return {
-                data: false,
+                data: null,
                 status: false,
                 error: `The ${visaTypeData?.name} is not available for ${nationalityData?.name} nationals at this time. Please check back later.`
             }
@@ -149,7 +161,7 @@ export default async function isVisaAvailable(destinationCountry: string, nation
 
 
         return {
-            data: true,
+            data: products,
             status: true,
             message: `The ${visaTypeData?.name} visa to ${destinationCountryData?.name} is available for ${nationalityData?.name} nationals. You can proceed with your application.`
         }
@@ -157,7 +169,7 @@ export default async function isVisaAvailable(destinationCountry: string, nation
     catch (error) {
         console.error(error);
         return {
-            data: false,
+            data: null,
             status: false,
             error: "An unexpected error occurred. Please try again or contact support if the problem continues."
         }

@@ -11,20 +11,24 @@ import {
 } from "react";
 import type { Tables } from "@/database.types";
 import { usePathname, useRouter } from "next/navigation";
-import isVisaAvailable from "@/actions/visas";
+import isVisaAvailable, { fetchVisaById, VisaType } from "@/actions/visas";
 import Link from "next/link";
 import ArrowButton from "@/components/ArrowButton";
+import { VisaProduct } from "@/actions/products";
+import { createApplicationClient } from "@/actions/applications";
+import type GeneralResponse from "@/types/general";
 
 const APPLICATION_ORDER_STORAGE_KEY = "visa-application-order";
 
 /** Temp traveller: DB travellers table without id, application_id */
-export type TempTraveller = Omit<Tables<"travellers">, "id" | "application_id" | "created_at" | "updated_at">;
+export type TempTraveller = Omit<Tables<"travellers">, "id" | "application_id" | "created_at" | "updated_at" | "product_id" | "gov_fee" | "processing_fee"> & { product: Tables<"products"> | null };
 
 export type ApplicationStepId = 1 | 2 | 3 | 4 | 5;
 
 /** Temp order: DB applications fields (no id, profile_id) + destination_country, nationality for routing + travellers + currentStep */
 export interface ApplicationOrder {
   turnaround_time_id: number | null;
+  visa_type: Tables<"visa_types"> | null;
   visa_name: string;
   contact_email: string;
   arrival_date: string;
@@ -62,7 +66,6 @@ export function setStoredOrder(order: ApplicationOrder): void {
 }
 
 export const defaultTraveller: TempTraveller = {
-  product_id: 0,
   nationality: "",
   first_name: "",
   last_name: "",
@@ -71,11 +74,13 @@ export const defaultTraveller: TempTraveller = {
   passport_expiry_date: "",
   country_of_birth: "",
   country_of_residence: "",
+  product: null,
 };
 
 export const defaultOrder: ApplicationOrder = {
   turnaround_time_id: null,
   visa_type_id: 0,
+  visa_type: null,
   visa_name: "",
   contact_email: "",
   arrival_date: new Date().toISOString().split("T")[0] ?? "",
@@ -90,9 +95,13 @@ export type OrderUpdate = Partial<ApplicationOrder> | ((prev: ApplicationOrder) 
 interface ApplicationOrderContextValue {
   order: ApplicationOrder;
   updateOrder: (update: OrderUpdate) => void;
+  handleCheckoutApplication: () => Promise<GeneralResponse<string>>;
   isLoading: boolean;
   travellerVisaErrors: Record<number, string> | null;
   turnaroundTimes: Tables<"turnaround_times">[];
+
+  travellersProducts: Record<number, VisaProduct> | null;
+  visaType: VisaType | null;
 }
 
 const ApplicationOrderContext = createContext<ApplicationOrderContextValue | null>(null);
@@ -115,8 +124,12 @@ export function ApplicationOrderProvider({
   const router = useRouter();
   const pathname = usePathname();
 
+  const [visaType, setVisaType] = useState<VisaType | null>(null);
+  const [travellersProducts, setTravellersProducts] = useState<VisaProduct[]>([]);
+
   useEffect(() => {
     async function validateOrder() {
+
       const stored = getStoredOrder();
 
       if (!stored) {
@@ -125,9 +138,14 @@ export function ApplicationOrderProvider({
       }
 
       // Validate the initial order
-      if (!stored.destination_country || !stored.nationality) {
+      if (!stored.destination_country || !stored.nationality || !stored.visa_type_id) {
         router.push("/");
         return;
+      }
+
+      const { data: visaTypeRes } = await fetchVisaById(stored?.visa_type_id ?? 0);
+      if (visaTypeRes) {
+        setVisaType(visaTypeRes);
       }
 
       if (pathname !== `/${stored.destination_country}/application` || stored.visa_type_id === 0) {
@@ -191,23 +209,37 @@ export function ApplicationOrderProvider({
           return;
         }
 
-        if (stored.travellers.some((t) => t.nationality && t.nationality !== stored.nationality)) {
+        const cashedProducts = new Map<string, Tables<"products">>();
+        if (stored.travellers.some((t) => t.nationality)) {
           let i = 0;
           for (const traveller of stored.travellers) {
-            if (traveller.nationality && traveller.nationality !== stored.nationality) {
-              const { error: visaError, status } = await isVisaAvailable(stored.destination_country, traveller.nationality, stored.visa_type_id);
-              console.log(visaError, status);
+            if (traveller.nationality) {
+              const cacheKey = `${traveller.nationality}-${stored.destination_country}-${stored.visa_type_id}`;
+              if (cashedProducts.has(cacheKey)) {
+                stored.travellers[i].product = cashedProducts.get(cacheKey) ?? null;
+                setStoredOrder(stored);
+                continue;
+              }
+
+              const { error: visaError, status, data: products } = await isVisaAvailable(stored.destination_country, traveller.nationality, stored.visa_type_id);
+
+              console.log(visaError, status, products);
               if (!status) {
                 setTravellerVisaErrors((prev) => ({ ...prev, [i]: visaError ?? "" }));
+                stored.travellers[i].product = null;
+                stored.currentStep = 3;
+                setStoredOrder(stored);
+                return;
+              } else {
+                console.log(products);
+                stored.travellers[i].product = products ?? null;
+                cashedProducts.set(cacheKey, products!);
+                setStoredOrder(stored);
               }
             }
 
             i++;
           }
-
-          stored.currentStep = 3;
-          setStoredOrder(stored);
-          return;
         }
 
         // Step 4: Turnaround time
@@ -251,9 +283,40 @@ export function ApplicationOrderProvider({
     });
   }, []);
 
+  const handleCheckoutApplication = useCallback(async (): Promise<GeneralResponse<string>> => {
+    const currentOrder = order;
+    if (!currentOrder.turnaround_time_id) {
+      return { status: false, error: "Please select a turnaround time" };
+    }
+    const travellersWithProduct = currentOrder.travellers.filter((t) => t.product?.id);
+    if (travellersWithProduct.length !== currentOrder.travellers.length) {
+      return { status: false, error: "Some travellers are missing product information. Please complete all traveller details." };
+    }
+    return createApplicationClient({
+      arrival_date: currentOrder.arrival_date,
+      contact_email: currentOrder.contact_email,
+      destination_country: currentOrder.destination_country,
+      visa_type_id: currentOrder.visa_type_id,
+      turnaround_time_id: currentOrder.turnaround_time_id,
+      travellers: currentOrder.travellers.map((t) => ({
+        first_name: t.first_name,
+        last_name: t.last_name,
+        date_of_birth: t.date_of_birth,
+        passport_number: t.passport_number,
+        passport_expiry_date: t.passport_expiry_date,
+        country_of_birth: t.country_of_birth,
+        country_of_residence: t.country_of_residence,
+        nationality: t.nationality,
+        product_id: t.product!.id,
+      })),
+    });
+  }, [order]);
+
+  useEffect(() => { console.log(order) }, [order])
+
   const value = useMemo(
-    () => ({ order, updateOrder, isLoading, visaError, travellerVisaErrors, turnaroundTimes }),
-    [order, updateOrder, isLoading, travellerVisaErrors, turnaroundTimes]
+    () => ({ order, updateOrder, handleCheckoutApplication, isLoading, visaError, travellerVisaErrors, turnaroundTimes, travellersProducts, visaType }),
+    [order, updateOrder, handleCheckoutApplication, isLoading, travellerVisaErrors, turnaroundTimes, travellersProducts, visaType]
   );
 
   return (

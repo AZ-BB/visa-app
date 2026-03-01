@@ -8,6 +8,7 @@ import {
   getStoredOrder,
   type ApplicationOrder,
 } from "@/app/(client)/[country]/application/_components/ApplicationOrderContext";
+import isVisaAvailable from "@/actions/visas";
 
 /** Banner only shows when the stored order has Step 2 (personal info) data. */
 function hasStep2Data(order: ApplicationOrder | null): boolean {
@@ -24,12 +25,28 @@ function hasStep2Data(order: ApplicationOrder | null): boolean {
 export function ResumeApplicationBanner() {
   const [storedOrder, setStoredOrder] = useState<ReturnType<typeof getStoredOrder>>(null);
   const [dismissed, setDismissed] = useState(false);
+  const [visaAvailable, setVisaAvailable] = useState<boolean | null>(null);
 
   useEffect(() => {
     setStoredOrder(getStoredOrder());
   }, []);
 
-  if (dismissed || !hasStep2Data(storedOrder)) return null;
+  useEffect(() => {
+    if (!storedOrder || !hasStep2Data(storedOrder)) return;
+    if (!storedOrder.destination_country || !storedOrder.nationality || !storedOrder.visa_type_id) {
+      setVisaAvailable(false);
+      return;
+    }
+    isVisaAvailable(
+      storedOrder.destination_country,
+      storedOrder.nationality,
+      storedOrder.visa_type_id
+    ).then((res) => {
+      setVisaAvailable(res.status === true);
+    });
+  }, [storedOrder]);
+
+  if (dismissed || !hasStep2Data(storedOrder) || visaAvailable !== true) return null;
 
   const step = storedOrder?.currentStep ?? 1;
   const applicationHref = storedOrder?.destination_country

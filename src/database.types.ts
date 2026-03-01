@@ -53,39 +53,51 @@ export type Database = {
           assigned_to: string | null
           contact_email: string
           created_at: string
+          destination_country_id: string
+          gov_fee: number
           id: string
-          price: number
+          processing_fee: number
           profile_id: string
           status: Database["public"]["Enums"]["application_status"]
-          turnaround_time_cost: number
+          total_fee: number
+          turnaround_fee: number
           turnaround_time_id: number
           updated_at: string
+          visa_type_id: number
         }
         Insert: {
           arrival_date: string
           assigned_to?: string | null
           contact_email: string
           created_at?: string
+          destination_country_id: string
+          gov_fee?: number
           id?: string
-          price: number
+          processing_fee?: number
           profile_id: string
           status: Database["public"]["Enums"]["application_status"]
-          turnaround_time_cost: number
+          total_fee?: number
+          turnaround_fee?: number
           turnaround_time_id: number
           updated_at?: string
+          visa_type_id: number
         }
         Update: {
           arrival_date?: string
           assigned_to?: string | null
           contact_email?: string
           created_at?: string
+          destination_country_id?: string
+          gov_fee?: number
           id?: string
-          price?: number
+          processing_fee?: number
           profile_id?: string
           status?: Database["public"]["Enums"]["application_status"]
-          turnaround_time_cost?: number
+          total_fee?: number
+          turnaround_fee?: number
           turnaround_time_id?: number
           updated_at?: string
+          visa_type_id?: number
         }
         Relationships: [
           {
@@ -93,6 +105,13 @@ export type Database = {
             columns: ["assigned_to"]
             isOneToOne: false
             referencedRelation: "admin"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_destination_country_id_fkey"
+            columns: ["destination_country_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
             referencedColumns: ["id"]
           },
           {
@@ -107,6 +126,13 @@ export type Database = {
             columns: ["turnaround_time_id"]
             isOneToOne: false
             referencedRelation: "turnaround_times"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_visa_type_id_fkey"
+            columns: ["visa_type_id"]
+            isOneToOne: false
+            referencedRelation: "visa_types"
             referencedColumns: ["id"]
           },
         ]
@@ -227,11 +253,13 @@ export type Database = {
           created_at: string
           date_of_birth: string
           first_name: string
+          gov_fee: number
           id: string
           last_name: string
           nationality: string
           passport_expiry_date: string
           passport_number: string
+          processing_fee: number
           product_id: number
           updated_at: string
         }
@@ -242,11 +270,13 @@ export type Database = {
           created_at?: string
           date_of_birth: string
           first_name: string
+          gov_fee: number
           id?: string
           last_name: string
           nationality: string
           passport_expiry_date: string
           passport_number: string
+          processing_fee: number
           product_id: number
           updated_at?: string
         }
@@ -257,11 +287,13 @@ export type Database = {
           created_at?: string
           date_of_birth?: string
           first_name?: string
+          gov_fee?: number
           id?: string
           last_name?: string
           nationality?: string
           passport_expiry_date?: string
           passport_number?: string
+          processing_fee?: number
           product_id?: number
           updated_at?: string
         }
@@ -305,30 +337,33 @@ export type Database = {
       }
       turnaround_times: {
         Row: {
-          cost: number
           created_at: string
           fee: number
           id: number
+          index: number
           is_disabled: boolean
           name: string
+          turnaround_time_hours: number
           updated_at: string
         }
         Insert: {
-          cost: number
           created_at?: string
           fee?: number
           id?: number
+          index?: number
           is_disabled?: boolean
           name: string
+          turnaround_time_hours?: number
           updated_at?: string
         }
         Update: {
-          cost?: number
           created_at?: string
           fee?: number
           id?: number
+          index?: number
           is_disabled?: boolean
           name?: string
+          turnaround_time_hours?: number
           updated_at?: string
         }
         Relationships: []

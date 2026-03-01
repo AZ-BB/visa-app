@@ -27,17 +27,15 @@ export type StepValidationErrors = Record<string, string> | null
 
 function ApplicationFlowContent({
   country,
-  initialStep,
   isAuthenticated,
 }: {
   country: string;
-  initialStep?: StepId | null;
   isAuthenticated: boolean;
 }) {
   const { order, updateOrder, travellerVisaErrors } = useApplicationOrder()
 
   const [currentStep, setCurrentStep] = useState<StepId>(() => {
-    const step = initialStep ?? order.currentStep ?? 1
+    const step = order.currentStep || 1
     return Math.min(MAX_STEP, Math.max(MIN_STEP, step)) as StepId
   })
   const [validationErrors, setValidationErrors] = useState<StepValidationErrors>(null)
@@ -121,18 +119,16 @@ function ApplicationFlowContent({
 
 export function ApplicationFlow({
   country,
-  initialStep,
   turnaroundTimes,
   isAuthenticated,
 }: {
   country: string;
-  initialStep?: StepId | null;
   turnaroundTimes: Tables<"turnaround_times">[];
   isAuthenticated: boolean;
 }) {
   return (
     <ApplicationOrderProvider turnaroundTimes={turnaroundTimes}>
-      <ApplicationFlowContent country={country} initialStep={initialStep} isAuthenticated={isAuthenticated} />
+      <ApplicationFlowContent country={country} isAuthenticated={isAuthenticated} />
     </ApplicationOrderProvider>
   )
 }
