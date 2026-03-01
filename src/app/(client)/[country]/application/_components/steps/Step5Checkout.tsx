@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatValidFor } from "@/lib/utils";
 import { useApplicationOrder } from "../ApplicationOrderContext";
+import type { TempTraveller } from "../ApplicationOrderContext";
 import TipCard from "@/components/TipCard";
 import ArrowButton from "@/components/ArrowButton";
 import { getCountryNameFromCode } from "@/lib/contries-name";
@@ -12,6 +13,8 @@ import { Separator } from "@/components/ui/separator";
 import InfoIcon from "@/components/svgs/info";
 import { checkEmailExists } from "@/actions/auth";
 import { CheckoutAuthModal } from "../CheckoutAuthModal";
+import Link from "next/link";
+import type { Tables } from "@/database.types";
 
 const TURNAROUND_LABELS: Record<number, string> = {
   1: "Standard",
@@ -22,6 +25,20 @@ const TURNAROUND_LABELS: Record<number, string> = {
 function formatCost(value: number | null): string {
   if (value === null) return "£—";
   return `£${value.toFixed(2)}`;
+}
+
+/** Get governmental fee: product override if set, else visaType default */
+function getGovFee(traveller: TempTraveller, visaType: { gov_fee?: number } | null): number {
+  const override = traveller.product?.gov_fee_override;
+  if (override != null) return override;
+  return visaType?.gov_fee ?? 0;
+}
+
+/** Get processing fee: product override if set, else visaType default */
+function getProcessingFee(traveller: TempTraveller, visaType: { processing_fee?: number } | null): number {
+  const override = traveller.product?.processing_fee_override;
+  if (override != null) return override;
+  return visaType?.processing_fee ?? 0;
 }
 
 interface Step5CheckoutProps {
@@ -37,14 +54,17 @@ export function Step5Checkout({
   visaName,
   isAuthenticated,
   onBack,
-  onContinueToPayment,
+  onContinueToPayment
 }: Step5CheckoutProps) {
-  const { order } = useApplicationOrder();
-  const { arrival_date, travellers, turnaround_time_id } = order;
+  const { order, turnaroundTimes, visaType, handleCheckoutApplication } = useApplicationOrder();
+  const { travellers, turnaround_time_id, destination_country } = order;
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [emailExists, setEmailExists] = useState<boolean | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated && order.contact_email) {
@@ -58,14 +78,42 @@ export function Step5Checkout({
     }
   }, [isAuthenticated, order.contact_email]);
 
-  const readyByDate = arrival_date ? new Date(arrival_date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : "";
+  const selectedTurnaround = turnaroundTimes.find((tt) => tt.id === turnaround_time_id);
+  const turnaroundHours = (selectedTurnaround as { turnaround_time_hours?: number } | undefined)?.turnaround_time_hours ?? 24;
+
+  // Fee breakdown: per-traveller gov + processing, plus turnaround fee
+  const visaTypeWithFees = visaType as Tables<"visa_types"> | null;
+  const travellerFees = useMemo(() => travellers.map((t) => ({
+    govFee: getGovFee(t, visaTypeWithFees),
+    processingFee: getProcessingFee(t, visaTypeWithFees),
+    subtotal: getGovFee(t, visaTypeWithFees) + getProcessingFee(t, visaTypeWithFees),
+  })), [travellers, visaTypeWithFees]);
+
+  const turnaroundFee = (selectedTurnaround as { fee?: number } | undefined)?.fee ?? 0;
+  const travellersSubtotal = travellerFees.reduce((sum, f) => sum + f.subtotal, 0);
+  const totalAmount = travellersSubtotal + turnaroundFee;
+
+  const readyByDate = (() => {
+    const ready = new Date();
+    ready.setTime(ready.getTime() + turnaroundHours * 60 * 60 * 1000);
+    return ready.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  })();
   const redirectUrl = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
 
-  const handleContinueClick = () => {
-    if (isAuthenticated) {
-      onContinueToPayment?.();
-    } else {
+  const handleContinueClick = async () => {
+    if (!isAuthenticated) {
       setAuthModalOpen(true);
+      return;
+    }
+    setCheckoutError(null);
+    setIsSubmitting(true);
+    const result = await handleCheckoutApplication();
+    setIsSubmitting(false);
+    if (result.status && result.data) {
+      onContinueToPayment?.();
+      router.push(`/applications/${result.data}`);
+    } else {
+      setCheckoutError(result.error ?? "Failed to create application");
     }
   };
 
@@ -81,7 +129,8 @@ export function Step5Checkout({
       <TipCard>
         <p className="text-base">
           Your application will be ready by the{" "}
-          <strong>{readyByDate || "—"}</strong>. We&apos;ll make sure to
+          <strong>{readyByDate}</strong>{" "}
+          <span className="text-secondary-copy">(in {turnaroundHours} hours)</span>. We&apos;ll make sure to
           contact you and let you know.
         </p>
       </TipCard>
@@ -94,25 +143,24 @@ export function Step5Checkout({
               {countryName} {visaName}
             </h3>
             <span className="rounded-full text-primary bg-primary/5 px-3 py-1 text-base font-semibold">
-              {TURNAROUND_LABELS[turnaround_time_id ?? 0] ?? "—"}
+              {turnaroundTimes.find((tt) => tt.id === turnaround_time_id)?.name ?? "—"}
             </span>
           </div>
-
 
           <Separator className="my-4" />
 
           <dl className="space-y-2 text-primary-copy">
             <div className="flex justify-between gap-4">
               <dt className="text-secondary-copy">Valid for</dt>
-              <dd className="font-semibold">3 months after issue</dd>
+              <dd className="font-semibold">{formatValidFor(visaType?.valid_for)} after issue</dd>
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-secondary-copy">Number of entries</dt>
-              <dd className="font-semibold">Single entry</dd>
+              <dd className="font-semibold">{visaType?.number_of_entries ?? "—"} entries</dd>
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-secondary-copy">Max stay</dt>
-              <dd className="font-semibold">30 days per entry</dd>
+              <dd className="font-semibold">{visaType?.max_stay ?? "—"} days per entry</dd>
             </div>
           </dl>
         </section>
@@ -125,21 +173,36 @@ export function Step5Checkout({
             Travellers
           </h3>
           <ul className="space-y-2 text-primary-copy">
-            {travellers.map((t, i) => (
-              <li key={i} className="flex justify-between items-center">
-                <div className="text-secondary-copy">
-                  Traveller #{i + 1}
-                </div>
-                <div className="font-semibold">
-                  {[t.first_name, t.last_name].filter(Boolean).join(" ") || "—"}
-                </div>
-              </li>
-            ))}
+            {travellers.map((t, i) => {
+              const fees = travellerFees[i];
+              return (
+                <li key={i}>
+                  <div className="flex justify-between items-center">
+                    <div className="text-secondary-copy">
+                      Traveller #{i + 1}
+                    </div>
+                    <div className="font-semibold">
+                      {[t.first_name, t.last_name].filter(Boolean).join(" ") || "—"}
+                    </div>
+                  </div>
+                  <div className="space-y-2 mt-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-secondary-copy">Governmental Fee</span>
+                      <span className="font-semibold">{formatCost(fees?.govFee ?? 0)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-secondary-copy">Processing Fee</span>
+                      <span className="font-semibold">{formatCost(fees?.processingFee ?? 0)}</span>
+                    </div>
+                  </div>
+                  {i < travellers.length - 1 && <Separator className="my-4" />}
+                </li>
+              );
+            })}
           </ul>
         </section>
 
         <Separator className="my-4" />
-
 
         {/* Additional costs */}
         <section className="mb-8">
@@ -148,12 +211,8 @@ export function Step5Checkout({
           </h3>
           <div className="space-y-2 text-primary-copy">
             <div className="flex justify-between">
-              <span className="text-secondary-copy">Visa fee</span>
-              <span className="font-semibold">{formatCost(0)}</span>
-            </div>
-            <div className="flex justify-between">
               <span className="text-secondary-copy">Turnaround time</span>
-              <span className="font-semibold">{formatCost(0)}</span>
+              <span className="font-semibold">{formatCost(turnaroundFee)}</span>
             </div>
           </div>
           <div className="mt-4 pt-4">
@@ -164,7 +223,7 @@ export function Step5Checkout({
                   Including taxes & fees
                 </p>
               </div>
-              <span className="text-xl font-bold text-primary-copy">{formatCost(0)}</span>
+              <span className="text-xl font-bold text-primary-copy">{formatCost(totalAmount)}</span>
             </div>
           </div>
         </section>
@@ -174,12 +233,12 @@ export function Step5Checkout({
         {/* Privacy link */}
         <p className="text-base text-primary-copy flex items-center gap-2">
           <InfoIcon className="inline-block size-5 fill-primary" aria-hidden />
-          <a
-            href="#"
+          <Link
+            href="/terms"
             className="font-semibold underline underline-offset-2 hover:text-primary"
           >
             Find out more
-          </a>{" "}
+          </Link>{" "}
           about how we keep your information safe.
         </p>
       </div>
@@ -202,13 +261,19 @@ export function Step5Checkout({
           <span />
         )}
         {onContinueToPayment && (
-          <ArrowButton
-            variant="default"
-            className="text-base"
-            onClick={handleContinueClick}
-          >
-            Continue to payment
-          </ArrowButton>
+          <div className="flex flex-col items-end gap-2">
+            {checkoutError && (
+              <p className="text-sm text-red-600">{checkoutError}</p>
+            )}
+            <ArrowButton
+              variant="default"
+              className="text-base"
+              onClick={handleContinueClick}
+              isLoading={isSubmitting}
+            >
+              Continue to payment
+            </ArrowButton>
+          </div>
         )}
       </div>
 

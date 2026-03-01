@@ -158,12 +158,14 @@ export function ApplyFormSection({
               >
                 <Minus className="size-5" strokeWidth={2.5} />
               </Button>
+
               <span
                 className="min-w-10 text-center text-base font-medium text-primary-copy"
                 aria-live="polite"
               >
                 {numberOfTravellers}
               </span>
+              
               <Button
                 type="button"
                 variant="outline"

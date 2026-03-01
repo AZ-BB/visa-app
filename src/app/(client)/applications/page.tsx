@@ -8,21 +8,8 @@ import {
     CardHeader,
 } from "@/components/ui/card";
 import { CountryFlag } from "@/components/ui/country-flag";
-import { cn } from "@/lib/utils";
-
-const STATUS_LABELS: Record<string, string> = {
-    NOT_STARTED: "Not Started",
-    IN_PROGRESS: "In Progress",
-    COMPLETED: "Completed",
-    REJECTED: "Rejected",
-};
-
-const STATUS_STYLES: Record<string, string> = {
-    NOT_STARTED: "bg-slate-100 text-slate-700 border-2 border-slate-200",
-    IN_PROGRESS: "bg-amber-100 text-amber-800 border-2 border-amber-200",
-    COMPLETED: "bg-emerald-100 text-emerald-800 border-2 border-emerald-200",
-    REJECTED: "bg-red-100 text-red-800 border-2 border-red-200",
-};
+import { Separator } from "@/components/ui/separator";
+import { StatusBadge } from "@/components/StatusBadge";
 
 function formatCreatedAt(dateStr: string | undefined) {
     if (!dateStr) return "—";
@@ -50,36 +37,33 @@ export default async function ApplicationsPage() {
         .from("applications")
         .select(
             `
-            *,
-            products(
-                visa_types(
-                    name,
-                    countries(id, name)
-                )
-            ),
+            id,
+            status,
+            total_fee,
+            destination_country:countries(id, name),
+            visa_type:visa_types(id, name),
+            arrival_date,
+            updated_at,
+            created_at,
             turnaround_times(name),
-            travellers(*)
+            travellers(id)
         `
         )
-        .eq("profile_id", user.authUser.id)
+        .eq("profile_id", user.profile?.id ?? user.authUser.id)
         .order("created_at", { ascending: false });
 
     const displayApplications = applications ?? [];
 
     type AppItem = (typeof displayApplications)[number];
 
-    type ProductsShape = {
-        visa_types?: { name: string; countries?: { id?: string; name: string } };
-    };
-
     const destinationName = (app: AppItem) =>
-        (app?.products as ProductsShape | null)?.visa_types?.countries?.name ?? "—";
+        (app as { destination_country?: { name?: string } }).destination_country?.name ?? "—";
 
     const destinationCountryCode = (app: AppItem) =>
-        (app?.products as ProductsShape | null)?.visa_types?.countries?.id ?? null;
+        (app as { destination_country?: { id?: string } }).destination_country?.id ?? null;
 
     const visaTypeName = (app: AppItem) =>
-        (app?.products as ProductsShape | null)?.visa_types?.name ?? "—";
+        (app as { visa_type?: { name?: string } }).visa_type?.name ?? "—";
 
     const travellerCount = (app: AppItem) =>
         Array.isArray((app as { travellers?: unknown[] }).travellers)
@@ -90,17 +74,17 @@ export default async function ApplicationsPage() {
         (app as { turnaround_times?: { name?: string } }).turnaround_times?.name ?? "—";
 
     const totalCost = (app: AppItem) =>
-        (app?.price ?? 0) + (app?.turnaround_time_cost ?? 0);
+        (app as { total_fee?: number }).total_fee ?? 0;
 
     return (
-        <div className="min-h-screen bg-bg-light-grey pt-6 sm:pt-16 pb-12 px-6">
+        <div className="min-h-screen bg-bg-light-grey pt-6 sm:pt-16 pb-12 px-4 sm:px-6">
             <div className="max-w-7xl mx-auto sm:px-6">
-                <h1 className="text-2xl sm:text-3xl font-bold text-primary-copy mb-8">
+                <h1 className="text-2xl sm:text-3xl font-bold text-primary-copy mb-6 sm:mb-8">
                     Applications
                 </h1>
 
                 {!displayApplications.length ? (
-                    <div className="rounded-2xl border border-border-default/50 bg-white p-12 text-center shadow-sm">
+                    <div className="rounded-2xl border border-border-default/50 bg-white p-8 sm:p-12 text-center shadow-sm">
                         <p className="text-secondary-copy text-lg">
                             You have no applications yet.
                         </p>
@@ -110,8 +94,8 @@ export default async function ApplicationsPage() {
                     </div>
                 ) : (
                     <div
-                            className={`grid gap-4 ${displayApplications.length === 1 ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-2"}`}
-                        >
+                        className={`grid gap-4 ${displayApplications.length === 1 ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-2"}`}
+                    >
                         {displayApplications.map((app) => (
                             <Link
                                 key={app.id}
@@ -121,82 +105,89 @@ export default async function ApplicationsPage() {
                                 <Card
                                     className="h-full rounded-2xl transition-colors border-2 hover:border-primary/40 hover:bg-primary/[0.02] border-border-default/50 bg-white"
                                 >
-                                <CardHeader className="pb-2">
-                                    <div className="flex items-start justify-between gap-3">
-                                        <div className="flex items-center gap-3 min-w-0">
-                                            {(() => {
-                                                const code = destinationCountryCode(app);
-                                                return code ? (
-                                                    <CountryFlag
-                                                        code={code}
-                                                        className="h-8 w-8 shrink-0"
-                                                        loading="lazy"
-                                                    />
-                                                ) : null;
-                                            })()}
-                                            <h2 className="text-xl font-semibold text-primary-copy truncate">
-                                                {destinationName(app)}
-                                            </h2>
+                                    <CardHeader className="">
+                                        {(() => {
+                                            const code = destinationCountryCode(app);
+                                            return (
+                                                <>
+                                                    {/* Mobile: [FLAG] | [Header] / [FLAG] | [Status] */}
+                                                    <div className="grid grid-cols-[auto_1fr] gap-x-3 items-start sm:hidden">
+                                                        {code ? (
+                                                            <div className="row-span-2 pt-2">
+                                                                <CountryFlag
+                                                                    code={code}
+                                                                    className="size-15 shrink-0 rounded-md"
+                                                                    round={false}
+                                                                    loading="lazy"
+                                                                />
+                                                            </div>
+                                                        ) : (
+                                                            <div className="row-span-2 w-0" />
+                                                        )}
+                                                        <h2 className="text-xl font-bold text-primary-copy line-clamp-2 min-w-0 pt-1">
+                                                            {destinationName(app)} - {visaTypeName(app)}
+                                                        </h2>
+                                                        <StatusBadge status={app.status} />
+                                                    </div>
+                                                    {/* Desktop: [FLAG] [Header] ——— [Status] */}
+                                                    <div className="hidden sm:flex sm:items-start sm:justify-between sm:gap-3">
+                                                        <div className="flex items-center gap-3 min-w-0">
+                                                            {code ? (
+                                                                <CountryFlag
+                                                                    code={code}
+                                                                    className="h-14 w-14 shrink-0 rounded-md"
+                                                                    round={false}
+                                                                    loading="lazy"
+                                                                />
+                                                            ) : null}
+                                                            <h2 className="text-2xl font-bold text-primary-copy line-clamp-2 min-w-0">
+                                                                {destinationName(app)} - {visaTypeName(app)}
+                                                            </h2>
+                                                        </div>
+                                                        <StatusBadge status={app.status} />
+                                                    </div>
+                                                </>
+                                            );
+                                        })()}
+                                    </CardHeader>
+                                    <CardContent className="space-y-3 pt-0">
+                                        <Separator className="mb-4" />
+                                        <div className="flex justify-between items-center gap-4 text-base">
+                                            <span className="text-secondary-copy shrink-0">
+                                                Turnaround time
+                                            </span>
+                                            <span className="font-semibold text-primary-copy text-right truncate min-w-0">
+                                                {turnaroundTimeName(app)}
+                                            </span>
                                         </div>
-                                        <span
-                                            className={cn(
-                                                "shrink-0 rounded-full px-3 py-1 text-xs font-medium",
-                                                STATUS_STYLES[app.status] ??
-                                                STATUS_STYLES.NOT_STARTED
-                                            )}
-                                        >
-                                            {
-                                                STATUS_LABELS[app.status] ??
-                                                app.status
-                                            }
-                                        </span>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="space-y-2 pt-0">
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-secondary-copy">
-                                            Visa type
-                                        </span>
-                                        <span className="font-medium text-primary-copy">
-                                            {visaTypeName(app)}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-secondary-copy">
-                                            Travellers
-                                        </span>
-                                        <span className="font-medium text-primary-copy">
-                                            {travellerCount(app)}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-secondary-copy">
-                                            Turnaround time
-                                        </span>
-                                        <span className="font-medium text-primary-copy">
-                                            {turnaroundTimeName(app)}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-secondary-copy">
-                                            Created
-                                        </span>
-                                        <span className="font-medium text-primary-copy">
-                                            {formatCreatedAt(
-                                                (app as { created_at?: string }).created_at
-                                            )}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-secondary-copy">
-                                            Cost
-                                        </span>
-                                        <span className="font-semibold text-primary-copy">
-                                            £{totalCost(app).toFixed(2)}
-                                        </span>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                                        <div className="flex justify-between items-center gap-4 text-base">
+                                            <span className="text-secondary-copy shrink-0">
+                                                Travellers
+                                            </span>
+                                            <span className="font-semibold text-primary-copy text-right truncate min-w-0">
+                                                {travellerCount(app)}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between items-center gap-4 text-base">
+                                            <span className="text-secondary-copy shrink-0">
+                                                Created
+                                            </span>
+                                            <span className="font-semibold text-primary-copy text-right truncate min-w-0">
+                                                {formatCreatedAt(
+                                                    (app as { created_at?: string }).created_at
+                                                )}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between items-center gap-4 text-base">
+                                            <span className="text-secondary-copy shrink-0">
+                                                Cost
+                                            </span>
+                                            <span className="font-semibold text-primary-copy text-right truncate min-w-0">
+                                                £{totalCost(app).toFixed(2)}
+                                            </span>
+                                        </div>
+                                    </CardContent>
+                                </Card>
                             </Link>
                         ))}
                     </div>

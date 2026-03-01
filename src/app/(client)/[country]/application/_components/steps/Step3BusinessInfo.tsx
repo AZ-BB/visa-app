@@ -204,6 +204,24 @@ export function Step3BusinessInfo({ onNext, onBack, errors }: Step3BusinessInfoP
       setIsValidatingNationality(false);
       if (!res.status && res.error) {
         setNationalityVisaErrors((prev) => ({ ...prev, [index]: res.error! }));
+        updateOrder((prev) => ({
+          travellers: prev.travellers.map((t, i) =>
+            i === index ? { ...t, product: null } : t
+          ),
+        }));
+      }
+      if (res.status && res.data) {
+        const product = res.data;
+        updateOrder((prev) => ({
+          travellers: prev.travellers.map((t, i) =>
+            i === index ? { ...t, product } : t
+          ),
+        }));
+        setNationalityVisaErrors((prev) => {
+          const next = { ...prev };
+          delete next[index];
+          return next;
+        });
       }
     });
   };
