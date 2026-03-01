@@ -18,6 +18,8 @@ export interface VisaType {
     max_stay: number;
     number_of_entries: number;
     valid_for: string;
+    processing_fee: number;
+    gov_fee: number;
     created_at: string;
     updated_at: string;
     destination_country_data: VisaCountry | null;

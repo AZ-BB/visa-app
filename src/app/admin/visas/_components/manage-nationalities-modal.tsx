@@ -95,6 +95,7 @@ export function ManageNationalitiesModal({
         destinationCountry,
         Array.from(selected)
       )
+      console.log(result)
       if (result.success) {
         setOpen(false)
       }
