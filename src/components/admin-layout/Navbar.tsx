@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, FileText, Plane, Globe2, Users, ShieldCheck, Coins, Menu, X } from "lucide-react"
+import { LayoutDashboard, FileText, Plane, Globe2, Users, ShieldCheck, Coins, Menu, X, Settings } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 
@@ -12,7 +12,7 @@ const links = [
   { href: "/admin/countries", label: "Countries", icon: Globe2 },
   { href: "/admin/clients", label: "Clients", icon: Users },
   { href: "/admin/admins", label: "Admins", icon: ShieldCheck },
-  { href: "/admin/fees", label: "Fees", icon: Coins },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
 ]
 
 export default function AdminNavbar() {

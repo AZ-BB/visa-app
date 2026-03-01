@@ -15,15 +15,18 @@ import {
   getClientById,
   getApplicationsByClient,
   getAdmins,
-  getTurnaroundTimes,
   disableProduct,
   deleteProduct,
   updateProduct,
   disableVisa,
   deleteVisa,
   createVisa,
-  updateTurnaroundTime,
 } from "@/lib/admin-mock-data"
+import {
+  createTurnaroundTime,
+  getTurnaroundTimes,
+  updateTurnaroundTime,
+} from "@/actions/turnaround-times"
 
 export async function fetchApplications() {
   return getApplications()
@@ -120,7 +123,27 @@ export async function createVisaAction(
 
 export async function updateTurnaroundTimeAction(
   id: number,
-  data: { name?: string; cost?: string }
+  data: {
+    name?: string
+    fee?: number
+    turnaround_time_hours?: number
+    is_disabled?: boolean
+  }
 ) {
-  await updateTurnaroundTime(id, data)
+  const result = await updateTurnaroundTime(id, data)
+  if (!result.status) {
+    throw new Error(result.error)
+  }
+}
+
+export async function createTurnaroundTimeAction(data: {
+  name: string
+  index: number
+  turnaround_time_hours: number
+  fee: number
+}) {
+  const result = await createTurnaroundTime(data)
+  if (!result.status) {
+    throw new Error(result.error)
+  }
 }

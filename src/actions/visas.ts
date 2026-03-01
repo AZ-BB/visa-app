@@ -72,7 +72,6 @@ export async function updateVisaTypeDisabledStatus(id: number, isDisabled: boole
 
 export default async function isVisaAvailable(destinationCountry: string, nationality: string, visaTypeId: number): Promise<GeneralResponse<Tables<"products"> | null>> {
     try {
-        console.log("isVisaAvailable", destinationCountry, nationality, visaTypeId);
         const supabase = await createSupabaseServerClient();
 
         const { data: destinationCountryData, error: destinationCountryError } = await supabase
@@ -124,8 +123,6 @@ export default async function isVisaAvailable(destinationCountry: string, nation
                 error: `We couldn't verify visa eligibility for ${nationalityData?.name} to ${destinationCountryData?.name}. Please try again or contact support if the issue persists.`
             }
         }
-
-        console.log("visaRuleData", visaRuleData);
 
         if(!visaRuleData.is_visa_required) {
             return {

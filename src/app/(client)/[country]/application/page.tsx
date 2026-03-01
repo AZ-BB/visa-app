@@ -4,7 +4,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/supabase-server";
 import { notFound } from "next/navigation";
 import ArrowButton from "@/components/ArrowButton";
 import Link from "next/link";
-import { getTurnaroundTimes } from "@/actions/turnaround_time";
+import { getTurnaroundTimes } from "@/actions/turnaround-times";
 
 export default async function ApplicationPage({
   params,

@@ -287,6 +287,7 @@ export function CountryDropdown({
   const [highlightIndex, setHighlightIndex] = useState(0);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const listRef = useListRef(null);
+  const scrollFromKeyboardRef = useRef(false);
 
   const options = valuesProp ?? DEFAULT_COUNTRIES;
 
@@ -314,7 +315,8 @@ export function CountryDropdown({
   }, [search, open]);
 
   useEffect(() => {
-    if (!open || highlightIndex < 0 || highlightIndex >= filteredOptions.length) return;
+    if (!open || highlightIndex < 0 || highlightIndex >= filteredOptions.length || !scrollFromKeyboardRef.current) return;
+    scrollFromKeyboardRef.current = false;
     listRef.current?.scrollToRow({ index: highlightIndex, align: "smart", behavior: "smooth" });
   }, [highlightIndex, filteredOptions.length, open]);
 
@@ -330,9 +332,11 @@ export function CountryDropdown({
     (e: React.KeyboardEvent) => {
       if (e.key === "ArrowDown") {
         e.preventDefault();
+        scrollFromKeyboardRef.current = true;
         setHighlightIndex((i) => (i < filteredOptions.length - 1 ? i + 1 : i));
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
+        scrollFromKeyboardRef.current = true;
         setHighlightIndex((i) => (i > 0 ? i - 1 : 0));
       } else if (e.key === "Enter" && filteredOptions[highlightIndex]) {
         e.preventDefault();
@@ -357,7 +361,7 @@ export function CountryDropdown({
             type="button"
             onClick={openPopover}
             className={cn(
-              "h-auto min-h-12 w-full rounded-2xl border border-[#DAE0E5] bg-white px-4 py-2.5 shadow-[0px_2px_4px_0px_#0000000A]",
+              "h-auto min-h-12 w-full rounded-2xl border border-[#DAE0E5] bg-white px-4 py-2.5 shadow-sm",
               "flex items-center justify-between gap-3 text-base text-primary-copy text-left",
               "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-0",
               "hover:border-gray-300 transition-colors",
