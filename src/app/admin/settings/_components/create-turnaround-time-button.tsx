@@ -40,7 +40,7 @@ export function CreateTurnaroundTimeButton({ nextIndex }: CreateTurnaroundTimeBu
     })
     setOpen(false)
     setName("")
-    setTurnaroundTimeHours("168")
+    setTurnaroundTimeHours("")
     setFee("")
     router.refresh()
   }
@@ -49,7 +49,7 @@ export function CreateTurnaroundTimeButton({ nextIndex }: CreateTurnaroundTimeBu
     setOpen(isOpen)
     if (!isOpen) {
       setName("")
-      setTurnaroundTimeHours("168")
+      setTurnaroundTimeHours("")
       setFee("")
     }
   }
@@ -73,7 +73,7 @@ export function CreateTurnaroundTimeButton({ nextIndex }: CreateTurnaroundTimeBu
               id="create-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Standard (5–7 days)"
+              placeholder="e.g. Standard (1-2 days)"
             />
           </div>
           <div className="grid gap-2">
@@ -84,7 +84,7 @@ export function CreateTurnaroundTimeButton({ nextIndex }: CreateTurnaroundTimeBu
               min={1}
               value={turnaroundTimeHours}
               onChange={(e) => setTurnaroundTimeHours(e.target.value)}
-              placeholder="e.g. 168 for 7 days"
+              placeholder="e.g. 24 for 1 day"
             />
           </div>
           <div className="grid gap-2">

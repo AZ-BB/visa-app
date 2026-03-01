@@ -2,9 +2,20 @@ import { fetchTurnaroundTimes } from "@/actions/admin"
 import { PageHeader } from "@/components/admin-layout/page-header"
 import { CreateTurnaroundTimeButton } from "./_components/create-turnaround-time-button"
 import { TurnaroundTimeCard } from "./_components/turnaround-time-card"
+import { getTurnaroundTimes } from "@/actions/turnaround-times"
 
 export default async function SettingsPage() {
-  const turnaroundTimes = await fetchTurnaroundTimes()
+  const { data: turnaroundTimes, status: turnaroundTimesStatus } = await getTurnaroundTimes()
+
+  if (!turnaroundTimes || !turnaroundTimesStatus) {
+    return (
+      <div className="flex flex-col items-center justify-center rounded-xl border border-border-default bg-white px-6 py-20 text-center shadow-sm">
+        <p className="text-sm text-secondary-copy">
+          No turnaround times configured.
+        </p>
+      </div>
+    )
+  }
 
   return (
     <main className="space-y-6 max-w-2xl mx-auto">

@@ -103,7 +103,7 @@ export default async function ApplicationsPage() {
                                 className="block cursor-pointer"
                             >
                                 <Card
-                                    className="h-full rounded-2xl transition-colors border-2 hover:border-primary/40 hover:bg-primary/[0.02] border-border-default/50 bg-white"
+                                    className="h-full rounded-2xl transition-colors border-2 hover:border-primary/40 hover:bg-primary/2 border-border-default/50 bg-white"
                                 >
                                     <CardHeader className="">
                                         {(() => {

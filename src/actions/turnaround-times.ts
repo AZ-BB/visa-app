@@ -5,19 +5,34 @@ import { createSupabaseServerClient } from "@/lib/supabase/supabase-server";
 import GeneralResponse from "@/types/general";
 import { revalidatePath } from "next/cache";
 
-export async function getTurnaroundTimes() {
-    const supabase = await createSupabaseServerClient();
+export async function getTurnaroundTimes(): Promise<GeneralResponse<Tables<"turnaround_times">[]>> {
+    try {
+        const supabase = await createSupabaseServerClient();
 
-    const { data, error } = await supabase
-        .from("turnaround_times")
-        .select("*")
-        .order("turnaround_time_hours", { ascending: true });
+        const { data, error } = await supabase
+            .from("turnaround_times")
+            .select("*")
+            .order("turnaround_time_hours", { ascending: false });
 
-    if (error) {
-        throw new Error(error.message);
+        if (error) {
+            return {
+                status: false,
+                error: error.message,
+            };
+        }
+
+        return {
+            status: true,
+            data: data,
+        };
     }
-
-    return data;
+    catch (error) {
+        console.error(error);
+        return {
+            status: false,
+            error: "Failed to get turnaround times",
+        };
+    }
 }
 
 export async function createTurnaroundTime(turnaroundTime: {
