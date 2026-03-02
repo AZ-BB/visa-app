@@ -292,6 +292,7 @@ export async function getApplications(page: number = 1, limit: number = 10, filt
     status?: ApplicationStatus
     assigned_to_id?: string
     search?: string
+    profile_id?: string
 
     destination?: string
     nationality?: string
@@ -314,6 +315,7 @@ export async function getApplications(page: number = 1, limit: number = 10, filt
             p_sort: filter.sort,
             p_order: filter.order,
             p_filter_unassigned: isUnassignedFilter,
+            p_profile_id: filter.profile_id ?? undefined,
         });
 
         if (error) {

@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { ChevronUp, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -26,6 +27,7 @@ export function SortableTableHeader({
   className,
   align = "left",
 }: SortableTableHeaderProps) {
+  const pathname = usePathname()
   const isActive = currentSort === sortKey
   const nextOrder: SortOrder = isActive && currentOrder === "desc" ? "asc" : "desc"
 
@@ -38,7 +40,7 @@ export function SortableTableHeader({
   searchParams.set("sort", sortKey)
   searchParams.set("order", nextOrder)
   searchParams.set("page", "1")
-  const href = `/admin/applications?${searchParams.toString()}`
+  const href = `${pathname}?${searchParams.toString()}`
 
   return (
     <th
