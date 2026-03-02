@@ -261,7 +261,7 @@ export function VisaRulesTable({
                 return (
                   <tr
                     key={rule.id}
-                    className="group transition-colors hover:bg-primary/[0.02]"
+                    className="group transition-colors hover:bg-primary/2"
                   >
                     <td className="w-12 py-3.5 pl-5 pr-2 text-xs tabular-nums text-secondary-copy">
                       {index + 1}

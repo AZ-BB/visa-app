@@ -2,7 +2,7 @@
 
 import { createSupabaseServerClient } from "@/lib/supabase/supabase-server";
 import { revalidatePath } from "next/cache";
-import { VisaCountry } from "./visas";
+import { VisaCountry, VisaType } from "./visas";
 import GeneralResponse from "@/types/general";
 
 export interface VisaProduct {
@@ -20,6 +20,7 @@ export interface VisaProduct {
         is_visa_required: boolean;
         nationality_country: VisaCountry | null;
     } | null;
+    visa_type: VisaType;
 }
 
 export async function fetchProductsByVisaType(visaTypeId: number): Promise<GeneralResponse<VisaProduct[]>> {
@@ -31,6 +32,9 @@ export async function fetchProductsByVisaType(visaTypeId: number): Promise<Gener
             visa_rule:visa_rules!visa_rule_id(
                 id, nationality, destination_country, is_supported, is_visa_required,
                 nationality_country:countries!nationality(id, name, is_disabled)
+            ),
+            visa_type:visa_types!visa_type_id(
+                id, name, destination_country, is_disabled, processing_fee, gov_fee, created_at, updated_at
             )
         `)
         .eq("visa_type_id", visaTypeId)
@@ -89,6 +93,36 @@ export async function fetchActiveProductCountsByVisaTypeIds(
         counts[row.visa_type_id] = Number(row.product_count);
     }
     return { data: counts };
+}
+
+export async function fetchProductsBetweenCountries(
+    destinationCountry: string,
+    nationality: string
+): Promise<GeneralResponse<VisaProduct[]>> {
+    const supabase = await createSupabaseServerClient();
+    const { data: visaRule } = await supabase
+        .from("visa_rules")
+        .select("id")
+        .eq("destination_country", destinationCountry)
+        .eq("nationality", nationality)
+        .single();
+    if (!visaRule) return { error: "Visa rule not found" };
+    const { data, error } = await supabase
+        .from("products")
+        .select(`
+            id, processing_fee_override, gov_fee_override, is_disabled, created_at, updated_at,
+            visa_rule:visa_rules!visa_rule_id(
+                id, nationality, destination_country, is_supported, is_visa_required,
+                nationality_country:countries!nationality(id, name, is_disabled)
+            ),
+            visa_type:visa_types!visa_type_id(
+                id, name, destination_country, is_disabled, processing_fee, gov_fee, created_at, updated_at
+            )
+        `)
+        .eq("visa_rule_id", visaRule?.id)
+        .is("deleted_at", null);
+    if (error) return { error: error.message };
+    return { data: data as VisaProduct[] };
 }
 
 export async function updateProductDisabledStatus(

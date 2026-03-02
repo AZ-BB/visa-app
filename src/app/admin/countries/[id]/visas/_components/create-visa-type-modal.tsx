@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useTransition } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useTransition, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Loader2, Plus } from "lucide-react"
 import { createVisaTypeForDestination } from "@/actions/visas"
 import { Button } from "@/components/ui/button"
@@ -45,10 +45,17 @@ export function CreateVisaTypeModal({
   className,
 }: CreateVisaTypeModalProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [form, setForm] = useState(initialForm)
+
+  useEffect(() => {
+    if (searchParams.get("create") === "true") {
+      setOpen(true)
+    }
+  }, [searchParams])
 
   const reset = () => {
     setForm(initialForm)
