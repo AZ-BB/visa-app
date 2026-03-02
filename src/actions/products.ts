@@ -46,6 +46,51 @@ export async function fetchProductsByVisaType(visaTypeId: number): Promise<Gener
     return { data: sorted as VisaProduct[] };
 }
 
+export interface VisaRuleProductStats {
+    productCounts: Record<number, number>;
+    visaTypeCounts: Record<number, number>;
+}
+
+export async function fetchProductStatsByVisaRuleIds(
+    visaRuleIds: number[]
+): Promise<GeneralResponse<VisaRuleProductStats>> {
+    if (visaRuleIds.length === 0) return { data: { productCounts: {}, visaTypeCounts: {} } };
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase.rpc("get_product_stats_by_visa_rule_ids", {
+        rule_ids: visaRuleIds,
+    });
+
+    if (error) return { error: error.message };
+
+    const productCounts: Record<number, number> = {};
+    const visaTypeCounts: Record<number, number> = {};
+
+    for (const row of data ?? []) {
+        productCounts[row.visa_rule_id] = Number(row.product_count);
+        visaTypeCounts[row.visa_rule_id] = Number(row.visa_type_count);
+    }
+
+    return { data: { productCounts, visaTypeCounts } };
+}
+
+export async function fetchActiveProductCountsByVisaTypeIds(
+    visaTypeIds: number[]
+): Promise<GeneralResponse<Record<number, number>>> {
+    if (visaTypeIds.length === 0) return { data: {} };
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase.rpc("get_active_product_counts_by_visa_type_ids", {
+        type_ids: visaTypeIds,
+    });
+
+    if (error) return { error: error.message };
+
+    const counts: Record<number, number> = {};
+    for (const row of data ?? []) {
+        counts[row.visa_type_id] = Number(row.product_count);
+    }
+    return { data: counts };
+}
+
 export async function syncAllowedNationalities(
     visaTypeId: number,
     destinationCountry: string,
