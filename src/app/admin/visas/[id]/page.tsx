@@ -200,7 +200,7 @@ function DetailRow({
           : ""
   return (
     <div
-      className={`flex items-center justify-between px-5 py-3 hover:bg-black/[0.1] ${roundedClass}`}
+      className={`flex items-center justify-between px-5 py-3 hover:bg-black/10 ${roundedClass}`}
     >
       <span className="text-sm text-secondary-copy">{label}</span>
       <span className="text-sm font-medium text-primary-copy">{children}</span>

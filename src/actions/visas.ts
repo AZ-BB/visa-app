@@ -77,6 +77,19 @@ export async function fetchVisas({
     const { data, error, count } = await query.range(from, to);
 
     if (error) {
+        const total = count ?? 0;
+        const totalPages = Math.max(1, Math.ceil(total / safePageSize));
+        if (safePage > totalPages) {
+            return {
+                data: {
+                    visas: [],
+                    total,
+                    page: safePage,
+                    pageSize: safePageSize,
+                    totalPages,
+                },
+            };
+        }
         return { error: error.message };
     }
 

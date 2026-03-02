@@ -1,19 +1,19 @@
 import Link from "next/link"
+import { redirect } from "next/navigation"
 import { fetchVisas } from "@/actions/visas"
 import { fetchAllCountriesList } from "@/actions/countries"
 import { CountryFlag } from "@/components/ui/country-flag"
 import { VisaStatusToggle } from "./_components/visa-status-toggle"
 import { VisasSearchForm } from "./_components/visas-search-form"
+import Pagination from "@/components/Pagination"
 import {
   Eye,
   Search as SearchIcon,
   CalendarDays,
   DoorOpen,
   Clock,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
+  AlertTriangle,
+  RefreshCw,
 } from "lucide-react"
 
 export default async function VisasPage({
@@ -24,16 +24,26 @@ export default async function VisasPage({
     country?: string
     status?: string
     page?: string
-    pageSize?: string
+    page_size?: string
   }>
 }) {
   const params = await searchParams
   const parsedPage = Number(params.page)
-  const parsedPageSize = Number(params.pageSize)
+  const parsedPageSize = Number(params.page_size)
   const statusFilter =
     params.status === "active" || params.status === "disabled"
       ? params.status
       : "all"
+
+  if (Number.isFinite(parsedPage) && (parsedPage < 1 || !Number.isInteger(parsedPage))) {
+    const p = new URLSearchParams()
+    if (params.search?.trim()) p.set("search", params.search.trim())
+    if (statusFilter !== "all") p.set("status", statusFilter)
+    if (params.country?.trim()) p.set("country", params.country.trim())
+    if (Number.isFinite(parsedPageSize) && parsedPageSize !== 20) p.set("page_size", String(parsedPageSize))
+    const qs = p.toString()
+    redirect(qs ? `/admin/visas?${qs}` : "/admin/visas")
+  }
 
   const [visasResponse, countriesResponse] = await Promise.all([
     fetchVisas({
@@ -46,44 +56,55 @@ export default async function VisasPage({
     fetchAllCountriesList(),
   ])
 
+  const allCountries = countriesResponse.data ?? []
+
   if (visasResponse.error || !visasResponse.data) {
-    throw new Error(visasResponse.error ?? "Failed to fetch visas")
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-xl font-semibold text-primary-copy">Visa types</h1>
+          <p className="mt-0.5 text-sm text-secondary-copy">
+            Manage all visa types across destinations
+          </p>
+        </div>
+        <div className="flex flex-col items-center justify-center rounded-xl border border-red-200 bg-red-50/50 px-6 py-16 text-center">
+          <div className="mb-4 flex size-14 items-center justify-center rounded-full bg-red-100 text-red-600">
+            <AlertTriangle className="size-6" />
+          </div>
+          <h3 className="text-sm font-semibold text-primary-copy">
+            Something went wrong
+          </h3>
+          <Link
+            href="/admin/visas"
+            className="mt-5 inline-flex h-9 items-center gap-2 rounded-lg border border-border-default bg-white px-4 text-sm font-medium text-primary-copy shadow-sm transition-all hover:border-primary/40 hover:text-primary"
+          >
+            <RefreshCw className="size-4" />
+            Try again
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   const {
     visas,
     total,
     page: currentPage,
-    totalPages,
     pageSize: currentPageSize,
+    totalPages,
   } = visasResponse.data
 
-  const allCountries = countriesResponse.data ?? []
-  const fromItem = visas.length === 0 ? 0 : (currentPage - 1) * currentPageSize + 1
-  const toItem = visas.length === 0 ? 0 : fromItem + visas.length - 1
-
-  const getPageHref = (targetPage: number) => {
+  if (currentPage > totalPages && totalPages > 0) {
     const p = new URLSearchParams()
     if (params.search?.trim()) p.set("search", params.search.trim())
     if (statusFilter !== "all") p.set("status", statusFilter)
     if (params.country?.trim()) p.set("country", params.country.trim())
-    if (currentPageSize !== 20) p.set("pageSize", String(currentPageSize))
-    if (targetPage > 1) p.set("page", String(targetPage))
-    const qs = p.toString()
-    return qs ? `/admin/visas?${qs}` : "/admin/visas"
+    if (currentPageSize !== 20) p.set("page_size", String(currentPageSize))
+    p.set("page", String(totalPages))
+    redirect(`/admin/visas?${p.toString()}`)
   }
 
-  const getVisiblePages = () => {
-    const pages: number[] = []
-    const maxVisible = 5
-    let start = Math.max(1, currentPage - Math.floor(maxVisible / 2))
-    const end = Math.min(totalPages, start + maxVisible - 1)
-    start = Math.max(1, end - maxVisible + 1)
-    for (let i = start; i <= end; i++) pages.push(i)
-    return pages
-  }
-
-  const visiblePages = getVisiblePages()
+  const fromItem = visas.length === 0 ? 0 : (currentPage - 1) * currentPageSize + 1
 
   return (
     <div className="space-y-6">
@@ -152,7 +173,7 @@ export default async function VisasPage({
                 {visas.map((visa, index) => (
                   <tr
                     key={visa.id}
-                    className="group transition-colors hover:bg-primary/[0.02]"
+                    className="group transition-colors hover:bg-primary/2"
                   >
                     <td className="w-12 py-3.5 pl-5 pr-2 text-xs tabular-nums text-secondary-copy">
                       {fromItem + index}
@@ -194,7 +215,9 @@ export default async function VisasPage({
                       <div className="flex items-center gap-3 text-secondary-copy">
                         <span className="inline-flex items-center gap-1.5">
                           <DoorOpen className="size-3.5 shrink-0 opacity-50" />
-                          {visa.number_of_entries}
+                          {visa.number_of_entries === -1
+                            ? "Multiple"
+                            : visa.number_of_entries}
                         </span>
                         <span className="text-border-default">/</span>
                         <span className="inline-flex items-center gap-1.5">
@@ -230,98 +253,15 @@ export default async function VisasPage({
 
         {/* Pagination */}
         {visas.length > 0 && (
-          <div className="flex flex-col gap-3 border-t border-border-default bg-white px-5 py-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-xs text-secondary-copy">
-              Showing{" "}
-              <span className="font-medium text-primary-copy">
-                {fromItem}&ndash;{toItem}
-              </span>{" "}
-              of{" "}
-              <span className="font-medium text-primary-copy">{total}</span>{" "}
-              visas
-            </p>
-            <div className="flex items-center gap-1">
-              {currentPage > 2 && (
-                <PaginationLink href={getPageHref(1)} disabled={false}>
-                  <ChevronsLeft className="size-4" />
-                </PaginationLink>
-              )}
-              <PaginationLink
-                href={getPageHref(currentPage - 1)}
-                disabled={currentPage <= 1}
-              >
-                <ChevronLeft className="size-4" />
-              </PaginationLink>
-
-              {visiblePages[0] > 1 && (
-                <span className="flex size-8 items-center justify-center text-xs text-secondary-copy">
-                  ...
-                </span>
-              )}
-              {visiblePages.map((p) => (
-                <PaginationLink
-                  key={p}
-                  href={getPageHref(p)}
-                  disabled={false}
-                  active={p === currentPage}
-                >
-                  {p}
-                </PaginationLink>
-              ))}
-              {visiblePages[visiblePages.length - 1] < totalPages && (
-                <span className="flex size-8 items-center justify-center text-xs text-secondary-copy">
-                  ...
-                </span>
-              )}
-
-              <PaginationLink
-                href={getPageHref(currentPage + 1)}
-                disabled={currentPage >= totalPages}
-              >
-                <ChevronRight className="size-4" />
-              </PaginationLink>
-              {currentPage < totalPages - 1 && (
-                <PaginationLink href={getPageHref(totalPages)} disabled={false}>
-                  <ChevronsRight className="size-4" />
-                </PaginationLink>
-              )}
-            </div>
+          <div className="border-t border-border-default px-5 py-3">
+            <Pagination
+              total={total}
+              page={currentPage}
+              pageSize={currentPageSize}
+            />
           </div>
         )}
       </div>
     </div>
-  )
-}
-
-function PaginationLink({
-  href,
-  disabled,
-  active,
-  children,
-}: {
-  href: string
-  disabled: boolean
-  active?: boolean
-  children: React.ReactNode
-}) {
-  if (disabled) {
-    return (
-      <span className="flex size-8 items-center justify-center rounded-lg text-xs text-secondary-copy/40">
-        {children}
-      </span>
-    )
-  }
-
-  return (
-    <Link
-      href={href}
-      className={
-        active
-          ? "flex size-8 items-center justify-center rounded-lg bg-primary text-xs font-semibold text-white shadow-sm"
-          : "flex size-8 items-center justify-center rounded-lg border border-transparent text-xs font-medium text-primary-copy transition-colors hover:border-border-default hover:bg-bg-light-grey"
-      }
-    >
-      {children}
-    </Link>
   )
 }
