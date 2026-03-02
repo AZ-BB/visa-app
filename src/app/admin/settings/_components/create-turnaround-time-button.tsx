@@ -88,7 +88,7 @@ export function CreateTurnaroundTimeButton({ nextIndex }: CreateTurnaroundTimeBu
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="create-fee">Fee (£)</Label>
+            <Label htmlFor="create-fee">Fee ($)</Label>
             <Input
               id="create-fee"
               type="number"

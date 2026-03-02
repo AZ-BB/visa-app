@@ -156,7 +156,7 @@ export default async function ApplicationDetailPage({
                                         Total cost
                                     </p>
                                     <p className="font-semibold text-primary-copy">
-                                        £{totalCost.toFixed(2)}
+                                        ${totalCost.toFixed(2)}
                                     </p>
                                 </div>
                             </div>
@@ -186,7 +186,7 @@ export default async function ApplicationDetailPage({
                                                 Gov fee
                                             </span>
                                             <span className="font-semibold text-primary-copy">
-                                                £{govFee.toFixed(2)}
+                                                ${govFee.toFixed(2)}
                                             </span>
                                         </div>
                                         <div className="flex justify-between text-sm">
@@ -194,7 +194,7 @@ export default async function ApplicationDetailPage({
                                                 Pro fee
                                             </span>
                                             <span className="font-semibold text-primary-copy">
-                                                £{proFee.toFixed(2)}
+                                                ${proFee.toFixed(2)}
                                             </span>
                                         </div>
                                         <div className="flex justify-between text-sm pt-1 border-t border-border-default/50">
@@ -202,7 +202,7 @@ export default async function ApplicationDetailPage({
                                                 Subtotal
                                             </span>
                                             <span className="font-semibold text-primary-copy">
-                                                £{travellerTotal.toFixed(2)}
+                                                ${travellerTotal.toFixed(2)}
                                             </span>
                                         </div>
                                     </div>
@@ -218,7 +218,7 @@ export default async function ApplicationDetailPage({
                                             Turnaround
                                         </span>
                                         <span className="font-semibold text-primary-copy">
-                                            £{turnaroundFee.toFixed(2)}
+                                            ${turnaroundFee.toFixed(2)}
                                         </span>
                                     </div>
                                 </div>
@@ -228,7 +228,7 @@ export default async function ApplicationDetailPage({
                                     Total
                                 </span>
                                 <span className="text-lg font-bold text-primary-copy">
-                                    £{totalCost.toFixed(2)}
+                                    ${totalCost.toFixed(2)}
                                 </span>
                             </div>
                         </CardContent>

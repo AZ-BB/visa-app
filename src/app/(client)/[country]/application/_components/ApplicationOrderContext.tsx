@@ -288,10 +288,7 @@ export function ApplicationOrderProvider({
     if (!currentOrder.turnaround_time_id) {
       return { status: false, error: "Please select a turnaround time" };
     }
-    const travellersWithProduct = currentOrder.travellers.filter((t) => t.product?.id);
-    if (travellersWithProduct.length !== currentOrder.travellers.length) {
-      return { status: false, error: "Some travellers are missing product information. Please complete all traveller details." };
-    }
+
     return createApplicationClient({
       arrival_date: currentOrder.arrival_date,
       contact_email: currentOrder.contact_email,

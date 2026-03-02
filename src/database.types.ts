@@ -478,24 +478,17 @@ export type Database = {
           visa_type_id: number
         }[]
       }
-      get_admin_by_id: {
-        Args: { p_id: string }
-        Returns: (Database["public"]["Tables"]["admin"]["Row"] & { email: string }) | null
-      }
+      get_admin_by_id: { Args: { p_id: string }; Returns: Json }
       get_admins: {
         Args: {
-          p_page?: number
           p_limit?: number
-          p_search?: string | null
-          p_role?: string | null
-          p_sort?: string
           p_order?: string
+          p_page?: number
+          p_role?: string
+          p_search?: string
+          p_sort?: string
         }
-        Returns: {
-          admins: (Database["public"]["Tables"]["admin"]["Row"] & { email: string })[]
-          total: number
-          error?: string
-        }
+        Returns: Json
       }
       get_product_stats_by_visa_rule_ids: {
         Args: { rule_ids: number[] }
@@ -506,6 +499,36 @@ export type Database = {
         }[]
       }
       is_admin: { Args: never; Returns: boolean }
+      list_applications_admin:
+        | {
+            Args: {
+              p_assigned_to_id?: string
+              p_destination_id?: string
+              p_limit?: number
+              p_nationality_id?: string
+              p_order?: string
+              p_page?: number
+              p_search?: string
+              p_sort?: string
+              p_status?: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_assigned_to_id?: string
+              p_destination_id?: string
+              p_filter_unassigned?: boolean
+              p_limit?: number
+              p_nationality_id?: string
+              p_order?: string
+              p_page?: number
+              p_search?: string
+              p_sort?: string
+              p_status?: string
+            }
+            Returns: Json
+          }
     }
     Enums: {
       admin_role: "ADMIN" | "SUPER_ADMIN"

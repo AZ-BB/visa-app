@@ -99,7 +99,7 @@ export default async function NationalityProductsPage({
                       {product.visa_type?.name ?? "—"}
                     </TableCell>
                     <TableCell className="py-3 font-medium text-primary-copy">
-                      £{product.price}
+                      ${product.price}
                     </TableCell>
                     <TableCell className="py-3">
                       <span
