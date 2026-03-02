@@ -86,7 +86,7 @@ export function ProductsTableActions({ product }: ProductsTableActionsProps) {
               {product.visa_type?.name ?? "Product"}
             </p>
             <div className="grid gap-2">
-              <Label htmlFor="price">Price (£)</Label>
+              <Label htmlFor="price">Price ($)</Label>
               <Input
                 id="price"
                 type="text"

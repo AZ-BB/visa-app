@@ -1,70 +1,248 @@
-import { fetchApplications } from "@/actions/admin"
+import Link from "next/link"
+import { getApplications } from "@/actions/applications"
+import { getAdmins } from "@/actions/admins"
+import { fetchAllCountriesList } from "@/actions/countries"
 import { PageHeader } from "@/components/admin-layout/page-header"
-import { AdminSearchInput } from "@/components/admin-layout/admin-search-input"
-import { ApplicationsTable } from "./_components/applications-table"
-import { Card, CardContent } from "@/components/ui/card"
+import Pagination from "@/components/Pagination"
+import { ApplicationStatusBadge } from "@/components/ApplicationStatusBadge"
+import { CountryFlag } from "@/components/ui/country-flag"
+import { FileText, Eye } from "lucide-react"
+import ApplicationsFilters from "./_components/ApplicationsFilters"
+import { SortableTableHeader } from "./_components/SortableTableHeader"
+import { TravellersCell } from "./_components/TravellersCell"
+import { AssigneeDropdown } from "./_components/AssigneeDropdown"
+import { ApplicationStatus } from "@/enums"
 
-export default async function ApplicationsPage() {
-  const applications = await fetchApplications()
-  const inProgress = applications.filter((a) => a.status === "IN_PROGRESS").length
-  const completed = applications.filter((a) => a.status === "COMPLETED").length
+const PAGE_SIZE_OPTIONS = [10, 20, 50] as const
+const SORT_OPTIONS = ["arrival_date", "created_at", "updated_at", "status", "client_name", "total_fee"] as const
+const STATUS_VALUES = Object.values(ApplicationStatus)
+
+export default async function ApplicationsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    page?: string
+    page_size?: string
+    search?: string
+    status?: string
+    assigned_to_id?: string
+    destination?: string
+    nationality?: string
+    sort?: string
+    order?: string
+  }>
+}) {
+  const params = await searchParams
+  const page = Math.max(1, parseInt(params.page ?? "1", 10) || 1)
+  const rawPageSize = parseInt(params.page_size ?? "10", 10) || 10
+  const pageSize = PAGE_SIZE_OPTIONS.includes(rawPageSize as (typeof PAGE_SIZE_OPTIONS)[number]) ? rawPageSize : 10
+  const search = params.search?.trim() ?? undefined
+  const status = STATUS_VALUES.includes(params.status as (typeof STATUS_VALUES)[number])
+    ? (params.status as ApplicationStatus)
+    : undefined
+  const assignedToId = params.assigned_to_id?.trim() || undefined
+  const destination = params.destination?.trim() || undefined
+  const nationality = params.nationality?.trim() || undefined
+  const sort = SORT_OPTIONS.includes(params.sort as (typeof SORT_OPTIONS)[number])
+    ? (params.sort as "arrival_date" | "created_at" | "updated_at" | "status" | "client_name" | "total_fee")
+    : "created_at"
+  const order = params.order === "asc" ? "asc" : "desc"
+
+  const [res, adminsRes, countriesRes] = await Promise.all([
+    getApplications(page, pageSize, {
+      search,
+      status,
+      assigned_to_id: assignedToId,
+      destination,
+      nationality,
+      sort,
+      order,
+    }),
+    getAdmins(1, 200, { sort: "first_name", order: "asc" }),
+    fetchAllCountriesList(),
+  ])
+
+  const admins = adminsRes.status && adminsRes.data ? adminsRes.data.admins : []
+  const countries = countriesRes.data ?? []
+
+  if (!res.status || !res.data) {
+    return (
+      <div className="space-y-6">
+        <PageHeader title="Applications" description="View and manage visa applications" />
+        <div className="flex flex-col items-center justify-center rounded-xl border border-border-default bg-white px-6 py-20 text-center shadow-sm">
+          <p className="text-sm text-red-600">{res.error ?? "Failed to load applications"}</p>
+        </div>
+      </div>
+    )
+  }
+
+  const { applications, total } = res.data
+
+  const tableParams: Record<string, string | undefined> = {
+    page: params.page,
+    page_size: params.page_size,
+    search: params.search,
+    status: params.status,
+    assigned_to_id: params.assigned_to_id,
+    destination: params.destination,
+    nationality: params.nationality,
+  }
 
   return (
-    <>
-      <div className="mb-6 grid gap-4 sm:grid-cols-3">
-        <Card className="border-border-default bg-white shadow-sm">
-          <CardContent className="pt-4">
-            <p className="text-sm font-medium text-secondary-copy">
-              Total applications
-            </p>
-            <p className="mt-1 text-2xl font-semibold text-primary-copy">
-              {applications.length}
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="border-border-default bg-white shadow-sm">
-          <CardContent className="pt-4">
-            <p className="text-sm font-medium text-secondary-copy">
-              In progress
-            </p>
-            <p className="mt-1 text-2xl font-semibold text-primary">
-              {inProgress}
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="border-border-default bg-white shadow-sm">
-          <CardContent className="pt-4">
-            <p className="text-sm font-medium text-secondary-copy">Completed</p>
-            <p className="mt-1 text-2xl font-semibold text-emerald-600">
-              {completed}
-            </p>
-          </CardContent>
-        </Card>
+    <div className="space-y-6">
+
+      <div>
+        Counts
       </div>
-      <Card className="border-border-default bg-white shadow-sm">
-        <CardContent className="p-0">
-          <div className="border-b border-border-default px-4 py-3 sm:flex sm:items-center sm:justify-between">
-            <div className="flex flex-1 items-center gap-3">
-              <AdminSearchInput
-                placeholder="Search by client, email, application ID..."
-                className="min-w-[200px] max-w-sm"
-              />
-              <select
-                className="h-9 rounded-md border border-border-default bg-white px-3 text-sm text-primary-copy focus:outline-none focus:ring-2 focus:ring-primary"
-                defaultValue=""
-                aria-label="Filter by status"
-              >
-                <option value="">All statuses</option>
-                <option value="NOT_STARTED">Not Started</option>
-                <option value="IN_PROGRESS">In Progress</option>
-                <option value="COMPLETED">Completed</option>
-                <option value="REJECTED">Rejected</option>
-              </select>
+
+      <div className="overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border-default px-5 py-3">
+          <ApplicationsFilters admins={admins} countries={countries} />
+        </div>
+
+        {applications.length === 0 ? (
+          <div className="flex flex-col items-center justify-center px-6 py-20 text-center">
+            <div className="mb-4 flex size-14 items-center justify-center rounded-full bg-primary/5 text-secondary-copy">
+              <FileText className="size-6" />
             </div>
+            <h3 className="text-sm font-semibold text-primary-copy">No applications found</h3>
+            <p className="mt-1 max-w-xs text-sm text-secondary-copy">
+              There are no visa applications matching your filters.
+            </p>
           </div>
-          <ApplicationsTable applications={applications} />
-        </CardContent>
-      </Card>
-    </>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full table-fixed text-sm">
+              <thead>
+                <tr className="border-b border-border-default bg-bg-light-grey/80">
+                  <th className="w-12 py-3 pl-5 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                    #
+                  </th>
+                  <SortableTableHeader
+                    sortKey="client_name"
+                    currentSort={sort}
+                    currentOrder={order}
+                    params={tableParams}
+                    className="w-40"
+                  >
+                    Client
+                  </SortableTableHeader>
+                  <th className="w-22 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                    Travellers
+                  </th>
+                  <th className="w-40 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                    Destination / Visa
+                  </th>
+                  <SortableTableHeader
+                    sortKey="total_fee"
+                    currentSort={sort}
+                    currentOrder={order}
+                    params={tableParams}
+                    className="w-22"
+                  >
+                    Total
+                  </SortableTableHeader>
+                  <SortableTableHeader
+                    sortKey="status"
+                    currentSort={sort}
+                    currentOrder={order}
+                    params={tableParams}
+                    className="w-22"
+                  >
+                    Status
+                  </SortableTableHeader>
+                  <th className="w-48 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                    Assigned to
+                  </th>
+                  <SortableTableHeader
+                    sortKey="arrival_date"
+                    currentSort={sort}
+                    currentOrder={order}
+                    params={tableParams}
+                    className="w-24"
+                  >
+                    Arrival
+                  </SortableTableHeader>
+                  <th className="w-24 py-3 pl-2 pr-5 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody className="divide-y divide-border-default/60">
+                {applications.map((app, index) => (
+                  <tr key={app.id} className="group transition-colors hover:bg-primary/2">
+                    <td className="w-12 py-3.5 pl-5 pr-2 text-xs tabular-nums text-secondary-copy">
+                      {(page - 1) * pageSize + index + 1}
+                    </td>
+
+                    <td className="w-40 py-3.5 pr-2">
+                      <Link href={`/admin/applications/${app.id}`} className="hover:underline group/link">
+                        <span
+                          className="block truncate text-lg font-semibold text-primary-copy transition-colors group-hover/link:text-primary"
+                        >
+                          {app.client_name}
+                        </span>
+                        <div className="mt-0.5 text-xs text-secondary-copy truncate">
+                          {app.contact_email}
+                        </div>
+                      </Link>
+                    </td>
+
+                    <td className="w-22 py-3.5 pr-2">
+                      <TravellersCell travellers={app.travellers} />
+                    </td>
+
+                    <td className="w-48 py-3.5 pr-2 flex items-center gap-2">
+                      <CountryFlag code={app.destination_country_id} className="size-8 rounded-md shrink-0 border border-border-default shadow-sm" loading="lazy" />
+                      <div>
+                        <div className="text-base font-semibold text-secondary truncate">{app.visa_type_name}</div>
+                        <span className="truncate font-normal">{app.destination_country_name}</span>
+                      </div>
+                    </td>
+
+                    <td className="w-22 py-3.5 pr-5 text-base font-semibold text-primary-copy tabular-nums">
+                      ${app.total_fee.toFixed(2)}
+                    </td>
+
+                    <td className="w-28 py-3.5 pr-2">
+                      <ApplicationStatusBadge status={app.status} />
+                    </td>
+
+                    <td className="w-48 py-3.5 pr-10">
+                      <AssigneeDropdown
+                        applicationId={app.id}
+                        assignedToId={app.assigned_to_id}
+                        admins={admins}
+                      />
+                    </td>
+
+                    <td className="w-24 py-3.5 pr-2 text-secondary-copy">
+                      {new Date(app.arrival_date).toLocaleDateString()}
+                    </td>
+
+                    <td className="w-24 py-3.5 pl-2 pr-5">
+                      <Link
+                        href={`/admin/applications/${app.id}`}
+                        className="inline-flex bg-primary text-white items-center justify-center rounded-md p-2 transition-colors hover:bg-primary/10 hover:text-primary"
+                        aria-label="View application"
+                      >
+                        <Eye className="size-5" />
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {
+        applications.length > 0 && (
+          <Pagination total={total} page={page} pageSize={pageSize} />
+        )
+      }
+    </div >
   )
 }

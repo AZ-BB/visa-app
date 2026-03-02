@@ -8,31 +8,31 @@ import { revalidatePath } from "next/cache";
 export type AdminWithEmail = Tables<"admin"> & { email: string };
 
 export async function getAdminById(
-  id: string
+    id: string
 ): Promise<GeneralResponse<AdminWithEmail | null>> {
-  try {
-    const supabase = await createSupabaseServerClient();
-    const { data, error } = await supabase.rpc("get_admin_by_id", {
-      p_id: id,
-    });
+    try {
+        const supabase = await createSupabaseServerClient();
+        const { data, error } = await supabase.rpc("get_admin_by_id", {
+            p_id: id,
+        });
 
-    if (error) {
-      return { status: false, error: error.message };
+        if (error) {
+            return { status: false, error: error.message };
+        }
+
+        const result = data as { error?: string } | AdminWithEmail | null;
+        if (result && typeof result === "object" && "error" in result) {
+            return { status: false, error: result.error };
+        }
+
+        return {
+            status: true,
+            data: result as AdminWithEmail | null,
+        };
+    } catch (err) {
+        console.error(err);
+        return { status: false, error: "Failed to get admin" };
     }
-
-    const result = data as { error?: string } | AdminWithEmail | null;
-    if (result && typeof result === "object" && "error" in result) {
-      return { status: false, error: result.error };
-    }
-
-    return {
-      status: true,
-      data: result as AdminWithEmail | null,
-    };
-  } catch (err) {
-    console.error(err);
-    return { status: false, error: "Failed to get admin" };
-  }
 }
 
 export async function getAdmins(page: number = 1, limit: number = 10, filter: {
@@ -47,8 +47,8 @@ export async function getAdmins(page: number = 1, limit: number = 10, filter: {
         const { data, error } = await supabase.rpc("get_admins", {
             p_page: page,
             p_limit: limit,
-            p_search: filter.search ?? null,
-            p_role: filter.role ?? null,
+            p_search: filter.search ?? undefined,
+            p_role: filter.role ?? undefined,
             p_sort: filter.sort,
             p_order: filter.order,
         });
@@ -60,13 +60,9 @@ export async function getAdmins(page: number = 1, limit: number = 10, filter: {
             };
         }
 
-        const result = data;
-        if (result?.error) {
-            return {
-                status: false,
-                error: result.error,
-            };
-        }
+        console.log('Data');
+
+        const result = data as { admins: AdminWithEmail[]; total: number };
 
         return {
             status: true,
@@ -226,33 +222,33 @@ export async function deleteAdmin(id: string): Promise<GeneralResponse<null>> {
 }
 
 export async function updateAdminPassword(
-  id: string,
-  password: string,
-  confirmPassword: string
+    id: string,
+    password: string,
+    confirmPassword: string
 ): Promise<GeneralResponse<null>> {
-  try {
-    if (!password || password.length < 8) {
-      return { status: false, error: "Password must be at least 8 characters" };
+    try {
+        if (!password || password.length < 8) {
+            return { status: false, error: "Password must be at least 8 characters" };
+        }
+        if (password !== confirmPassword) {
+            return { status: false, error: "Passwords do not match" };
+        }
+
+        const supabase = await createSupabaseAdminServerClient();
+        const { error } = await supabase.auth.admin.updateUserById(id, { password });
+
+        if (error) {
+            return { status: false, error: error.message };
+        }
+
+        revalidatePath("/admin/admins", "page");
+        revalidatePath(`/admin/admins/${id}`);
+
+        return { status: true, data: null };
+    } catch (err) {
+        console.error(err);
+        return { status: false, error: "Failed to update password" };
     }
-    if (password !== confirmPassword) {
-      return { status: false, error: "Passwords do not match" };
-    }
-
-    const supabase = await createSupabaseAdminServerClient();
-    const { error } = await supabase.auth.admin.updateUserById(id, { password });
-
-    if (error) {
-      return { status: false, error: error.message };
-    }
-
-    revalidatePath("/admin/admins", "page");
-    revalidatePath(`/admin/admins/${id}`);
-
-    return { status: true, data: null };
-  } catch (err) {
-    console.error(err);
-    return { status: false, error: "Failed to update password" };
-  }
 }
 
 export async function updateAdmin(id: string, admin: {

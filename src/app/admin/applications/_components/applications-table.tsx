@@ -84,7 +84,7 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
               </div>
             </TableCell>
             <TableCell className="py-3 font-medium text-primary-copy">
-              £{app.price}
+              ${app.price}
             </TableCell>
             <TableCell className="py-3">
               <StatusBadge status={app.status} />

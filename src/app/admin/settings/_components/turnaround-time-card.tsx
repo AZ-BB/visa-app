@@ -153,7 +153,7 @@ export function TurnaroundTimeCard({ turnaroundTime }: TurnaroundTimeCardProps) 
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="fee">Fee (£)</Label>
+              <Label htmlFor="fee">Fee ($)</Label>
               <Input
                 id="fee"
                 type="number"

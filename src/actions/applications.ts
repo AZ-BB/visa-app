@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/supabase-server";
 import { Tables } from "@/database.types";
 import GeneralResponse from "@/types/general";
 import { getUser } from "@/lib/get-user";
+import { ApplicationStatus } from "@/enums";
 
 export async function createApplicationClient({
     arrival_date,
@@ -254,5 +255,197 @@ export async function createApplicationClient({
             status: false,
             error: "Failed to create application",
         }
+    }
+}
+
+export type ApplicationList = {
+    id: string;
+
+    destination_country_id: string;
+    destination_country_name: string;
+
+    visa_type_id: number;
+    visa_type_name: string;
+
+    assigned_to_id: string | null;
+    assigned_to_name: string;
+
+    status: ApplicationStatus;
+    turnaround_time_id: number;
+    total_fee: number;
+
+    client_name: string;
+    contact_email: string;
+
+    travellers: {
+        first_name: string;
+        last_name: string;
+        nationality: string;
+    }[]
+
+    arrival_date: string;
+    created_at: string;
+    updated_at: string;
+}[];
+
+export async function getApplications(page: number = 1, limit: number = 10, filter: {
+    status?: ApplicationStatus
+    assigned_to_id?: string
+    search?: string
+
+    destination?: string
+    nationality?: string
+
+    sort: 'arrival_date' | 'created_at' | 'updated_at' | 'status' | 'client_name' | 'total_fee'
+    order: 'asc' | 'desc'
+}): Promise<GeneralResponse<{ applications: ApplicationList; total: number }>> {
+    try {
+        const supabase = await createSupabaseServerClient();
+
+        const isUnassignedFilter = filter.assigned_to_id === "__unassigned__";
+        const { data, error } = await supabase.rpc("list_applications_admin", {
+            p_page: page,
+            p_limit: limit,
+            p_search: filter.search ?? undefined,
+            p_status: filter.status ?? undefined,
+            p_assigned_to_id: isUnassignedFilter ? undefined : (filter.assigned_to_id ?? undefined),
+            p_destination_id: filter.destination ?? undefined,
+            p_nationality_id: filter.nationality ?? undefined,
+            p_sort: filter.sort,
+            p_order: filter.order,
+            p_filter_unassigned: isUnassignedFilter,
+        });
+
+        if (error) {
+            return {
+                status: false,
+                error: error.message,
+            };
+        }
+
+        const result = data as unknown as { error?: string; applications?: ApplicationList; total?: number } | null | undefined;
+        if (result?.error) {
+            return {
+                status: false,
+                error: result.error,
+            };
+        }
+
+        return {
+            status: true,
+            data: {
+                applications: result?.applications ?? [],
+                total: result?.total ?? 0,
+            },
+        };
+    } catch (error) {
+        console.error(error);
+        return {
+            status: false,
+            error: "Failed to get applications",
+        }
+    }
+}
+
+export type Application = Tables<"applications"> & {
+    destination_country: Tables<"countries">;
+    visa_type: Tables<"visa_types">;
+    turnaround_time: Tables<"turnaround_times">;
+    travellers: Tables<"travellers"> & {
+        product: Tables<"products">;
+    }[];
+}
+
+export async function getApplication(id: string): Promise<GeneralResponse<Application>> {
+    try {
+        const supabase = await createSupabaseServerClient();
+        const { data, error } = await supabase
+            .from("applications")
+            .select(`
+            *,
+            destination_country:countries(*),
+            visa_type:visa_types(*),
+            turnaround_times(*),
+            travellers(*, product:products(*))
+        `)
+            .eq("id", id)
+            .single();
+
+        if (error || !data) {
+            return {
+                status: false,
+                error: error.message,
+            };
+        }
+
+        return {
+            status: true,
+            data: data as unknown as Application,
+        };
+    }
+    catch (error) {
+        console.error(error);
+        return {
+            status: false,
+            error: "Failed to get application",
+        };
+    }
+}
+
+export async function updateApplicationStatus(
+    applicationId: string,
+    status: ApplicationStatus
+): Promise<GeneralResponse<void>> {
+    try {
+        const supabase = await createSupabaseServerClient();
+
+        const { error } = await supabase
+            .from("applications")
+            .update({ status })
+            .eq("id", applicationId);
+
+        if (error) {
+            return {
+                status: false,
+                error: error.message,
+            };
+        }
+
+        return { status: true };
+    } catch (error) {
+        console.error(error);
+        return {
+            status: false,
+            error: "Failed to update status",
+        };
+    }
+}
+
+export async function updateApplicationAssignee(
+    applicationId: string,
+    assignedToId: string | null
+): Promise<GeneralResponse<void>> {
+    try {
+        const supabase = await createSupabaseServerClient();
+
+        const { error } = await supabase
+            .from("applications")
+            .update({ assigned_to: assignedToId })
+            .eq("id", applicationId);
+
+        if (error) {
+            return {
+                status: false,
+                error: error.message,
+            };
+        }
+
+        return { status: true };
+    } catch (error) {
+        console.error(error);
+        return {
+            status: false,
+            error: "Failed to update assignment",
+        };
     }
 }

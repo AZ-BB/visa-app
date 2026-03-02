@@ -47,7 +47,7 @@ export function Footer() {
             </span>
 
             <span className="flex items-center gap-2">
-              <span className="font-semibold">£</span>
+              <span className="font-semibold">$</span>
               GBP
             </span>
           </div>
