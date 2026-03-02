@@ -42,7 +42,7 @@ function SelectTrigger({
         "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-0",
         "hover:border-gray-300 transition-colors",
         "data-[placeholder]:text-secondary-copy disabled:cursor-not-allowed disabled:opacity-50",
-        "data-[size=default]:min-h-12 data-[size=sm]:min-h-10",
+        "data-[size=sm]:min-h-10",
         "*:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0",
         className

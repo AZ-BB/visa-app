@@ -1,127 +1,116 @@
-import Link from "next/link"
-import { notFound } from "next/navigation"
-import { fetchCountryById, fetchProductsBetweenCountries } from "@/actions/admin"
-import { PageHeader } from "@/components/admin-layout/page-header"
-import { CountryFlag } from "@/components/ui/country-flag"
-import { Card, CardContent } from "@/components/ui/card"
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { fetchCountryById } from "@/actions/countries";
+import { fetchProductsBetweenCountries } from "@/actions/products";
+import { getAllVisaTypesForDestination } from "@/actions/visas";
+import { CountryFlag } from "@/components/ui/country-flag";
+import { ProductsTable } from "./_components/products-table";
+import { AddProductModal } from "./_components/add-product-modal";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { ProductsTableActions } from "./_components/products-table-actions"
+  ChevronLeft,
+  ArrowRight,
+  FileText,
+} from "lucide-react";
 
 export default async function NationalityProductsPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ id: string; nationality_id: string }>
-  searchParams: Promise<{ view_as?: string }>
+  params: Promise<{ id: string; nationality_id: string }>;
+  searchParams: Promise<{ view_as?: string }>;
 }) {
-  const { id, nationality_id } = await params
-  const { view_as } = await searchParams
-  const isDestinationView = view_as !== "nationality"
+  const { id, nationality_id } = await params;
+  const { view_as } = await searchParams;
+  const isDestinationView = view_as !== "nationality";
 
-  const destinationId = isDestinationView ? id : nationality_id
-  const nationalityId = isDestinationView ? nationality_id : id
+  const destinationId = isDestinationView ? id : nationality_id;
+  const nationalityId = isDestinationView ? nationality_id : id;
 
-  const [country, otherCountry, products] = await Promise.all([
+  const [countryRes, otherCountryRes, productsRes, visaTypesRes] = await Promise.all([
     fetchCountryById(id),
     fetchCountryById(nationality_id),
     fetchProductsBetweenCountries(destinationId, nationalityId),
-  ])
+    getAllVisaTypesForDestination(destinationId),
+  ]);
 
-  if (!country || !otherCountry) notFound()
+  if (!countryRes.data || !otherCountryRes.data) notFound();
 
-  const breadcrumbs = [
-    { label: "Countries", href: "/admin/countries" },
-    { label: country.name, href: `/admin/countries/${id}` },
-    {
-      label: `${otherCountry.name} → ${country.name}`,
-      href: undefined,
-    },
-  ]
+  const country = countryRes.data;
+  const otherCountry = otherCountryRes.data;
+  const products = productsRes.data ?? [];
+  const visaTypes = visaTypesRes.data ?? [];
+
+  const nationalityCountry = isDestinationView ? otherCountry : country;
+  const destinationCountry = isDestinationView ? country : otherCountry;
+
+  const existingVisaTypeIds = products
+    .map((p) => p.visa_type?.id)
+    .filter((id): id is number => id != null);
 
   return (
-    <>
-      <PageHeader
-        title={
-          <span className="inline-flex items-center gap-2 my-4">
-            <CountryFlag code={nationalityId} className="size-8 rounded-md" round={false} />
-            <span>{otherCountry.name}</span>
-            <span className="text-secondary-copy mx-4">→</span>
-            <CountryFlag code={destinationId} className="size-8 rounded-md" round={false} />
-            <span>{country.name}</span>
-          </span>
-        }
-        description="Visas between these two countries (nationality → destination). Disable, delete, or edit in place."
-        breadcrumbs={breadcrumbs}
-      />
-      <Card className="border-border-default bg-white shadow-sm">
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-border-default hover:bg-transparent">
-                <TableHead className="text-xs font-semibold uppercase tracking-wider text-secondary-copy">
-                  Visa type
-                </TableHead>
-                <TableHead className="text-xs font-semibold uppercase tracking-wider text-secondary-copy">
-                  Price
-                </TableHead>
-                <TableHead className="text-xs font-semibold uppercase tracking-wider text-secondary-copy">
-                  Status
-                </TableHead>
-                <TableHead className="w-[140px] text-right text-xs font-semibold uppercase tracking-wider text-secondary-copy">
-                  Actions
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {products.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={4}
-                    className="py-12 text-center text-sm text-secondary-copy"
-                  >
-                    No products for this country pair.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                products.map((product) => (
-                  <TableRow
-                    key={product.id}
-                    className="border-border-default hover:bg-muted/30"
-                  >
-                    <TableCell className="py-3 font-medium text-primary-copy">
-                      {product.visa_type?.name ?? "—"}
-                    </TableCell>
-                    <TableCell className="py-3 font-medium text-primary-copy">
-                      ${product.price}
-                    </TableCell>
-                    <TableCell className="py-3">
-                      <span
-                        className={
-                          product.is_disabled
-                            ? "text-amber-600"
-                            : "text-emerald-600"
-                        }
-                      >
-                        {product.is_disabled ? "Disabled" : "Active"}
-                      </span>
-                    </TableCell>
-                    <TableCell className="py-3 text-right">
-                      <ProductsTableActions product={product} />
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-    </>
-  )
+    <div className="space-y-6">
+      {/* Breadcrumb */}
+      <Link
+        href={`/admin/countries/${id}?view_as=${view_as ?? "destination"}`}
+        className="inline-flex items-center gap-1.5 text-sm text-secondary-copy transition-colors hover:text-primary"
+      >
+        <ChevronLeft className="size-4" />
+        Back to {country.name}
+      </Link>
+
+      {/* Page header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 rounded-xl border border-border-default bg-white px-4 py-3 shadow-sm">
+            <div className="flex items-center gap-2.5">
+              <CountryFlag
+                code={nationalityId}
+                className="size-8 shrink-0 rounded shadow-sm ring-1 ring-black/5"
+                round={false}
+              />
+              <div>
+                <p className="text-xs text-secondary-copy">Nationality</p>
+                <p className="font-medium text-primary-copy">{nationalityCountry.name}</p>
+              </div>
+            </div>
+
+            <ArrowRight className="size-4 text-secondary-copy/50" />
+
+            <div className="flex items-center gap-2.5">
+              <CountryFlag
+                code={destinationId}
+                className="size-8 shrink-0 rounded shadow-sm ring-1 ring-black/5"
+                round={false}
+              />
+              <div>
+                <p className="text-xs text-secondary-copy">Destination</p>
+                <p className="font-medium text-primary-copy">{destinationCountry.name}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Products table */}
+      <div className="overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
+        <div className="flex items-center justify-between border-b border-border-default px-5 py-3">
+          <div className="flex items-center gap-2">
+            <FileText className="size-4 text-secondary-copy" />
+            <p className="text-sm font-medium text-primary-copy">Visas</p>
+            <span className="rounded-full bg-bg-light-grey px-2 py-0.5 text-xs font-medium text-secondary-copy">
+              {products.length}
+            </span>
+          </div>
+          <AddProductModal
+            destinationCountry={destinationId}
+            nationalityId={nationalityId}
+            visaTypes={visaTypes}
+            existingVisaTypeIds={existingVisaTypeIds}
+          />
+        </div>
+
+        <ProductsTable products={products} />
+      </div>
+    </div>
+  );
 }

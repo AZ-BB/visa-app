@@ -1,5 +1,6 @@
 "use server"
 
+const { revalidatePath } = await import("next/cache");
 import { Tables } from "@/database.types";
 import { createSupabaseServerClient } from "@/lib/supabase/supabase-server";
 import GeneralResponse from "@/types/general";
@@ -23,6 +24,85 @@ export interface VisaType {
     created_at: string;
     updated_at: string;
     destination_country_data: VisaCountry | null;
+}
+
+export interface VisaTypesPageData {
+    visas: VisaType[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+}
+
+export async function fetchVisas({
+    page = 1,
+    pageSize = 20,
+    search = "",
+    status = "all",
+    country = "",
+}: {
+    page?: number;
+    pageSize?: number;
+    search?: string;
+    status?: "all" | "active" | "disabled";
+    country?: string;
+} = {}): Promise<GeneralResponse<VisaTypesPageData>> {
+    const supabase = await createSupabaseServerClient();
+    const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
+    const safePageSize =
+        Number.isFinite(pageSize) && pageSize > 0 ? Math.min(Math.floor(pageSize), 100) : 20;
+    const from = (safePage - 1) * safePageSize;
+    const to = from + safePageSize - 1;
+
+    let query = supabase
+        .from("visa_types")
+        .select("*, destination_country_data:countries!destination_country(*)", { count: "exact" })
+        .is("deleted_at", null)
+        .order("name", { ascending: true });
+
+    if (search.trim()) {
+        query = query.ilike("name", `%${search.trim()}%`);
+    }
+
+    if (status === "active") {
+        query = query.eq("is_disabled", false);
+    } else if (status === "disabled") {
+        query = query.eq("is_disabled", true);
+    }
+
+    if (country.trim()) {
+        query = query.eq("destination_country", country.trim());
+    }
+
+    const { data, error, count } = await query.range(from, to);
+
+    if (error) {
+        const total = count ?? 0;
+        const totalPages = Math.max(1, Math.ceil(total / safePageSize));
+        if (safePage > totalPages) {
+            return {
+                data: {
+                    visas: [],
+                    total,
+                    page: safePage,
+                    pageSize: safePageSize,
+                    totalPages,
+                },
+            };
+        }
+        return { error: error.message };
+    }
+
+    const total = count ?? 0;
+    return {
+        data: {
+            visas: data ?? [],
+            total,
+            page: safePage,
+            pageSize: safePageSize,
+            totalPages: Math.max(1, Math.ceil(total / safePageSize)),
+        },
+    };
 }
 
 export async function getAllVisaTypesForDestination(countryId: string): Promise<GeneralResponse<VisaType[]>> {
@@ -52,6 +132,20 @@ export async function fetchVisaById(id: number): Promise<GeneralResponse<VisaTyp
     return { data: data };
 }
 
+
+export async function softDeleteVisaType(id: number): Promise<{ success: boolean; error?: string }> {
+    const supabase = await createSupabaseServerClient();
+    const { error } = await supabase
+        .from("visa_types")
+        .update({ deleted_at: new Date().toISOString() })
+        .eq("id", id);
+    if (error) {
+        return { success: false, error: error.message };
+    }
+    revalidatePath("/admin/visas");
+    revalidatePath("/admin/countries");
+    return { success: true };
+}
 
 export async function updateVisaTypeDisabledStatus(id: number, isDisabled: boolean): Promise<{ success: boolean; error?: string }> {
     const supabase = await createSupabaseServerClient();
@@ -119,6 +213,53 @@ export async function createVisaTypeForDestination(input: {
     return { success: true, id: data.id };
 }
 
+export async function updateVisaType(input: {
+    id: number;
+    name: string;
+    validFor: string;
+    numberOfEntries: number;
+    maxStay: number;
+    processingFee?: number;
+    govFee?: number;
+}): Promise<{ success: boolean; error?: string }> {
+    const name = input.name.trim();
+    const validFor = input.validFor.trim();
+
+    if (!name) return { success: false, error: "Visa name is required." };
+    if (!validFor) return { success: false, error: "Validity period is required." };
+    if (Number.isNaN(input.numberOfEntries) || (input.numberOfEntries < 1 && input.numberOfEntries !== -1)) {
+        return { success: false, error: "Entries must be -1 (multiple) or a positive number." };
+    }
+    if (Number.isNaN(input.maxStay) || input.maxStay < 1) {
+        return { success: false, error: "Max stay must be at least 1 day." };
+    }
+    if ((input.processingFee ?? 0) < 0 || (input.govFee ?? 0) < 0) {
+        return { success: false, error: "Fees cannot be negative." };
+    }
+
+    const supabase = await createSupabaseServerClient();
+    const { error } = await supabase
+        .from("visa_types")
+        .update({
+            name,
+            valid_for: validFor,
+            number_of_entries: input.numberOfEntries,
+            max_stay: input.maxStay,
+            processing_fee: input.processingFee ?? 0,
+            gov_fee: input.govFee ?? 0,
+        })
+        .eq("id", input.id);
+
+    if (error) {
+        return { success: false, error: error.message };
+    }
+
+    revalidatePath(`/admin/visas/${input.id}`);
+    revalidatePath("/admin/visas");
+    revalidatePath("/admin/countries");
+
+    return { success: true };
+}
 
 
 export default async function isVisaAvailable(destinationCountry: string, nationality: string, visaTypeId: number): Promise<GeneralResponse<Tables<"products"> | null>> {
