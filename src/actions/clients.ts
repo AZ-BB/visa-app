@@ -46,7 +46,7 @@ export async function fetchClients({
     const { data, error } = await supabase.rpc("get_clients", {
         p_page: safePage,
         p_limit: safePageSize,
-        p_search: search?.trim() || null,
+        p_search: search?.trim() || undefined,
         p_has_applications: hasApplications === "yes" ? "yes" : "all",
         p_sort: sort,
         p_order: sortDir,
@@ -55,17 +55,13 @@ export async function fetchClients({
     if (error) {
         return { error: error.message };
     }
-
-    const result = data;
-    if (!result) {
+;
+    if (!data) {
         return { error: "Failed to fetch clients" };
     }
-    if (result.error) {
-        return { error: result.error };
-    }
-
-    const clients = result.clients ?? [];
-    const total = result.total ?? 0;
+    const result = data as unknown as { clients: ClientRow[] | null; total: number | null };
+    const clients = result?.clients ?? [];
+    const total = result?.total ?? 0;
     const totalPages = Math.max(1, Math.ceil(total / safePageSize));
 
     return {
