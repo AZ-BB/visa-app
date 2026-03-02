@@ -1,6 +1,6 @@
 'use server'
 
-import { createSupabaseServerClient } from "@/lib/supabase/supabase-server";
+import { createSupabaseServerClient, createSupabaseAdminServerClient } from "@/lib/supabase/supabase-server";
 import { Tables } from "@/database.types";
 import GeneralResponse from "@/types/general";
 import { getUser } from "@/lib/get-user";
@@ -344,6 +344,44 @@ export async function getApplications(page: number = 1, limit: number = 10, filt
             status: false,
             error: "Failed to get applications",
         }
+    }
+}
+
+export async function getApplicationCount(): Promise<GeneralResponse<{ total: number; in_progress: number; completed: number; total_fee: number; }>> {
+    try {
+        const supabase = await createSupabaseServerClient();
+        const { data, error } = await supabase.rpc("get_application_counts");
+
+        if (error) {
+            return {
+                status: false,
+                error: error.message,
+            };
+        }
+
+        const result = data as { total: number; in_progress: number; completed: number; total_fee: number } | null;
+        if (!result) {
+            return {
+                status: false,
+                error: "Failed to get application count",
+            };
+        }
+
+        return {
+            status: true,
+            data: {
+                total: Number(result.total) ?? 0,
+                in_progress: Number(result.in_progress) ?? 0,
+                completed: Number(result.completed) ?? 0,
+                total_fee: Number(result.total_fee) ?? 0,
+            },
+        };
+    } catch (error) {
+        console.error(error);
+        return {
+            status: false,
+            error: "Failed to get application count",
+        };
     }
 }
 
