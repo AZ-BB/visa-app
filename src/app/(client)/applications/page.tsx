@@ -183,7 +183,7 @@ export default async function ApplicationsPage() {
                                                 Cost
                                             </span>
                                             <span className="font-semibold text-primary-copy text-right truncate min-w-0">
-                                                £{totalCost(app).toFixed(2)}
+                                                ${totalCost(app).toFixed(2)}
                                             </span>
                                         </div>
                                     </CardContent>

@@ -1,206 +1,583 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { fetchApplicationById } from "@/actions/admin"
-import { PageHeader } from "@/components/admin-layout/page-header"
-import { StatusBadge } from "@/components/admin-layout/status-badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { format } from "date-fns"
+  ChevronLeft,
+  ExternalLink,
+  Mail,
+  Users,
+  CreditCard,
+  CalendarDays,
+  Globe,
+  FileText,
+  Clock,
+  DoorOpen,
+  Timer,
+  Plane,
+  Hash,
+} from "lucide-react"
+import { getApplication } from "@/actions/applications"
+import { getAdmins } from "@/actions/admins"
+import { StatusDropdown } from "./_components/StatusDropdown"
+import { AssigneeDropdown } from "../_components/AssigneeDropdown"
 import { CountryFlag } from "@/components/ui/country-flag"
+import { getCountryNameFromCode } from "@/lib/contries-name"
+import { ApplicationStatus } from "@/enums"
+import type { Application } from "@/actions/applications"
+import { Tables } from "@/database.types"
 
-export default async function ApplicationDetailPage({
+type TravellerWithProduct = Tables<"travellers"> & {
+  product: Tables<"products">
+}
+
+function formatDate(dateStr: string) {
+  try {
+    return new Date(dateStr).toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    })
+  } catch {
+    return dateStr
+  }
+}
+
+function formatDateTime(dateStr: string) {
+  try {
+    return new Date(dateStr).toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  } catch {
+    return dateStr
+  }
+}
+
+function StatCard({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode
+  label: string
+  value: string
+}) {
+  return (
+    <div className="flex items-start gap-3 rounded-xl border border-border-default bg-white p-4 shadow-sm">
+      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/5">
+        {icon}
+      </div>
+      <div className="min-w-0">
+        <p className="text-xs font-medium text-secondary-copy">{label}</p>
+        <p className="mt-0.5 truncate text-sm font-semibold text-primary-copy">
+          {value}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function DetailRow({
+  label,
+  children,
+}: {
+  label: string
+  children: React.ReactNode
+}) {
+  return (
+    <div className="flex items-center justify-between px-5 py-3">
+      <span className="text-sm text-secondary-copy">{label}</span>
+      <span className="text-sm font-medium text-primary-copy">{children}</span>
+    </div>
+  )
+}
+
+export default async function AdminApplicationDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const application = await fetchApplicationById(id)
+
+  const [res, adminsRes] = await Promise.all([
+    getApplication(id),
+    getAdmins(1, 200, { sort: "first_name", order: "asc" }),
+  ])
+  const application: Application | null =
+    res.status && res.data ? res.data : null
+  const admins =
+    adminsRes.status && adminsRes.data ? adminsRes.data.admins : []
+
   if (!application) notFound()
 
+  const destinationCountry = application.destination_country
+  const visaType = application.visa_type
+  const tt =
+    application.turnaround_time ??
+    ((application as Record<string, unknown>).turnaround_times as typeof application.turnaround_time)
+  const travellers = (application.travellers ?? []) as unknown as TravellerWithProduct[]
+
+  const totalCost = application.total_fee ?? 0
+  const turnaroundFee = application.turnaround_fee ?? 0
+  const govFeeTotal = application.gov_fee ?? 0
+  const processingFeeTotal = application.processing_fee ?? 0
 
   return (
-    <>
-      <PageHeader
-        title={
-          <span className="inline-flex items-center gap-2">
-            <CountryFlag
-              code={application.travellers?.[0]?.nationality_country?.id ?? ""}
-              className="size-8"
-              round={true}
-            />
-            <span>
-              {application.profile?.first_name} {application.profile?.last_name}
-            </span>
-            <span className="text-secondary-copy">-</span>
-            <CountryFlag
-              code={application.product?.visa_type?.destination_country_data?.id ?? ""}
-              className="size-8"
-              round={true}
-            />
-            <span>{application.product?.visa_type?.name ?? "Visa"}</span>
-          </span>
-        }
-      />
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="border-border-default bg-white shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-base">Client</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4 text-sm">
-            {application.profile && (
-              <>
-                <div className="flex justify-between">
-                  <span className="text-secondary-copy">Name</span>
-                  <span className="text-primary-copy">
-                    {application.profile.first_name} {application.profile.last_name}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-secondary-copy">Email</span>
-                  <span className="text-primary-copy">{application.profile.email}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-secondary-copy">Phone</span>
-                  <span className="text-primary-copy">{application.profile.phone}</span>
-                </div>
-                <Link
-                  href={`/admin/clients/${application.profile.id}`}
-                  className="text-primary hover:underline"
-                >
-                  View all applications for this client →
-                </Link>
-              </>
-            )}
-          </CardContent>
-        </Card>
-        <Card className="border-border-default bg-white shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-base">Application details</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4 text-sm">
-            <div className="flex justify-between">
-              <span className="text-secondary-copy">Status</span>
-              <StatusBadge status={application.status} />
-            </div>
-            <div className="flex justify-between">
-              <span className="text-secondary-copy">Contact email</span>
-              <span className="text-primary-copy">{application.contact_email}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-secondary-copy">Arrival date</span>
-              <span className="text-primary-copy">
-                {format(new Date(application.arrival_date), "dd MMM yyyy")}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-secondary-copy">Price</span>
-              <span className="font-medium text-primary-copy">£{application.price}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-secondary-copy">Turnaround</span>
-              <span className="text-primary-copy">
-                {application.turnaround_time?.name ?? "—"} (£
-                {application.turnaround_time_cost})
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-secondary-copy">Assigned to</span>
-              <span className="text-primary-copy">
-                {application.assigned_admin
-                  ? `${application.assigned_admin.first_name} ${application.assigned_admin.last_name}`
-                  : "—"}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+    <div className="space-y-6">
+      {/* Back link */}
+      <Link
+        href="/admin/applications"
+        className="inline-flex items-center gap-1.5 text-sm text-secondary-copy transition-colors hover:text-primary"
+      >
+        <ChevronLeft className="size-4" />
+        Back to applications
+      </Link>
 
+      {/* Page header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex items-center gap-4">
+          <div className="flex size-14 items-center justify-center overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
+            <CountryFlag
+              code={destinationCountry.id}
+              className="size-10 shrink-0 rounded"
+              round={false}
+            />
+          </div>
+          <div>
+            <h1 className="text-xl font-semibold text-primary-copy">
+              {destinationCountry.name} — {visaType.name}
+            </h1>
+            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-secondary-copy">
+              <Link
+                href={`/admin/countries/${destinationCountry.id}`}
+                className="inline-flex items-center gap-1 transition-colors hover:text-primary"
+              >
+                <Globe className="size-3" />
+                {destinationCountry.name}
+                <ExternalLink className="size-3 opacity-50" />
+              </Link>
+              <span className="opacity-30">·</span>
+              <Link
+                href={`/admin/visas/${visaType.id}`}
+                className="inline-flex items-center gap-1 transition-colors hover:text-primary"
+              >
+                <FileText className="size-3" />
+                {visaType.name}
+                <ExternalLink className="size-3 opacity-50" />
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="flex flex-col gap-1">
+            <span className="text-xs text-secondary-copy">Status</span>
+            <StatusDropdown
+              applicationId={application.id}
+              status={application.status as ApplicationStatus}
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="text-xs text-secondary-copy">Assigned to</span>
+            <AssigneeDropdown
+              applicationId={application.id}
+              assignedToId={application.assigned_to ?? null}
+              admins={admins}
+              className="w-44"
+            />
+          </div>
+        </div>
       </div>
-      <Card className="mt-6 border-border-default bg-white shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-base">Product</CardTitle>
-        </CardHeader>
-        <CardContent className="text-sm">
-          {application.product && (
-            <div className="flex flex-wrap gap-x-6 gap-y-2">
-              <span className="text-secondary-copy">Visa type:</span>
-              <span className="text-primary-copy">
-                {application.product.visa_type?.name ?? "—"}
+
+      {/* Quick stat cards */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          icon={<Mail className="size-4 text-primary" />}
+          label="Contact email"
+          value={application.contact_email}
+        />
+        <StatCard
+          icon={<Plane className="size-4 text-primary" />}
+          label="Arrival date"
+          value={formatDate(application.arrival_date)}
+        />
+        <StatCard
+          icon={<CalendarDays className="size-4 text-primary" />}
+          label="Submitted"
+          value={formatDateTime(application.created_at)}
+        />
+        <StatCard
+          icon={<CreditCard className="size-4 text-primary" />}
+          label="Total cost"
+          value={`$${totalCost.toFixed(2)}`}
+        />
+      </div>
+
+      {/* Main 3-col grid */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* ── Left: 2 cols ── */}
+        <div className="space-y-6 lg:col-span-2">
+          {/* Visa details */}
+          <div className="overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
+            <div className="flex items-center justify-between border-b border-border-default px-5 py-3">
+              <p className="text-sm font-medium text-primary-copy">
+                Visa details
+              </p>
+              <Link
+                href={`/admin/visas/${visaType.id}`}
+                className="inline-flex items-center gap-1 text-xs text-secondary-copy transition-colors hover:text-primary"
+              >
+                View visa
+                <ExternalLink className="size-3" />
+              </Link>
+            </div>
+            <div className="divide-y divide-border-default/60">
+              <DetailRow label="Destination country">
+                <Link
+                  href={`/admin/countries/${destinationCountry.id}`}
+                  className="inline-flex items-center gap-2 transition-colors hover:text-primary"
+                >
+                  <CountryFlag
+                    code={destinationCountry.id}
+                    className="size-5 shrink-0 rounded shadow-sm ring-1 ring-black/5"
+                    round={false}
+                  />
+                  {destinationCountry.name}
+                  <ExternalLink className="size-3 opacity-40" />
+                </Link>
+              </DetailRow>
+              <DetailRow label="Visa type">
+                <Link
+                  href={`/admin/visas/${visaType.id}`}
+                  className="inline-flex items-center gap-1.5 transition-colors hover:text-primary"
+                >
+                  {visaType.name}
+                  <ExternalLink className="size-3 opacity-40" />
+                </Link>
+              </DetailRow>
+              <DetailRow label="Valid for">{visaType.valid_for}</DetailRow>
+              <DetailRow label="Max stay">{visaType.max_stay} days</DetailRow>
+              <DetailRow label="Number of entries">
+                {visaType.number_of_entries === -1
+                  ? "Multiple"
+                  : visaType.number_of_entries}
+              </DetailRow>
+              <DetailRow label="Base gov fee">
+                ${Number(visaType.gov_fee).toFixed(2)}
+              </DetailRow>
+              <DetailRow label="Base processing fee">
+                ${Number(visaType.processing_fee).toFixed(2)}
+              </DetailRow>
+            </div>
+          </div>
+
+          {/* Travellers */}
+          <div className="overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
+            <div className="flex items-center gap-2 border-b border-border-default px-5 py-3">
+              <Users className="size-4 text-secondary-copy" />
+              <p className="text-sm font-medium text-primary-copy">
+                Travellers
+              </p>
+              <span className="rounded-full bg-bg-light-grey px-2 py-0.5 text-xs font-medium text-secondary-copy">
+                {travellers.length}
               </span>
-              <span className="text-secondary-copy">Destination:</span>
-              <span className="text-primary-copy">
-                {application.product.visa_type?.destination_country_data?.name ?? "—"}
-              </span>
-              <span className="text-secondary-copy">Product price:</span>
-              <span className="text-primary-copy">£{application.product.price}</span>
+            </div>
+            <div className="divide-y divide-border-default/60">
+              {travellers.map((traveller, index) => (
+                <div key={traveller.id} className="space-y-5 p-5">
+                  {/* Traveller header */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <span className="flex size-7 items-center justify-center rounded-full bg-primary/5 text-xs font-semibold text-primary">
+                        {index + 1}
+                      </span>
+                      <h3 className="font-semibold text-primary-copy">
+                        {traveller.first_name} {traveller.last_name}
+                      </h3>
+                    </div>
+                    <Link
+                      href={`/admin/countries/${destinationCountry.id}/nationality/${traveller.nationality}`}
+                      className="inline-flex items-center gap-1 text-xs text-secondary-copy transition-colors hover:text-primary"
+                    >
+                      Product #{traveller.product_id}
+                      <ExternalLink className="size-3 opacity-40" />
+                    </Link>
+                  </div>
+
+                  {/* Info grid: 3 cols */}
+                  <div className="grid gap-x-8 gap-y-4 text-sm sm:grid-cols-3">
+                    {/* Personal info */}
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-xs text-secondary-copy">
+                          Date of birth
+                        </p>
+                        <p className="mt-0.5 font-medium text-primary-copy">
+                          {formatDate(traveller.date_of_birth)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-secondary-copy">
+                          Passport number
+                        </p>
+                        <p className="mt-0.5 font-mono font-medium text-primary-copy">
+                          {traveller.passport_number}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-secondary-copy">
+                          Passport expiry
+                        </p>
+                        <p className="mt-0.5 font-medium text-primary-copy">
+                          {formatDate(traveller.passport_expiry_date)}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Countries */}
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-xs text-secondary-copy">
+                          Nationality
+                        </p>
+                        <Link
+                          href={`/admin/countries/${traveller.nationality}`}
+                          className="mt-0.5 inline-flex items-center gap-2 transition-colors hover:text-primary"
+                        >
+                          <CountryFlag
+                            code={traveller.nationality}
+                            className="size-5 shrink-0 rounded shadow-sm ring-1 ring-black/5"
+                            round={false}
+                          />
+                          <span className="font-medium text-primary-copy hover:text-primary">
+                            {getCountryNameFromCode(traveller.nationality)}
+                          </span>
+                        </Link>
+                      </div>
+                      <div>
+                        <p className="text-xs text-secondary-copy">
+                          Country of birth
+                        </p>
+                        <Link
+                          href={`/admin/countries/${traveller.country_of_birth}`}
+                          className="mt-0.5 inline-flex items-center gap-2 transition-colors hover:text-primary"
+                        >
+                          <CountryFlag
+                            code={traveller.country_of_birth}
+                            className="size-5 shrink-0 rounded shadow-sm ring-1 ring-black/5"
+                            round={false}
+                          />
+                          <span className="font-medium text-primary-copy hover:text-primary">
+                            {getCountryNameFromCode(traveller.country_of_birth)}
+                          </span>
+                        </Link>
+                      </div>
+                      <div>
+                        <p className="text-xs text-secondary-copy">
+                          Country of residence
+                        </p>
+                        <Link
+                          href={`/admin/countries/${traveller.country_of_residence}`}
+                          className="mt-0.5 inline-flex items-center gap-2 transition-colors hover:text-primary"
+                        >
+                          <CountryFlag
+                            code={traveller.country_of_residence}
+                            className="size-5 shrink-0 rounded shadow-sm ring-1 ring-black/5"
+                            round={false}
+                          />
+                          <span className="font-medium text-primary-copy hover:text-primary">
+                            {getCountryNameFromCode(
+                              traveller.country_of_residence
+                            )}
+                          </span>
+                        </Link>
+                      </div>
+                    </div>
+
+                    {/* Fees */}
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-xs text-secondary-copy">Gov fee</p>
+                        <p className="mt-0.5 font-semibold tabular-nums text-primary-copy">
+                          ${Number(traveller.gov_fee).toFixed(2)}
+                        </p>
+                        {traveller.product?.gov_fee_override != null && (
+                          <p className="text-xs text-secondary-copy line-through">
+                            base: ${Number(visaType.gov_fee).toFixed(2)}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-xs text-secondary-copy">
+                          Processing fee
+                        </p>
+                        <p className="mt-0.5 font-semibold tabular-nums text-primary-copy">
+                          ${Number(traveller.processing_fee).toFixed(2)}
+                        </p>
+                        {traveller.product?.processing_fee_override != null && (
+                          <p className="text-xs text-secondary-copy line-through">
+                            base: ${Number(visaType.processing_fee).toFixed(2)}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-xs text-secondary-copy">Subtotal</p>
+                        <p className="mt-0.5 font-bold tabular-nums text-primary-copy">
+                          $
+                          {(
+                            Number(traveller.gov_fee) +
+                            Number(traveller.processing_fee)
+                          ).toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Right: 1 col ── */}
+        <div className="space-y-6">
+          {/* Invoice */}
+          <div className="overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
+            <div className="border-b border-border-default px-5 py-3">
+              <p className="text-sm font-medium text-primary-copy">Invoice</p>
+            </div>
+            <div className="divide-y divide-border-default/60">
+              {travellers.map((traveller) => (
+                <div key={traveller.id} className="space-y-2 px-5 py-4">
+                  <p className="text-xs font-semibold text-primary-copy">
+                    {traveller.first_name} {traveller.last_name}
+                  </p>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-secondary-copy">Gov fee</span>
+                    <span className="tabular-nums font-medium text-primary-copy">
+                      ${Number(traveller.gov_fee).toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-secondary-copy">Processing fee</span>
+                    <span className="tabular-nums font-medium text-primary-copy">
+                      ${Number(traveller.processing_fee).toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between border-t border-border-default/50 pt-2 text-sm">
+                    <span className="text-secondary-copy">Subtotal</span>
+                    <span className="tabular-nums font-semibold text-primary-copy">
+                      $
+                      {(
+                        Number(traveller.gov_fee) +
+                        Number(traveller.processing_fee)
+                      ).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+
+              {turnaroundFee > 0 && (
+                <div className="space-y-2 px-5 py-4">
+                  <p className="text-xs font-semibold text-primary-copy">
+                    Turnaround
+                  </p>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-secondary-copy">
+                      {tt?.name ?? "Turnaround fee"}
+                    </span>
+                    <span className="tabular-nums font-medium text-primary-copy">
+                      ${turnaroundFee.toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between px-5 py-4">
+                <span className="font-bold text-primary-copy">Total</span>
+                <span className="text-lg font-bold tabular-nums text-primary-copy">
+                  ${totalCost.toFixed(2)}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Turnaround time */}
+          {tt && (
+            <div className="overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
+              <div className="flex items-center gap-2 border-b border-border-default px-5 py-3">
+                <Timer className="size-4 text-secondary-copy" />
+                <p className="text-sm font-medium text-primary-copy">
+                  Turnaround time
+                </p>
+              </div>
+              <div className="divide-y divide-border-default/60">
+                <DetailRow label="Plan">{tt.name}</DetailRow>
+                <DetailRow label="Processing time">
+                  {tt.turnaround_time_hours}h
+                </DetailRow>
+                <DetailRow label="Fee">
+                  ${Number(tt.fee).toFixed(2)}
+                </DetailRow>
+              </div>
             </div>
           )}
-        </CardContent>
-      </Card>
-      <Card className="mt-6 border-border-default bg-white shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-base">Travellers</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          {application.travellers && application.travellers.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow className="border-border-default hover:bg-transparent">
-                  <TableHead className="text-xs font-semibold uppercase tracking-wider text-secondary-copy">
-                    Name
-                  </TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wider text-secondary-copy">
-                    Nationality
-                  </TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wider text-secondary-copy">
-                    Date of birth
-                  </TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wider text-secondary-copy">
-                    Passport
-                  </TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wider text-secondary-copy">
-                    Expiry
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {application.travellers.map((t) => (
-                  <TableRow
-                    key={t.id}
-                    className="border-border-default hover:bg-muted/30"
-                  >
-                    <TableCell className="py-3 font-medium text-primary-copy">
-                      {t.first_name} {t.last_name}
-                    </TableCell>
-                    <TableCell className="py-3 text-secondary-copy">
-                      {t.nationality_country?.name ?? t.nationality}
-                    </TableCell>
-                    <TableCell className="py-3 text-secondary-copy">
-                      {format(new Date(t.date_of_birth), "dd MMM yyyy")}
-                    </TableCell>
-                    <TableCell className="py-3 font-mono text-sm text-secondary-copy">
-                      {t.passport_number}
-                    </TableCell>
-                    <TableCell className="py-3 text-secondary-copy">
-                      {format(new Date(t.passport_expiry_date), "dd MMM yyyy")}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          ) : (
-            <p className="py-6 text-center text-sm text-secondary-copy">
-              No travellers for this application.
-            </p>
-          )}
-        </CardContent>
-      </Card>
-    </>
+
+          {/* Fee breakdown */}
+          <div className="overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
+            <div className="flex items-center gap-2 border-b border-border-default px-5 py-3">
+              <CreditCard className="size-4 text-secondary-copy" />
+              <p className="text-sm font-medium text-primary-copy">
+                Fee breakdown
+              </p>
+            </div>
+            <div className="divide-y divide-border-default/60">
+              <DetailRow label="Gov fees total">
+                ${govFeeTotal.toFixed(2)}
+              </DetailRow>
+              <DetailRow label="Processing fees total">
+                ${processingFeeTotal.toFixed(2)}
+              </DetailRow>
+              <DetailRow label="Turnaround fee">
+                ${turnaroundFee.toFixed(2)}
+              </DetailRow>
+              <div className="flex items-center justify-between px-5 py-3">
+                <span className="text-sm font-bold text-primary-copy">
+                  Total
+                </span>
+                <span className="text-sm font-bold tabular-nums text-primary-copy">
+                  ${totalCost.toFixed(2)}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Metadata */}
+          <div className="overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
+            <div className="flex items-center gap-2 border-b border-border-default px-5 py-3">
+              <Hash className="size-4 text-secondary-copy" />
+              <p className="text-sm font-medium text-primary-copy">Metadata</p>
+            </div>
+            <div className="divide-y divide-border-default/60">
+              <div className="flex items-center justify-between px-5 py-3">
+                <span className="text-sm text-secondary-copy">
+                  Application ID
+                </span>
+                <span className="font-mono text-xs text-primary-copy">
+                  {application.id.slice(0, 8)}…
+                </span>
+              </div>
+              <DetailRow label="Submitted">
+                {formatDateTime(application.created_at)}
+              </DetailRow>
+              <DetailRow label="Last updated">
+                {formatDateTime(application.updated_at)}
+              </DetailRow>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }

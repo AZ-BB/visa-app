@@ -23,8 +23,8 @@ const TURNAROUND_LABELS: Record<number, string> = {
 };
 
 function formatCost(value: number | null): string {
-  if (value === null) return "£—";
-  return `£${value.toFixed(2)}`;
+  if (value === null) return "$—";
+  return `$${value.toFixed(2)}`;
 }
 
 /** Get governmental fee: product override if set, else visaType default */
