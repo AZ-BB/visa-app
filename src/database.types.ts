@@ -478,6 +478,25 @@ export type Database = {
           visa_type_id: number
         }[]
       }
+      get_admin_by_id: {
+        Args: { p_id: string }
+        Returns: (Database["public"]["Tables"]["admin"]["Row"] & { email: string }) | null
+      }
+      get_admins: {
+        Args: {
+          p_page?: number
+          p_limit?: number
+          p_search?: string | null
+          p_role?: string | null
+          p_sort?: string
+          p_order?: string
+        }
+        Returns: {
+          admins: (Database["public"]["Tables"]["admin"]["Row"] & { email: string })[]
+          total: number
+          error?: string
+        }
+      }
       get_product_stats_by_visa_rule_ids: {
         Args: { rule_ids: number[] }
         Returns: {
