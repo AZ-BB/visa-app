@@ -59,7 +59,7 @@ export function VisaStatusToggle({
             "ring-1 ring-inset",
             isPending && "opacity-60",
             isDisabled
-              ? "bg-amber-50 text-amber-700 ring-amber-200/80 hover:bg-amber-100"
+              ? "bg-red-50 text-red-700 ring-red-200/80 hover:bg-red-100"
               : "bg-emerald-50 text-emerald-700 ring-emerald-200/80 hover:bg-emerald-100"
           )}
         >
@@ -69,7 +69,7 @@ export function VisaStatusToggle({
             <span
               className={cn(
                 "size-1.5 rounded-full",
-                isDisabled ? "bg-amber-500" : "bg-emerald-500"
+                isDisabled ? "bg-red-500" : "bg-emerald-500"
               )}
             />
           )}
@@ -97,7 +97,7 @@ export function VisaStatusToggle({
             disabled={isDisabled}
             className="gap-2"
           >
-            <XCircle className="size-4 text-amber-600" />
+            <XCircle className="size-4 text-red-600" />
             <span>Disabled</span>
             {isDisabled && (
               <span className="ml-auto text-[10px] text-secondary-copy">Current</span>
@@ -109,8 +109,8 @@ export function VisaStatusToggle({
       <Dialog open={showWarning} onOpenChange={setShowWarning}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <div className="mx-auto mb-2 flex size-12 items-center justify-center rounded-full bg-amber-50 sm:mx-0">
-              <AlertTriangle className="size-6 text-amber-600" />
+            <div className="mx-auto mb-2 flex size-12 items-center justify-center rounded-full bg-red-50 sm:mx-0">
+              <AlertTriangle className="size-6 text-red-600" />
             </div>
             <DialogTitle>Disable &ldquo;{visaName}&rdquo;?</DialogTitle>
             <DialogDescription>
@@ -128,7 +128,7 @@ export function VisaStatusToggle({
               Cancel
             </Button>
             <Button
-              className="bg-amber-600 text-white hover:bg-amber-700"
+              className="bg-red-600 text-white hover:bg-red-700"
               onClick={() => applyChange(true)}
               disabled={isPending}
             >

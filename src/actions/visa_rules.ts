@@ -1,5 +1,8 @@
+"use server"
+
 import { createSupabaseServerClient } from "@/lib/supabase/supabase-server"
 import GeneralResponse from "@/types/general"
+import { revalidatePath } from "next/cache"
 
 export interface CountryDetails {
     id: string;
@@ -57,13 +60,18 @@ export async function getAllVisaRulesForNationality(nationality: string): Promis
 
 export async function updateVisaRuleSupportStatus(id: number, isSupported: boolean): Promise<{ success: boolean; error?: string }> {
     const supabase = await createSupabaseServerClient();
+    const updateData: Record<string, boolean> = { is_supported: isSupported };
+    if (isSupported) {
+        updateData.is_visa_required = true;
+    }
     const { error } = await supabase
         .from("visa_rules")
-        .update({ is_supported: isSupported })
+        .update(updateData)
         .eq("id", id);
     if (error) {
         return { success: false, error: error.message };
     }
+    revalidatePath("/admin/countries")
     return { success: true };
 }
 
@@ -76,5 +84,6 @@ export async function updateVisaRuleVisaRequiredStatus(id: number, isVisaRequire
     if (error) {
         return { success: false, error: error.message };
     }
+    revalidatePath("/admin/countries")
     return { success: true };
 }

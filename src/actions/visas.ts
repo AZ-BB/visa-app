@@ -68,6 +68,57 @@ export async function updateVisaTypeDisabledStatus(id: number, isDisabled: boole
     return { success: true };
 }
 
+export async function createVisaTypeForDestination(input: {
+    destinationCountry: string;
+    name: string;
+    validFor: string;
+    numberOfEntries: number;
+    maxStay: number;
+    processingFee?: number;
+    govFee?: number;
+}): Promise<{ success: boolean; id?: number; error?: string }> {
+    const name = input.name.trim();
+    const validFor = input.validFor.trim();
+
+    if (!name) return { success: false, error: "Visa name is required." };
+    if (!validFor) return { success: false, error: "Validity period is required." };
+    if (Number.isNaN(input.numberOfEntries) || (input.numberOfEntries < 1 && input.numberOfEntries !== -1)) {
+        return { success: false, error: "Entries must be -1 (multiple) or a positive number." };
+    }
+    if (Number.isNaN(input.maxStay) || input.maxStay < 1) {
+        return { success: false, error: "Max stay must be at least 1 day." };
+    }
+    if ((input.processingFee ?? 0) < 0 || (input.govFee ?? 0) < 0) {
+        return { success: false, error: "Fees cannot be negative." };
+    }
+
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
+        .from("visa_types")
+        .insert({
+            destination_country: input.destinationCountry,
+            name,
+            valid_for: validFor,
+            number_of_entries: input.numberOfEntries,
+            max_stay: input.maxStay,
+            processing_fee: input.processingFee ?? 0,
+            gov_fee: input.govFee ?? 0,
+        })
+        .select("id")
+        .single();
+
+    if (error || !data) {
+        return { success: false, error: error?.message ?? "Failed to create visa type." };
+    }
+
+    const { revalidatePath } = await import("next/cache");
+    revalidatePath(`/admin/countries/${input.destinationCountry}/visas`);
+    revalidatePath(`/admin/countries/${input.destinationCountry}`);
+    revalidatePath("/admin/visas");
+
+    return { success: true, id: data.id };
+}
+
 
 
 export default async function isVisaAvailable(destinationCountry: string, nationality: string, visaTypeId: number): Promise<GeneralResponse<Tables<"products"> | null>> {

@@ -471,6 +471,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_active_product_counts_by_visa_type_ids: {
+        Args: { type_ids: number[] }
+        Returns: {
+          product_count: number
+          visa_type_id: number
+        }[]
+      }
+      get_product_stats_by_visa_rule_ids: {
+        Args: { rule_ids: number[] }
+        Returns: {
+          product_count: number
+          visa_rule_id: number
+          visa_type_count: number
+        }[]
+      }
       is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
