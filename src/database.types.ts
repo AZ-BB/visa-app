@@ -497,6 +497,29 @@ export type Database = {
           error?: string
         }
       }
+      get_clients: {
+        Args: {
+          p_page?: number
+          p_limit?: number
+          p_search?: string | null
+          p_has_applications?: string
+          p_sort?: string
+          p_order?: string
+        }
+        Returns: {
+          clients: {
+            id: string
+            first_name: string
+            last_name: string
+            email: string
+            phone: string
+            created_at: string
+            applications: { count: number }[]
+          }[]
+          total: number
+          error?: string
+        }
+      }
       get_product_stats_by_visa_rule_ids: {
         Args: { rule_ids: number[] }
         Returns: {
