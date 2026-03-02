@@ -26,6 +26,72 @@ export interface VisaType {
     destination_country_data: VisaCountry | null;
 }
 
+export interface VisaTypesPageData {
+    visas: VisaType[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+}
+
+export async function fetchVisas({
+    page = 1,
+    pageSize = 20,
+    search = "",
+    status = "all",
+    country = "",
+}: {
+    page?: number;
+    pageSize?: number;
+    search?: string;
+    status?: "all" | "active" | "disabled";
+    country?: string;
+} = {}): Promise<GeneralResponse<VisaTypesPageData>> {
+    const supabase = await createSupabaseServerClient();
+    const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
+    const safePageSize =
+        Number.isFinite(pageSize) && pageSize > 0 ? Math.min(Math.floor(pageSize), 100) : 20;
+    const from = (safePage - 1) * safePageSize;
+    const to = from + safePageSize - 1;
+
+    let query = supabase
+        .from("visa_types")
+        .select("*, destination_country_data:countries!destination_country(*)", { count: "exact" })
+        .is("deleted_at", null)
+        .order("name", { ascending: true });
+
+    if (search.trim()) {
+        query = query.ilike("name", `%${search.trim()}%`);
+    }
+
+    if (status === "active") {
+        query = query.eq("is_disabled", false);
+    } else if (status === "disabled") {
+        query = query.eq("is_disabled", true);
+    }
+
+    if (country.trim()) {
+        query = query.eq("destination_country", country.trim());
+    }
+
+    const { data, error, count } = await query.range(from, to);
+
+    if (error) {
+        return { error: error.message };
+    }
+
+    const total = count ?? 0;
+    return {
+        data: {
+            visas: data ?? [],
+            total,
+            page: safePage,
+            pageSize: safePageSize,
+            totalPages: Math.max(1, Math.ceil(total / safePageSize)),
+        },
+    };
+}
+
 export async function getAllVisaTypesForDestination(countryId: string): Promise<GeneralResponse<VisaType[]>> {
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase
