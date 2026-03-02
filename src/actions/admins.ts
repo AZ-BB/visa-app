@@ -60,7 +60,7 @@ export async function getAdmins(page: number = 1, limit: number = 10, filter: {
             };
         }
 
-        console.log('Data');
+ 
 
         const result = data as { admins: AdminWithEmail[]; total: number };
 
