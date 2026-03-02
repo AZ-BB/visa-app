@@ -2,8 +2,8 @@
 
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { Loader2, Plus } from "lucide-react"
-import { createVisaTypeForDestination } from "@/actions/visas"
+import { Loader2, Pencil } from "lucide-react"
+import { updateVisaType } from "@/actions/visas"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -23,35 +23,57 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-interface CreateVisaTypeModalProps {
-  countryId: string
-  countryName: string
-  className?: string
+interface EditVisaModalProps {
+  visa: {
+    id: number
+    name: string
+    valid_for: string
+    number_of_entries: number
+    max_stay: number
+    processing_fee: number
+    gov_fee: number
+  }
 }
 
-const initialForm = {
-  name: "",
-  validForAmount: "90",
-  validForUnit: "days" as "days" | "months" | "years",
-  numberOfEntries: "1",
-  maxStay: "30",
-  processingFee: "0",
-  govFee: "0",
+function parseValidFor(raw: string): {
+  amount: string
+  unit: "days" | "months" | "years"
+} | null {
+  const match = raw.trim().match(/^(\d+)\s+(days?|months?|years?)$/i)
+  if (!match) return null
+  const amount = match[1]
+  const unitRaw = match[2].toLowerCase().replace(/s$/, "")
+  const unitMap: Record<string, "days" | "months" | "years"> = {
+    day: "days",
+    month: "months",
+    year: "years",
+  }
+  const unit = unitMap[unitRaw]
+  if (!unit) return null
+  return { amount, unit }
 }
 
-export function CreateVisaTypeModal({
-  countryId,
-  countryName,
-  className,
-}: CreateVisaTypeModalProps) {
+export function EditVisaModal({ visa }: EditVisaModalProps) {
   const router = useRouter()
+  const parsed = parseValidFor(visa.valid_for)
+
+  const buildInitial = () => ({
+    name: visa.name,
+    validForAmount: parsed?.amount ?? "",
+    validForUnit: parsed?.unit ?? "days",
+    numberOfEntries: String(visa.number_of_entries),
+    maxStay: String(visa.max_stay),
+    processingFee: String(visa.processing_fee),
+    govFee: String(visa.gov_fee),
+  })
+
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
-  const [form, setForm] = useState(initialForm)
+  const [form, setForm] = useState(buildInitial)
 
   const reset = () => {
-    setForm(initialForm)
+    setForm(buildInitial())
     setError(null)
   }
 
@@ -60,7 +82,7 @@ export function CreateVisaTypeModal({
     setOpen(isOpen)
   }
 
-  const onChange = (key: keyof typeof form, value: string) => {
+  const onChange = (key: keyof ReturnType<typeof buildInitial>, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }))
   }
 
@@ -74,8 +96,8 @@ export function CreateVisaTypeModal({
     const govFee = Number(form.govFee)
 
     startTransition(async () => {
-      const result = await createVisaTypeForDestination({
-        destinationCountry: countryId,
+      const result = await updateVisaType({
+        id: visa.id,
         name: form.name,
         validFor: `${form.validForAmount} ${form.validForUnit}`,
         numberOfEntries,
@@ -85,7 +107,7 @@ export function CreateVisaTypeModal({
       })
 
       if (!result.success) {
-        setError(result.error ?? "Failed to create visa type.")
+        setError(result.error ?? "Failed to update visa type.")
         return
       }
 
@@ -97,28 +119,32 @@ export function CreateVisaTypeModal({
 
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className={className}>
-        <Plus className="size-4" />
-        Create visa
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary/90"
+      >
+        <Pencil className="size-4" />
+        Edit visa
       </button>
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className="gap-0 p-0 sm:max-w-[480px]">
+        <DialogContent className="gap-0 p-0 sm:max-w-[480px]" onOpenAutoFocus={(e) => e.preventDefault()}>
           <DialogHeader className="border-b border-border-default px-6 py-5">
-            <DialogTitle className="text-base">Create visa type</DialogTitle>
+            <DialogTitle className="text-base">Edit visa type</DialogTitle>
             <DialogDescription className="text-secondary-copy">
-              Add a new visa type for {countryName}.
+              Update the details for {visa.name}.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSubmit}>
             <div className="space-y-5 px-6 py-5">
               <div className="space-y-1.5">
-                <Label htmlFor="visa-name" className="text-sm font-medium text-primary-copy">
+                <Label htmlFor="edit-visa-name" className="text-sm font-medium text-primary-copy">
                   Name
                 </Label>
                 <Input
-                  id="visa-name"
+                  id="edit-visa-name"
                   value={form.name}
                   onChange={(e) => onChange("name", e.target.value)}
                   placeholder="e.g. Tourist Visa"
@@ -128,12 +154,12 @@ export function CreateVisaTypeModal({
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="visa-valid-amount" className="text-sm font-medium text-primary-copy">
+                <Label htmlFor="edit-visa-valid-amount" className="text-sm font-medium text-primary-copy">
                   Valid for
                 </Label>
                 <div className="flex gap-4">
                   <Input
-                    id="visa-valid-amount"
+                    id="edit-visa-valid-amount"
                     type="number"
                     value={form.validForAmount}
                     onChange={(e) => onChange("validForAmount", e.target.value)}
@@ -159,26 +185,27 @@ export function CreateVisaTypeModal({
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="visa-entries" className="text-sm font-medium text-primary-copy">
+                  <Label htmlFor="edit-visa-entries" className="text-sm font-medium text-primary-copy">
                     Number of entries
                   </Label>
                   <Input
-                    id="visa-entries"
+                    id="edit-visa-entries"
                     type="number"
                     value={form.numberOfEntries}
                     onChange={(e) => onChange("numberOfEntries", e.target.value)}
-                    min={1}
+                    min={-1}
                     className="h-10"
                     required
                   />
+                  <p className="text-xs text-secondary-copy">Use -1 for multiple</p>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="visa-max-stay" className="text-sm font-medium text-primary-copy">
+                  <Label htmlFor="edit-visa-max-stay" className="text-sm font-medium text-primary-copy">
                     Max stay (days)
                   </Label>
                   <Input
-                    id="visa-max-stay"
+                    id="edit-visa-max-stay"
                     type="number"
                     value={form.maxStay}
                     onChange={(e) => onChange("maxStay", e.target.value)}
@@ -191,11 +218,11 @@ export function CreateVisaTypeModal({
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="visa-processing-fee" className="text-sm font-medium text-primary-copy">
+                  <Label htmlFor="edit-visa-processing-fee" className="text-sm font-medium text-primary-copy">
                     Processing fee
                   </Label>
                   <Input
-                    id="visa-processing-fee"
+                    id="edit-visa-processing-fee"
                     type="number"
                     step="0.01"
                     min={0}
@@ -207,11 +234,11 @@ export function CreateVisaTypeModal({
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="visa-gov-fee" className="text-sm font-medium text-primary-copy">
+                  <Label htmlFor="edit-visa-gov-fee" className="text-sm font-medium text-primary-copy">
                     Gov fee
                   </Label>
                   <Input
-                    id="visa-gov-fee"
+                    id="edit-visa-gov-fee"
                     type="number"
                     step="0.01"
                     min={0}
@@ -244,10 +271,10 @@ export function CreateVisaTypeModal({
                 {isPending ? (
                   <>
                     <Loader2 className="size-4 animate-spin" />
-                    Creating...
+                    Saving...
                   </>
                 ) : (
-                  "Create visa"
+                  "Save changes"
                 )}
               </Button>
             </DialogFooter>
