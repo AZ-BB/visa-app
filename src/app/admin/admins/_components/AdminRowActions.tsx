@@ -18,22 +18,23 @@ export default function AdminRowActions({ adminId }: { adminId: string }) {
 
   return (
     <div className="flex items-center justify-start gap-1">
-      <Button variant="default" size="icon" asChild>
-        <Link href={`/admin/admins/${adminId}`} aria-label="View">
-          <Eye className="size-4" />
-        </Link>
-      </Button>
+      <Link
+        href={`/admin/admins/${adminId}`}
+        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border-default bg-white px-3 text-xs font-medium text-primary-copy shadow-sm transition-all hover:border-primary/40 hover:text-primary group-hover:border-primary/30"
+      >
+        <Eye className="size-3.5" />
+        View
+      </Link>
 
       <Button
-        variant="default"
-        size="icon"
         onClick={handleDelete}
         disabled={isPending}
-        aria-label="Delete"
-        className="bg-red-600 hover:bg-red-600/80 text-white"
+        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border-default bg-white px-3 text-xs font-medium text-red-600 hover:bg-white hover:text-red-600 shadow-sm transition-all hover:border-red-500/40 group-hover:border-primary/30"
       >
-        <Trash2 className="size-5" />
+        <Trash2 className="size-3.5" />
+        Delete
       </Button>
+
     </div>
   )
 }

@@ -69,7 +69,8 @@ export default async function AdminsPage({
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+            <div className="overflow-x-auto">
             <table className="w-full table-fixed text-sm">
               <thead>
                 <tr className="border-b border-border-default bg-bg-light-grey/80">
@@ -140,12 +141,14 @@ export default async function AdminsPage({
               </tbody>
             </table>
           </div>
+
+          {/* Pagination */}
+          <div className="border-t border-border-default px-5 py-3">
+            <Pagination total={total} page={page} pageSize={pageSize} />
+          </div>
+          </>
         )}
       </div>
-
-      {admins.length > 0 && (
-        <Pagination total={total} page={page} pageSize={pageSize} />
-      )}
     </div>
   )
 }
