@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "biome check",
     "format": "biome format --write",
-    "db:gen": "supabase gen types typescript --project-id \"atutbgvourzqqheunkhk\" --schema public > src/database.types.ts"
+    "db:gen": "supabase gen types typescript --project-id \"atutbgvourzqqheunkhk\" --schema public > src/database.types.ts",
+    "db:push": "supabase db push"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
