@@ -490,6 +490,18 @@ export type Database = {
         }
         Returns: Json
       }
+      get_application_counts: { Args: never; Returns: Json }
+      get_clients: {
+        Args: {
+          p_has_applications?: string
+          p_limit?: number
+          p_order?: string
+          p_page?: number
+          p_search?: string
+          p_sort?: string
+        }
+        Returns: Json
+      }
       get_product_stats_by_visa_rule_ids: {
         Args: { rule_ids: number[] }
         Returns: {

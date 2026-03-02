@@ -1,12 +1,12 @@
 import Link from "next/link"
-import { getApplications } from "@/actions/applications"
+import { getApplicationCount, getApplications } from "@/actions/applications"
 import { getAdmins } from "@/actions/admins"
 import { fetchAllCountriesList } from "@/actions/countries"
 import { PageHeader } from "@/components/admin-layout/page-header"
 import Pagination from "@/components/Pagination"
 import { ApplicationStatusBadge } from "@/components/ApplicationStatusBadge"
 import { CountryFlag } from "@/components/ui/country-flag"
-import { FileText, Eye } from "lucide-react"
+import { FileText, Eye, Clock, CheckCircle2, DollarSign } from "lucide-react"
 import ApplicationsFilters from "./_components/ApplicationsFilters"
 import { SortableTableHeader } from "./_components/SortableTableHeader"
 import { TravellersCell } from "./_components/TravellersCell"
@@ -48,7 +48,7 @@ export default async function ApplicationsPage({
     : "created_at"
   const order = params.order === "asc" ? "asc" : "desc"
 
-  const [res, adminsRes, countriesRes] = await Promise.all([
+  const [res, adminsRes, countriesRes, countRes] = await Promise.all([
     getApplications(page, pageSize, {
       search,
       status,
@@ -60,10 +60,12 @@ export default async function ApplicationsPage({
     }),
     getAdmins(1, 200, { sort: "first_name", order: "asc" }),
     fetchAllCountriesList(),
+    getApplicationCount(),
   ])
 
   const admins = adminsRes.status && adminsRes.data ? adminsRes.data.admins : []
   const countries = countriesRes.data ?? []
+  const count = countRes
 
   if (!res.status || !res.data) {
     return (
@@ -91,8 +93,47 @@ export default async function ApplicationsPage({
   return (
     <div className="space-y-6">
 
-      <div>
-        Counts
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+
+        <div className="rounded-xl border border-border-default bg-white px-5 py-3 shadow-sm">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold uppercase tracking-wider text-secondary-copy">Total</p>
+            <div className="flex size-8 items-center justify-center rounded-lg bg-primary/8 text-primary">
+              <FileText className="size-4" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold tabular-nums text-primary-copy">{count.data?.total ?? 0}</p>
+        </div>
+
+        <div className="rounded-xl border border-border-default bg-white px-5 py-3 shadow-sm">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold uppercase tracking-wider text-secondary-copy">In Progress</p>
+            <div className="flex size-8 items-center justify-center rounded-lg bg-amber-50 text-amber-500">
+              <Clock className="size-4" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold tabular-nums text-primary-copy">{count.data?.in_progress ?? 0}</p>
+        </div>
+
+        <div className="rounded-xl border border-border-default bg-white px-5 py-3 shadow-sm">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold uppercase tracking-wider text-secondary-copy">Completed</p>
+            <div className="flex size-8 items-center justify-center rounded-lg bg-green-50 text-green-500">
+              <CheckCircle2 className="size-4" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold tabular-nums text-primary-copy">{count.data?.completed ?? 0}</p>
+        </div>
+
+        <div className="rounded-xl border border-border-default bg-white px-5 py-3 shadow-sm">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold uppercase tracking-wider text-secondary-copy">Total Revenue</p>
+            <div className="flex size-8 items-center justify-center rounded-lg bg-primary/8 text-primary">
+              <DollarSign className="size-4" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold tabular-nums text-primary-copy">${(count.data?.total_fee ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+        </div>
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
