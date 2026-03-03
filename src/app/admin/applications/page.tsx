@@ -221,7 +221,7 @@ export default async function ApplicationsPage({
                       <td className="w-40 py-3.5 pr-2">
                         <Link href={`/admin/applications/${app.id}`} className="hover:underline group/link">
                           <span
-                            className="block truncate text-lg font-semibold text-primary-copy transition-colors group-hover/link:text-primary"
+                            className="block truncate text-base font-semibold text-primary-copy transition-colors group-hover/link:text-primary"
                           >
                             {app.client_name}
                           </span>
@@ -235,12 +235,14 @@ export default async function ApplicationsPage({
                         <TravellersCell travellers={app.travellers} />
                       </td>
 
-                      <td className="w-48 py-3.5 pr-2 flex items-center gap-2">
-                        <CountryFlag code={app.destination_country_id} className="size-8 rounded-md shrink-0 border border-border-default shadow-sm" loading="lazy" />
-                        <div>
-                          <div className="text-base font-semibold text-secondary truncate">{app.visa_type_name}</div>
-                          <span className="truncate font-normal">{app.destination_country_name}</span>
-                        </div>
+                      <td className="w-48 ">
+                        <Link href={`/admin/countries/${app.destination_country_id}`} className="py-3.5 pr-2 flex items-center gap-2 hover:underline">
+                          <CountryFlag code={app.destination_country_id} className="size-8 rounded-md shrink-0 border border-border-default shadow-sm" loading="lazy" />
+                          <div>
+                            <div className="text-base font-semibold text-secondary truncate">{app.visa_type_name}</div>
+                            <span className="truncate font-normal">{app.destination_country_name}</span>
+                          </div>
+                        </Link>
                       </td>
 
                       <td className="w-22 py-3.5 pr-5 text-base font-semibold text-primary-copy tabular-nums">

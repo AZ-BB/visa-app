@@ -231,7 +231,7 @@ export function ApplicationOrderProvider({
                 setStoredOrder(stored);
                 return;
               } else {
-                console.log(products);
+                console.log('PRODUCTS',products);
                 stored.travellers[i].product = products ?? null;
                 cashedProducts.set(cacheKey, products!);
                 setStoredOrder(stored);
@@ -304,7 +304,7 @@ export function ApplicationOrderProvider({
         country_of_birth: t.country_of_birth,
         country_of_residence: t.country_of_residence,
         nationality: t.nationality,
-        product_id: t.product!.id,
+        product_id: t.product?.id ?? 0,
       })),
     });
   }, [order]);

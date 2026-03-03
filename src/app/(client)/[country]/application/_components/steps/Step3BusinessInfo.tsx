@@ -239,6 +239,59 @@ export function Step3BusinessInfo({ onNext, onBack, errors }: Step3BusinessInfoP
     });
   }, [order.nationality, travellers, updateOrder]);
 
+  // Verify visa for all travellers when step renders
+  useEffect(() => {
+    const dest = order.destination_country?.trim();
+    const visaTypeId = order.visa_type_id;
+    if (!dest || !visaTypeId) return;
+
+    const toVerify = travellers
+      .map((t, i) => ({ traveller: t, index: i }))
+      .filter(({ traveller }) => traveller.nationality?.trim());
+
+    if (toVerify.length === 0) return;
+
+    // Skip if all travellers with nationality already have a valid product
+    const needsVerification = toVerify.some(({ traveller }) => !traveller.product);
+    if (!needsVerification) return;
+
+    const requestId = ++validationRequestId.current;
+    setIsValidatingNationality(true);
+    setNationalityVisaErrors({});
+
+    Promise.all(
+      toVerify.map(({ traveller, index }) =>
+        isVisaAvailable(dest, traveller.nationality!, visaTypeId).then((res) => ({
+          index,
+          res,
+        }))
+      )
+    ).then((results) => {
+      if (requestId !== validationRequestId.current) return;
+      setIsValidatingNationality(false);
+
+      const errors: Record<number, string> = {};
+      let hasUpdates = false;
+      const nextTravellers = [...travellers];
+
+      for (const { index, res } of results) {
+        if (!res.status && res.error) {
+          errors[index] = res.error;
+          nextTravellers[index] = { ...nextTravellers[index], product: null };
+          hasUpdates = true;
+        } else if (res.status && res.data) {
+          nextTravellers[index] = { ...nextTravellers[index], product: res.data };
+          hasUpdates = true;
+        }
+      }
+
+      setNationalityVisaErrors(errors);
+      if (hasUpdates) {
+        updateOrder({ travellers: nextTravellers });
+      }
+    });
+  }, []);
+
   const updateTraveller = (index: number, patch: Partial<TempTraveller>) => {
     updateOrder({
       travellers: travellers.map((t, i) => (i === index ? { ...t, ...patch } : t)),

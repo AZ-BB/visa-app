@@ -27,10 +27,13 @@ export function TravellersCell({ travellers }: TravellersCellProps) {
           <div className="text-sm font-medium text-primary-copy">
             {travellers.length} traveller{travellers.length !== 1 ? "s" : ""}
           </div>
-          <div className="mt-1 flex flex-wrap gap-1">
-            {uniqueNationalities.map((code) => (
+          <div className="mt-1 flex flex-wrap items-center gap-0.5">
+            {uniqueNationalities.slice(0, 3).map((code) => (
               <CountryFlag key={code} code={code} className="size-5" loading="lazy" />
             ))}
+            {uniqueNationalities.length > 3 && (
+              <span className="text-xs font-semibold text-muted-foreground">(+{uniqueNationalities.length - 3})</span>
+            )}
           </div>
         </div>
       </HoverCardTrigger>
