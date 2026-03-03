@@ -46,6 +46,11 @@ export function ResumeApplicationBanner() {
     });
   }, [storedOrder]);
 
+  function handleDismiss() {
+    setDismissed(true);
+    localStorage.removeItem('visa-application-order');
+  }
+
   if (dismissed || !hasStep2Data(storedOrder) || visaAvailable !== true) return null;
 
   const step = storedOrder?.currentStep ?? 1;
@@ -66,7 +71,7 @@ export function ResumeApplicationBanner() {
           type="button"
           variant="outline"
           className="border-white text-white bg-light-primary py-6 px-4 rounded-full hover:bg-white/20"
-          onClick={() => setDismissed(true)}
+          onClick={handleDismiss}
         >
           Dismiss
         </Button>
