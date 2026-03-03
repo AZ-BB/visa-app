@@ -221,7 +221,7 @@ export default async function ApplicationsPage({
                       <td className="w-40 py-3.5 pr-2">
                         <Link href={`/admin/applications/${app.id}`} className="hover:underline group/link">
                           <span
-                            className="block truncate text-lg font-semibold text-primary-copy transition-colors group-hover/link:text-primary"
+                            className="block truncate text-base font-semibold text-primary-copy transition-colors group-hover/link:text-primary"
                           >
                             {app.client_name}
                           </span>
