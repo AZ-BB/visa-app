@@ -6,6 +6,7 @@ interface YesNoRadioGroupProps {
     value: boolean | undefined;
     onChange: (value: boolean) => void;
     name?: string;
+    id?: string;
     disabled?: boolean;
     "aria-label"?: string;
     "aria-describedby"?: string;
@@ -17,6 +18,7 @@ export function YesNoRadioGroup({
     value,
     onChange,
     name,
+    id,
     disabled = false,
     "aria-label": ariaLabel = "Yes or No",
     "aria-describedby": ariaDescribedBy,
@@ -25,6 +27,7 @@ export function YesNoRadioGroup({
 }: YesNoRadioGroupProps) {
     return (
         <fieldset
+            id={id}
             role="radiogroup"
             aria-label={ariaLabel}
             aria-describedby={ariaDescribedBy}
