@@ -541,6 +541,22 @@ export type Database = {
             }
             Returns: Json
           }
+        | {
+            Args: {
+              p_assigned_to_id?: string
+              p_destination_id?: string
+              p_filter_unassigned?: boolean
+              p_limit?: number
+              p_nationality_id?: string
+              p_order?: string
+              p_page?: number
+              p_profile_id?: string
+              p_search?: string
+              p_sort?: string
+              p_status?: string
+            }
+            Returns: Json
+          }
     }
     Enums: {
       admin_role: "ADMIN" | "SUPER_ADMIN"
