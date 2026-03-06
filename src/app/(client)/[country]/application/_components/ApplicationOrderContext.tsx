@@ -21,7 +21,11 @@ import type GeneralResponse from "@/types/general";
 const APPLICATION_ORDER_STORAGE_KEY = "visa-application-order";
 
 /** Temp traveller: DB travellers table without id, application_id */
-export type TempTraveller = Omit<Tables<"travellers">, "id" | "application_id" | "created_at" | "updated_at" | "product_id" | "gov_fee" | "processing_fee"> & { product: Tables<"products"> | null };
+export type TempTraveller = Omit<Tables<"travellers">, "id" | "application_id" | "created_at" | "updated_at" | "product_id" | "gov_fee" | "processing_fee"> & {
+  product: Tables<"products"> | null;
+  /** UI-only: whether traveller was denied this visa type in the last 6 months */
+  denied_visa_last_6_months?: boolean;
+};
 
 export type ApplicationStepId = 1 | 2 | 3 | 4 | 5;
 
@@ -75,6 +79,7 @@ export const defaultTraveller: TempTraveller = {
   country_of_birth: "",
   country_of_residence: "",
   product: null,
+  denied_visa_last_6_months: false,
 };
 
 export const defaultOrder: ApplicationOrder = {
@@ -231,7 +236,7 @@ export function ApplicationOrderProvider({
                 setStoredOrder(stored);
                 return;
               } else {
-                console.log(products);
+                console.log('PRODUCTS',products);
                 stored.travellers[i].product = products ?? null;
                 cashedProducts.set(cacheKey, products!);
                 setStoredOrder(stored);
@@ -304,7 +309,7 @@ export function ApplicationOrderProvider({
         country_of_birth: t.country_of_birth,
         country_of_residence: t.country_of_residence,
         nationality: t.nationality,
-        product_id: t.product!.id,
+        product_id: t.product?.id ?? 0,
       })),
     });
   }, [order]);

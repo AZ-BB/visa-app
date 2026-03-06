@@ -1,0 +1,16 @@
+---
+description: Supabase migrations - never create migrations; user creates them
+alwaysApply: true
+---
+
+# Supabase Migrations
+
+**Never create migration files.** Do not write new `.sql` files in `supabase/migrations/` and do not run migration commands.
+
+When migration SQL is needed, provide the SQL content and instruct the user to create the migration themselves:
+
+```bash
+npx supabase migration new [migration name]
+```
+
+Then they can paste the SQL into the generated file.

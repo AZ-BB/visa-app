@@ -33,7 +33,7 @@ export function ApplicationStatusBadge({ status, className }: ApplicationStatusB
     return (
         <span
             className={cn(
-                "inline-flex text-base font-semibold items-center px-2.5 py-0.5 rounded-lg border-2 opacity-75",
+                "inline-flex text-sm font-semibold items-center px-2.5 py-0.5 rounded-lg border-2 opacity-75",
                 config.className,
                 className
             )}

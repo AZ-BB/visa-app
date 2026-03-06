@@ -58,8 +58,8 @@ export function AssigneeDropdown({
     >
       <SelectTrigger
         className={cn(
-          "h-9 w-full min-w-0 rounded-lg border-2 border-border-default/75 px-2 py-1.5 text-base shadow-none hover:border-primary/75",
-          !assignedToId && "text-secondary-copy",
+          "h-9 w-full min-w-0 rounded-lg border-2 border-border-default/75 px-2 py-1.5 text-sm font-semibold shadow-none hover:border-primary/75",
+          !assignedToId && "text-secondary-copy font-medium",
           className
         )}
         size="sm"

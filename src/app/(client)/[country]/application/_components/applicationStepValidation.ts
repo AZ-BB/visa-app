@@ -56,6 +56,10 @@ export async function validateStep(
           errors[`traveller_${i}_date_of_birth`] = "Date of birth cannot be in the future";
         }
       }
+      if (t.denied_visa_last_6_months === true) {
+        errors[`traveller_${i}_denied_visa_last_6_months`] =
+          "We can't help you with a new application right now as it's likely to be denied again.";
+      }
     });
   }
 

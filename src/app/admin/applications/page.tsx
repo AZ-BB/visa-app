@@ -166,153 +166,154 @@ export default async function ApplicationsPage({
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full table-fixed text-sm">
-              <thead>
-                <tr className="border-b border-border-default bg-bg-light-grey/80">
-                  <th className="w-12 py-3 pl-5 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
-                    #
-                  </th>
-                  <SortableTableHeader
-                    sortKey="client_name"
-                    currentSort={sort}
-                    currentOrder={order}
-                    params={tableParams}
-                    className="w-40"
-                  >
-                    Client
-                  </SortableTableHeader>
-                  <th className="w-22 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
-                    Travellers
-                  </th>
-                  <th className="w-40 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
-                    Destination / Visa
-                  </th>
-                  <SortableTableHeader
-                    sortKey="total_fee"
-                    currentSort={sort}
-                    currentOrder={order}
-                    params={tableParams}
-                    className="w-22"
-                  >
-                    Total
-                  </SortableTableHeader>
-                  <th className="w-20 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
-                    Refunded
-                  </th>
-                  <SortableTableHeader
-                    sortKey="status"
-                    currentSort={sort}
-                    currentOrder={order}
-                    params={tableParams}
-                    className="w-22"
-                  >
-                    Status
-                  </SortableTableHeader>
-                  <th className="w-48 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
-                    Assigned to
-                  </th>
-                  <SortableTableHeader
-                    sortKey="arrival_date"
-                    currentSort={sort}
-                    currentOrder={order}
-                    params={tableParams}
-                    className="w-24"
-                  >
-                    Arrival
-                  </SortableTableHeader>
-                  <th className="w-24 py-3 pl-2 pr-5 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody className="divide-y divide-border-default/60">
-                {applications.map((app, index) => (
-                  <tr key={app.id} className="group transition-colors hover:bg-primary/2">
-                    <td className="w-12 py-3.5 pl-5 pr-2 text-xs tabular-nums text-secondary-copy">
-                      {(page - 1) * pageSize + index + 1}
-                    </td>
-
-                    <td className="w-40 py-3.5 pr-2">
-                      <Link href={`/admin/applications/${app.id}`} className="hover:underline group/link">
-                        <span
-                          className="block truncate text-lg font-semibold text-primary-copy transition-colors group-hover/link:text-primary"
-                        >
-                          {app.client_name}
-                        </span>
-                        <div className="mt-0.5 text-xs text-secondary-copy truncate">
-                          {app.contact_email}
-                        </div>
-                      </Link>
-                    </td>
-
-                    <td className="w-22 py-3.5 pr-2">
-                      <TravellersCell travellers={app.travellers} />
-                    </td>
-
-                    <td className="w-48 py-3.5 pr-2 flex items-center gap-2">
-                      <CountryFlag code={app.destination_country_id} className="size-8 rounded-md shrink-0 border border-border-default shadow-sm" loading="lazy" />
-                      <div>
-                        <div className="text-base font-semibold text-secondary truncate">{app.visa_type_name}</div>
-                        <span className="truncate font-normal">{app.destination_country_name}</span>
-                      </div>
-                    </td>
-
-                    <td className="w-22 py-3.5 pr-5">
-                      <div className="text-base font-semibold text-primary-copy tabular-nums">
-                        ${app.total_fee.toFixed(2)}
-                      </div>
-                      {app.amount_paid_cents != null &&
-                        Math.abs(app.amount_paid_cents / 100 - app.total_fee) > 0.001 && (
-                          <div className="mt-0.5 text-xs text-secondary-copy tabular-nums">
-                            Paid: ${(app.amount_paid_cents / 100).toFixed(2)}
-                          </div>
-                        )}
-                    </td>
-
-                    <td className="w-20 py-3.5 pr-2 text-sm text-secondary-copy tabular-nums">
-                      {(app.amount_refunded_cents ?? 0) > 0 ? `$${((app.amount_refunded_cents ?? 0) / 100).toFixed(2)}` : "—"}
-                    </td>
-
-                    <td className="w-28 py-3.5 pr-2">
-                      <ApplicationStatusBadge status={app.status} />
-                    </td>
-
-                    <td className="w-48 py-3.5 pr-10">
-                      <AssigneeDropdown
-                        applicationId={app.id}
-                        assignedToId={app.assigned_to_id}
-                        admins={admins}
-                      />
-                    </td>
-
-                    <td className="w-24 py-3.5 pr-2 text-secondary-copy">
-                      {new Date(app.arrival_date).toLocaleDateString()}
-                    </td>
-
-                    <td className="w-24 py-3.5 pl-2 pr-5">
-                      <Link
-                        href={`/admin/applications/${app.id}`}
-                        className="inline-flex bg-primary text-white items-center justify-center rounded-md p-2 transition-colors hover:bg-primary/10 hover:text-primary"
-                        aria-label="View application"
-                      >
-                        <Eye className="size-5" />
-                      </Link>
-                    </td>
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full table-fixed text-sm">
+                <thead>
+                  <tr className="border-b border-border-default bg-bg-light-grey/80">
+                    <th className="w-12 py-3 pl-5 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                      #
+                    </th>
+                    <SortableTableHeader
+                      sortKey="client_name"
+                      currentSort={sort}
+                      currentOrder={order}
+                      params={tableParams}
+                      className="w-40"
+                    >
+                      Client
+                    </SortableTableHeader>
+                    <th className="w-22 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                      Travellers
+                    </th>
+                    <th className="w-40 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                      Destination / Visa
+                    </th>
+                    <SortableTableHeader
+                      sortKey="total_fee"
+                      currentSort={sort}
+                      currentOrder={order}
+                      params={tableParams}
+                      className="w-22"
+                    >
+                      Total
+                    </SortableTableHeader>
+                    <th className="w-20 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                      Refunded
+                    </th>
+                    <SortableTableHeader
+                      sortKey="status"
+                      currentSort={sort}
+                      currentOrder={order}
+                      params={tableParams}
+                      className="w-22"
+                    >
+                      Status
+                    </SortableTableHeader>
+                    <th className="w-48 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                      Assigned to
+                    </th>
+                    <SortableTableHeader
+                      sortKey="arrival_date"
+                      currentSort={sort}
+                      currentOrder={order}
+                      params={tableParams}
+                      className="w-24"
+                    >
+                      Arrival
+                    </SortableTableHeader>
+                    <th className="w-24 py-3 pl-2 pr-5 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                      Actions
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+
+                <tbody className="divide-y divide-border-default/60">
+                  {applications.map((app, index) => (
+                    <tr key={app.id} className="group transition-colors hover:bg-primary/2">
+                      <td className="w-12 py-3.5 pl-5 pr-2 text-xs tabular-nums text-secondary-copy">
+                        {(page - 1) * pageSize + index + 1}
+                      </td>
+
+                      <td className="w-40 py-3.5 pr-2">
+                        <Link href={`/admin/applications/${app.id}`} className="hover:underline group/link">
+                          <span className="block truncate text-base font-semibold text-primary-copy transition-colors group-hover/link:text-primary">
+                            {app.client_name}
+                          </span>
+                          <div className="mt-0.5 text-xs text-secondary-copy truncate">
+                            {app.contact_email}
+                          </div>
+                        </Link>
+                      </td>
+
+                      <td className="w-22 py-3.5 pr-2">
+                        <TravellersCell travellers={app.travellers} />
+                      </td>
+
+                      <td className="w-48">
+                        <Link href={`/admin/countries/${app.destination_country_id}`} className="py-3.5 pr-2 flex items-center gap-2 hover:underline">
+                          <CountryFlag code={app.destination_country_id} className="size-8 rounded-md shrink-0 border border-border-default shadow-sm" loading="lazy" />
+                          <div>
+                            <div className="text-base font-semibold text-secondary truncate">{app.visa_type_name}</div>
+                            <span className="truncate font-normal">{app.destination_country_name}</span>
+                          </div>
+                        </Link>
+                      </td>
+
+                      <td className="w-22 py-3.5 pr-5">
+                        <div className="text-base font-semibold text-primary-copy tabular-nums">
+                          ${app.total_fee.toFixed(2)}
+                        </div>
+                        {app.amount_paid_cents != null &&
+                          Math.abs(app.amount_paid_cents / 100 - app.total_fee) > 0.001 && (
+                            <div className="mt-0.5 text-xs text-secondary-copy tabular-nums">
+                              Paid: ${(app.amount_paid_cents / 100).toFixed(2)}
+                            </div>
+                          )}
+                      </td>
+
+                      <td className="w-20 py-3.5 pr-2 text-sm text-secondary-copy tabular-nums">
+                        {(app.amount_refunded_cents ?? 0) > 0 ? `$${((app.amount_refunded_cents ?? 0) / 100).toFixed(2)}` : "—"}
+                      </td>
+
+                      <td className="w-28 py-3.5 pr-2">
+                        <ApplicationStatusBadge status={app.status} />
+                      </td>
+
+                      <td className="w-48 py-3.5 pr-10">
+                        <AssigneeDropdown
+                          applicationId={app.id}
+                          assignedToId={app.assigned_to_id}
+                          admins={admins}
+                        />
+                      </td>
+
+                      <td className="w-24 py-3.5 pr-2 text-secondary-copy">
+                        {new Date(app.arrival_date).toLocaleDateString()}
+                      </td>
+
+                      <td className="w-24 py-3.5 pl-2 pr-5">
+                        <Link
+                          href={`/admin/applications/${app.id}`}
+                          className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border-default bg-white px-3 text-xs font-medium text-primary-copy shadow-sm transition-all hover:border-primary/40 hover:text-primary group-hover:border-primary/30"
+                        >
+                          <Eye className="size-3.5" />
+                          View
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            <div className="border-t border-border-default px-5 py-3">
+              <Pagination total={total} page={page} pageSize={pageSize} />
+            </div>
+          </>
         )}
       </div>
-
-      {
-        applications.length > 0 && (
-          <Pagination total={total} page={page} pageSize={pageSize} />
-        )
-      }
-    </div >
+    </div>
   )
 }

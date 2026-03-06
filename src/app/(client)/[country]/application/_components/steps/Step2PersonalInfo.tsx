@@ -19,6 +19,7 @@ import { DatePicker } from "@/components/ui/date-picker";
 import TipCard from "@/components/TipCard";
 import { Separator } from "@/components/ui/separator";
 import ArrowButton from "@/components/ArrowButton";
+import { YesNoRadioGroup } from "@/components/YesNoRadioGroup";
 
 interface Step2PersonalInfoProps {
   onNext?: () => void;
@@ -63,18 +64,22 @@ function ApplicationSidebar({
   );
 }
 
+const DENIED_VISA_ERROR = "We can't help you with a new application right now as it's likely to be denied again.";
+
 function TravellerFields({
   idPrefix,
   index,
   traveller,
   onUpdate,
   errors,
+  visaName,
 }: {
   idPrefix: string;
   index: number;
   traveller: TempTraveller;
   onUpdate: (patch: Partial<TempTraveller>) => void;
   errors?: Record<string, string> | null;
+  visaName: string;
 }) {
   const field = (key: string) => errors?.[`traveller_${index}_${key}`];
   return (
@@ -139,13 +144,32 @@ function TravellerFields({
           <p className="mt-1.5 text-sm text-red-600">{field("date_of_birth")}</p>
         )}
       </div>
+      <div>
+        <label
+          htmlFor={`${idPrefix}-denied-visa`}
+          className="block text-base font-medium text-primary-copy mb-2"
+        >
+          Have you been denied a {visaName || "visa"} in the last 6 months?
+        </label>
+        <YesNoRadioGroup
+          id={`${idPrefix}-denied-visa`}
+          value={traveller.denied_visa_last_6_months}
+          onChange={(value) => onUpdate({ denied_visa_last_6_months: value })}
+          aria-label={`Have you been denied a ${visaName || "visa"} in the last 6 months?`}
+          aria-invalid={traveller.denied_visa_last_6_months === true}
+        />
+        {traveller.denied_visa_last_6_months === true && (
+          <p className="mt-1.5 text-sm text-red-600">{DENIED_VISA_ERROR}</p>
+        )}
+      </div>
     </div>
   );
 }
 
 export function Step2PersonalInfo({ onNext, onBack, errors }: Step2PersonalInfoProps) {
   const { order, updateOrder } = useApplicationOrder();
-  const { travellers } = order;
+  const { travellers, visa_name } = order;
+  const hasAnyDeniedVisa = travellers.some((t) => t.denied_visa_last_6_months === true);
 
   const updateTraveller = (index: number, patch: Partial<TempTraveller>) => {
     updateOrder({
@@ -193,6 +217,7 @@ export function Step2PersonalInfo({ onNext, onBack, errors }: Step2PersonalInfoP
                   traveller={traveller}
                   onUpdate={(patch) => updateTraveller(index, patch)}
                   errors={errors}
+                  visaName={visa_name}
                 />
                 {
                   index > 0 && (
@@ -247,6 +272,7 @@ export function Step2PersonalInfo({ onNext, onBack, errors }: Step2PersonalInfoP
               variant="default"
               className="text-base"
               onClick={onNext}
+              disabled={hasAnyDeniedVisa}
             >
               Save & continue
             </ArrowButton>

@@ -109,8 +109,12 @@ export function Step5Checkout({
     setIsSubmitting(true);
 
     const result = await handleCheckoutApplication();
+    setIsSubmitting(false);
     if (!result.status || !result.data) {
-      setIsSubmitting(false);
+      localStorage.removeItem('visa-application-order');
+      onContinueToPayment?.();
+      router.push(`/applications/${result.data}`);
+    } else {
       setCheckoutError(result.error ?? "Failed to create application");
       return;
     }

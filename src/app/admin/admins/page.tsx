@@ -69,20 +69,21 @@ export default async function AdminsPage({
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+            <div className="overflow-x-auto">
             <table className="w-full table-fixed text-sm">
               <thead>
                 <tr className="border-b border-border-default bg-bg-light-grey/80">
                   <th className="w-12 py-3 pl-5 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     #
                   </th>
-                  <th className="w-40 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                  <th className="w-36 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     Name
                   </th>
-                  <th className="w-52 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                  <th className="w-48 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     Email
                   </th>
-                  <th className="w-32 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                  <th className="w-30 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     Phone
                   </th>
                   <th className="w-32 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
@@ -91,7 +92,7 @@ export default async function AdminsPage({
                   <th className="w-24 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     Created
                   </th>
-                  <th className="w-24 py-3 pl-2 pr-5 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                  <th className="w-28 py-3 pl-2 pr-5 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     Actions
                   </th>
                 </tr>
@@ -107,7 +108,7 @@ export default async function AdminsPage({
                       {(page - 1) * pageSize + index + 1}
                     </td>
 
-                    <td className="w-40 py-3.5 pr-2">
+                    <td className="w-36 py-3.5 pr-2">
                       <Link
                         href={`/admin/admins/${admin.id}`}
                         className="block truncate text-base hover:underline font-medium text-primary-copy transition-colors hover:text-primary"
@@ -116,11 +117,11 @@ export default async function AdminsPage({
                       </Link>
                     </td>
 
-                    <td className="w-52 py-3.5 pr-2 text-base text-secondary-copy">
+                    <td className="w-48 py-3.5 pr-2 text-base text-secondary-copy">
                       <span className="block truncate">{admin.email}</span>
                     </td>
 
-                    <td className="w-36 py-3.5 pr-2 text-secondary-copy">
+                    <td className="w-30 py-3.5 pr-2 text-secondary-copy">
                       <span className="block truncate">{admin.phone}</span>
                     </td>
 
@@ -132,7 +133,7 @@ export default async function AdminsPage({
                       {new Date(admin.created_at).toLocaleDateString()}
                     </td>
 
-                    <td className="w-24 py-3.5 pl-2 pr-5">
+                    <td className="w-28 py-3.5 pl-2 pr-5">
                       <AdminRowActions adminId={admin.id} />
                     </td>
                   </tr>
@@ -140,12 +141,14 @@ export default async function AdminsPage({
               </tbody>
             </table>
           </div>
+
+          {/* Pagination */}
+          <div className="border-t border-border-default px-5 py-3">
+            <Pagination total={total} page={page} pageSize={pageSize} />
+          </div>
+          </>
         )}
       </div>
-
-      {admins.length > 0 && (
-        <Pagination total={total} page={page} pageSize={pageSize} />
-      )}
     </div>
   )
 }
