@@ -107,15 +107,35 @@ export function Step5Checkout({
     }
     setCheckoutError(null);
     setIsSubmitting(true);
+
     const result = await handleCheckoutApplication();
     setIsSubmitting(false);
-    if (result.status && result.data) {
+    if (!result.status || !result.data) {
       localStorage.removeItem('visa-application-order');
       onContinueToPayment?.();
       router.push(`/applications/${result.data}`);
     } else {
       setCheckoutError(result.error ?? "Failed to create application");
+      return;
     }
+
+    const applicationId = result.data;
+    const res = await fetch("/api/stripe/create-checkout-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ applicationId }),
+    });
+
+    const data = (await res.json()) as { url?: string; error?: string };
+    setIsSubmitting(false);
+
+    if (!res.ok || !data.url) {
+      setCheckoutError(data.error ?? "Failed to create checkout session");
+      return;
+    }
+
+    onContinueToPayment?.();
+    window.location.href = data.url;
   };
 
   const countryName = getCountryNameFromCode(country || "");

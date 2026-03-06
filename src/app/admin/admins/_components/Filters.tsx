@@ -92,6 +92,7 @@ export default function Filters() {
             <SelectItem className="font-medium" value="all">All roles</SelectItem>
             <SelectItem className="font-medium" value="ADMIN">Admin</SelectItem>
             <SelectItem className="font-medium" value="SUPER_ADMIN">Super Admin</SelectItem>
+            <SelectItem className="font-medium" value="SUPERVISOR">Supervisor</SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>

@@ -40,6 +40,7 @@ export default async function ApplicationsPage() {
             id,
             status,
             total_fee,
+            amount_refunded_cents,
             destination_country:countries(id, name),
             visa_type:visa_types(id, name),
             arrival_date,
@@ -49,7 +50,7 @@ export default async function ApplicationsPage() {
             travellers(id)
         `
         )
-        .eq("profile_id", user.profile?.id ?? user.authUser.id)
+        .eq("profile_id", user.profile?.id ?? user.authUser.id).eq("is_paid", true)
         .order("created_at", { ascending: false });
 
     const displayApplications = applications ?? [];
@@ -75,6 +76,9 @@ export default async function ApplicationsPage() {
 
     const totalCost = (app: AppItem) =>
         (app as { total_fee?: number }).total_fee ?? 0;
+
+    const amountRefundedCents = (app: AppItem) =>
+        (app as { amount_refunded_cents?: number }).amount_refunded_cents ?? 0;
 
     return (
         <div className="min-h-screen bg-bg-light-grey pt-6 sm:pt-16 pb-12 px-4 sm:px-6">
@@ -127,7 +131,14 @@ export default async function ApplicationsPage() {
                                                         <h2 className="text-xl font-bold text-primary-copy line-clamp-2 min-w-0 pt-1">
                                                             {destinationName(app)} - {visaTypeName(app)}
                                                         </h2>
-                                                        <StatusBadge status={app.status} />
+                                                        <div className="flex flex-col items-end gap-1">
+                                                            <StatusBadge status={app.status} />
+                                                            {amountRefundedCents(app) > 0 && (
+                                                                <span className="text-xs font-medium text-orange-600">
+                                                                    Refunded ${(amountRefundedCents(app) / 100).toFixed(2)}
+                                                                </span>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                     {/* Desktop: [FLAG] [Header] ——— [Status] */}
                                                     <div className="hidden sm:flex sm:items-start sm:justify-between sm:gap-3">
@@ -144,7 +155,14 @@ export default async function ApplicationsPage() {
                                                                 {destinationName(app)} - {visaTypeName(app)}
                                                             </h2>
                                                         </div>
-                                                        <StatusBadge status={app.status} />
+                                                        <div className="flex flex-col items-end gap-1">
+                                                            <StatusBadge status={app.status} />
+                                                            {amountRefundedCents(app) > 0 && (
+                                                                <span className="text-xs font-medium text-orange-600">
+                                                                    Refunded ${(amountRefundedCents(app) / 100).toFixed(2)}
+                                                                </span>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </>
                                             );
@@ -186,6 +204,16 @@ export default async function ApplicationsPage() {
                                                 ${totalCost(app).toFixed(2)}
                                             </span>
                                         </div>
+                                        {amountRefundedCents(app) > 0 && (
+                                            <div className="flex justify-between items-center gap-4 text-base">
+                                                <span className="text-secondary-copy shrink-0">
+                                                    Refunded
+                                                </span>
+                                                <span className="font-semibold text-orange-600 text-right truncate min-w-0">
+                                                    ${(amountRefundedCents(app) / 100).toFixed(2)}
+                                                </span>
+                                            </div>
+                                        )}
                                     </CardContent>
                                 </Card>
                             </Link>
