@@ -2,12 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
-import { cn, formatValidFor } from "@/lib/utils";
+import { formatValidFor } from "@/lib/utils";
 import { useApplicationOrder } from "../ApplicationOrderContext";
 import type { TempTraveller } from "../ApplicationOrderContext";
 import TipCard from "@/components/TipCard";
-import ArrowButton from "@/components/ArrowButton";
+import { StepActionButtons } from "../StepActionButtons";
 import { getCountryNameFromCode } from "@/lib/contries-name";
 import { Separator } from "@/components/ui/separator";
 import InfoIcon from "@/components/svgs/info";
@@ -245,38 +244,13 @@ export function Step5Checkout({
       </div>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between">
-        {onBack ? (
-          <button
-            type="button"
-            onClick={onBack}
-            className={cn(
-              "inline-flex items-center gap-2 text-primary font-semibold",
-              "hover:text-primary-dark transition-colors"
-            )}
-          >
-            <ArrowLeft className="size-5" aria-hidden />
-            Previous step
-          </button>
-        ) : (
-          <span />
-        )}
-        {onContinueToPayment && (
-          <div className="flex flex-col items-end gap-2">
-            {checkoutError && (
-              <p className="text-sm text-red-600">{checkoutError}</p>
-            )}
-            <ArrowButton
-              variant="default"
-              className="text-base"
-              onClick={handleContinueClick}
-              isLoading={isSubmitting}
-            >
-              Continue to payment
-            </ArrowButton>
-          </div>
-        )}
-      </div>
+      <StepActionButtons
+        onBack={onBack}
+        primaryLabel="Continue to payment"
+        primaryOnClick={onContinueToPayment ? handleContinueClick : undefined}
+        primaryLoading={isSubmitting}
+        errorMessage={checkoutError}
+      />
 
       {!isAuthenticated && (
         <CheckoutAuthModal

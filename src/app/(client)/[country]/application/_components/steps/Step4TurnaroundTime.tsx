@@ -1,11 +1,10 @@
 "use client";
 
-import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useApplicationOrder } from "../ApplicationOrderContext";
 import { Separator } from "@/components/ui/separator";
 import TipCard from "@/components/TipCard";
-import ArrowButton from "@/components/ArrowButton";
+import { StepActionButtons } from "../StepActionButtons";
 
 interface Step4TurnaroundTimeProps {
   onNext?: () => void;
@@ -79,33 +78,12 @@ export function Step4TurnaroundTime({ onNext, onBack }: Step4TurnaroundTimeProps
           })}
         </fieldset>
 
-        <div className="mt-10 flex items-center justify-between">
-          {onBack ? (
-            <button
-              type="button"
-              onClick={onBack}
-              className={cn(
-                "inline-flex items-center gap-2 text-primary font-semibold",
-                "hover:text-primary-dark transition-colors"
-              )}
-            >
-              <ArrowLeft className="size-5" aria-hidden />
-              Previous step
-            </button>
-          ) : (
-            <span />
-          )}
-          {onNext && (
-            <ArrowButton
-              variant="default"
-              className="text-base"
-              onClick={onNext}
-              disabled={selected == null}
-            >
-              Save & continue
-            </ArrowButton>
-          )}
-        </div>
+        <StepActionButtons
+          onBack={onBack}
+          primaryLabel="Save & continue"
+          primaryOnClick={onNext}
+          primaryDisabled={selected == null}
+        />
       </div>
 
       {/* Sidebar - Additional costs */}

@@ -1,15 +1,13 @@
 "use client"
 
-import { ArrowLeft, ArrowRight, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DatePicker } from "@/components/ui/date-picker"
 import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
 import { useApplicationOrder } from "../ApplicationOrderContext"
 import { getCountryNameFromCode } from "@/lib/contries-name"
 import TipCard from "@/components/TipCard"
 import { Separator } from "@/components/ui/separator"
-import ArrowButton from "@/components/ArrowButton"
+import { StepActionButtons } from "../StepActionButtons"
 
 interface Step1TripDetailsProps {
   country: string
@@ -99,32 +97,11 @@ export function Step1TripDetails({
           </div>
         </div>
 
-        <div className="mt-10 flex items-center justify-between">
-          {onBack ? (
-            <button
-              type="button"
-              onClick={onBack}
-              className={cn(
-                "inline-flex items-center gap-2 text-primary font-semibold",
-                "hover:text-primary-dark transition-colors",
-              )}
-            >
-              <ArrowLeft className="size-5" aria-hidden />
-              Previous step
-            </button>
-          ) : (
-            <span />
-          )}
-          {onNext && (
-            <ArrowButton
-              variant="default"
-              className="text-base"
-              onClick={onNext}
-            >
-              Save & continue
-            </ArrowButton>
-          )}
-        </div>
+        <StepActionButtons
+          onBack={onBack}
+          primaryLabel="Save & continue"
+          primaryOnClick={onNext}
+        />
       </div>
 
       {/* Right: sidebar — ~1/3 */}
