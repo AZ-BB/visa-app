@@ -15,12 +15,16 @@ import {
   Plane,
   Hash,
 } from "lucide-react"
-import { getApplication } from "@/actions/applications"
-import { getAdmins } from "@/actions/admins"
+import { getApplication, getApplicationActivityLogs } from "@/actions/applications"
+import { getAdmins, getCurrentAdmin } from "@/actions/admins"
 import { StatusDropdown } from "./_components/StatusDropdown"
 import { AssigneeDropdown } from "../_components/AssigneeDropdown"
+import { RefundButton } from "./_components/RefundButton"
+import { EditApplicationButton } from "./_components/EditApplicationButton"
+import { ActivityTimeline } from "./_components/ActivityTimeline"
 import { CountryFlag } from "@/components/ui/country-flag"
 import { getCountryNameFromCode } from "@/lib/contries-name"
+import { cn } from "@/lib/utils"
 import { ApplicationStatus } from "@/enums"
 import type { Application } from "@/actions/applications"
 import { Tables } from "@/database.types"
@@ -59,10 +63,12 @@ function StatCard({
   icon,
   label,
   value,
+  valueClassName,
 }: {
   icon: React.ReactNode
   label: string
   value: string
+  valueClassName?: string
 }) {
   return (
     <div className="flex items-start gap-3 rounded-xl border border-border-default bg-white p-4 shadow-sm">
@@ -71,7 +77,7 @@ function StatCard({
       </div>
       <div className="min-w-0">
         <p className="text-xs font-medium text-secondary-copy">{label}</p>
-        <p className="mt-0.5 truncate text-sm font-semibold text-primary-copy">
+        <p className={cn("mt-0.5 truncate text-sm font-semibold", valueClassName ?? "text-primary-copy")}>
           {value}
         </p>
       </div>
@@ -101,14 +107,20 @@ export default async function AdminApplicationDetailPage({
 }) {
   const { id } = await params
 
-  const [res, adminsRes] = await Promise.all([
+  const [res, adminsRes, currentAdminRes, logsRes] = await Promise.all([
     getApplication(id),
     getAdmins(1, 200, { sort: "first_name", order: "asc" }),
+    getCurrentAdmin(),
+    getApplicationActivityLogs(id),
   ])
   const application: Application | null =
     res.status && res.data ? res.data : null
   const admins =
     adminsRes.status && adminsRes.data ? adminsRes.data.admins : []
+  const currentAdmin = currentAdminRes.status && currentAdminRes.data ? currentAdminRes.data : null
+  const activityLogs = logsRes.status && logsRes.data ? logsRes.data : []
+  const canEdit =
+    currentAdmin?.role === "SUPER_ADMIN" || currentAdmin?.role === "SUPERVISOR"
 
   if (!application) notFound()
 
@@ -123,6 +135,12 @@ export default async function AdminApplicationDetailPage({
   const turnaroundFee = application.turnaround_fee ?? 0
   const govFeeTotal = application.gov_fee ?? 0
   const processingFeeTotal = application.processing_fee ?? 0
+  const amountPaidCents = application.amount_paid_cents ?? null
+  const amountPaidDollars = amountPaidCents != null ? amountPaidCents / 100 : null
+  const showPaidAmountCard =
+    amountPaidDollars != null &&
+    application.is_paid &&
+    Math.abs(amountPaidDollars - totalCost) > 0.001
 
   return (
     <div className="space-y-6">
@@ -171,12 +189,28 @@ export default async function AdminApplicationDetailPage({
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-end gap-3">
+          <EditApplicationButton application={application} canEdit={canEdit} />
+          {application.is_paid &&
+            application.stripe_payment_intent_id &&
+            Math.round(totalCost * 100) - (application.amount_refunded_cents ?? 0) >= 50 && (
+              <div className="flex flex-col gap-1">
+                <span className="text-xs text-secondary-copy">Refund</span>
+                <RefundButton
+                  applicationId={application.id}
+                  totalFee={totalCost}
+                  amountRefundedCents={application.amount_refunded_cents ?? 0}
+                  stripePaymentIntentId={application.stripe_payment_intent_id}
+                  isPaid={application.is_paid ?? false}
+                />
+              </div>
+            )}
           <div className="flex flex-col gap-1">
             <span className="text-xs text-secondary-copy">Status</span>
             <StatusDropdown
               applicationId={application.id}
               status={application.status as ApplicationStatus}
+              amountRefundedCents={application.amount_refunded_cents ?? 0}
             />
           </div>
           <div className="flex flex-col gap-1">
@@ -213,6 +247,22 @@ export default async function AdminApplicationDetailPage({
           label="Total cost"
           value={`$${totalCost.toFixed(2)}`}
         />
+        {(application.amount_refunded_cents ?? 0) > 0 && (
+          <StatCard
+            icon={<CreditCard className="size-4 text-orange-600" />}
+            label="Refunded"
+            value={`$${((application.amount_refunded_cents ?? 0) / 100).toFixed(2)}`}
+            valueClassName="text-orange-600"
+          />
+        )}
+        {showPaidAmountCard && (
+          <StatCard
+            icon={<CreditCard className="size-4 text-amber-600" />}
+            label="Amount paid (client paid this)"
+            value={`$${amountPaidDollars!.toFixed(2)}`}
+            valueClassName="text-amber-600"
+          />
+        )}
       </div>
 
       {/* Main 3-col grid */}
@@ -500,6 +550,28 @@ export default async function AdminApplicationDetailPage({
                   ${totalCost.toFixed(2)}
                 </span>
               </div>
+              {(application as { amount_paid_cents?: number | null }).amount_paid_cents != null &&
+                application.is_paid &&
+                Math.abs(
+                  totalCost -
+                    ((application as { amount_paid_cents: number }).amount_paid_cents ?? 0) / 100
+                ) > 0.001 && (
+                  <div className="border-t border-border-default/50 px-5 py-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-secondary-copy">Amount paid (client paid this)</span>
+                      <span className="tabular-nums font-medium text-primary-copy">
+                        $
+                        {(
+                          ((application as { amount_paid_cents: number }).amount_paid_cents ?? 0) /
+                          100
+                        ).toFixed(2)}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-xs text-amber-600">
+                      Fees were edited after payment. Total above reflects current fees.
+                    </p>
+                  </div>
+                )}
             </div>
           </div>
 
@@ -553,6 +625,39 @@ export default async function AdminApplicationDetailPage({
             </div>
           </div>
 
+          {/* Stripe */}
+          {(application.stripe_checkout_session_id ||
+            application.stripe_payment_intent_id) && (
+            <div className="overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
+              <div className="flex items-center gap-2 border-b border-border-default px-5 py-3">
+                <CreditCard className="size-4 text-secondary-copy" />
+                <p className="text-sm font-medium text-primary-copy">Stripe</p>
+              </div>
+              <div className="divide-y divide-border-default/60">
+                {application.stripe_checkout_session_id && (
+                  <div className="px-5 py-3">
+                    <p className="text-xs text-secondary-copy mb-1">
+                      Checkout session ID
+                    </p>
+                    <p className="font-mono text-xs text-primary-copy break-all">
+                      {application.stripe_checkout_session_id}
+                    </p>
+                  </div>
+                )}
+                {application.stripe_payment_intent_id && (
+                  <div className="px-5 py-3">
+                    <p className="text-xs text-secondary-copy mb-1">
+                      Payment intent ID
+                    </p>
+                    <p className="font-mono text-xs text-primary-copy break-all">
+                      {application.stripe_payment_intent_id}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Metadata */}
           <div className="overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
             <div className="flex items-center gap-2 border-b border-border-default px-5 py-3">
@@ -576,6 +681,9 @@ export default async function AdminApplicationDetailPage({
               </DetailRow>
             </div>
           </div>
+
+          {/* Activity timeline */}
+          <ActivityTimeline logs={activityLogs} admins={admins} />
         </div>
       </div>
     </div>

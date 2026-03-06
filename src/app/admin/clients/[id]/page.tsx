@@ -40,6 +40,7 @@ export default async function ClientDetailPage({
     assigned_to_id?: string
     destination?: string
     nationality?: string
+    refunded?: string
     sort?: string
     order?: string
   }>
@@ -61,6 +62,7 @@ export default async function ClientDetailPage({
     ? (sp.sort as "arrival_date" | "created_at" | "updated_at" | "status" | "client_name" | "total_fee")
     : "created_at"
   const order = sp.order === "asc" ? "asc" : "desc"
+  const refundedFilter = sp.refunded === "refunded_only" ? "refunded_only" as const : "all" as const
 
   const [clientRes, appsRes, adminsRes, countriesRes] = await Promise.all([
     fetchClientById(id, { includeApplications: false }),
@@ -71,6 +73,7 @@ export default async function ClientDetailPage({
       assigned_to_id: assignedToId,
       destination,
       nationality,
+      refunded_filter: refundedFilter,
       sort,
       order,
     }),
@@ -97,6 +100,7 @@ export default async function ClientDetailPage({
     assigned_to_id: sp.assigned_to_id,
     destination: sp.destination,
     nationality: sp.nationality,
+    refunded: sp.refunded,
   }
 
   return (
@@ -185,7 +189,7 @@ export default async function ClientDetailPage({
               {total}
             </span>
           </div>
-          <ApplicationsFilters admins={admins} countries={countries} />
+          <ApplicationsFilters admins={admins} countries={countries} refunded={sp.refunded} />
         </div>
 
         {applications.length === 0 ? (
@@ -223,6 +227,9 @@ export default async function ClientDetailPage({
                   >
                     Total
                   </SortableTableHeader>
+                  <th className="w-20 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                    Refunded
+                  </th>
                   <SortableTableHeader
                     sortKey="status"
                     currentSort={sort}
@@ -273,8 +280,20 @@ export default async function ClientDetailPage({
                       </div>
                     </td>
 
-                    <td className="w-22 py-3.5 pr-5 text-base font-semibold text-primary-copy tabular-nums">
-                      ${app.total_fee.toFixed(2)}
+                    <td className="w-22 py-3.5 pr-5">
+                      <div className="text-base font-semibold text-primary-copy tabular-nums">
+                        ${app.total_fee.toFixed(2)}
+                      </div>
+                      {app.amount_paid_cents != null &&
+                        Math.abs(app.amount_paid_cents / 100 - app.total_fee) > 0.001 && (
+                          <div className="mt-0.5 text-xs text-secondary-copy tabular-nums">
+                            Paid: ${(app.amount_paid_cents / 100).toFixed(2)}
+                          </div>
+                        )}
+                    </td>
+
+                    <td className="w-20 py-3.5 pr-2 text-sm text-secondary-copy tabular-nums">
+                      {(app.amount_refunded_cents ?? 0) > 0 ? `$${((app.amount_refunded_cents ?? 0) / 100).toFixed(2)}` : "—"}
                     </td>
 
                     <td className="w-28 py-3.5 pr-2">

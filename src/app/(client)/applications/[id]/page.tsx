@@ -19,6 +19,9 @@ type ApplicationWithRelations = {
     total_fee: number;
     contact_email: string;
     arrival_date: string;
+    is_paid?: boolean;
+    amount_refunded_cents?: number;
+    stripe_checkout_session_id?: string | null;
     destination_country?: { id?: string; name?: string };
     visa_type?: { id?: number; name?: string };
     turnaround_times?: { name?: string };
@@ -52,8 +55,10 @@ function formatDate(dateStr: string) {
 
 export default async function ApplicationDetailPage({
     params,
+    searchParams,
 }: {
     params: Promise<{ id: string }>;
+    searchParams: Promise<{ payment?: string }>;
 }) {
     const user = await getUser();
     if (!user?.authUser?.id) {
@@ -74,6 +79,7 @@ export default async function ApplicationDetailPage({
         `
         )
         .eq("id", id)
+        .eq("is_paid", true)
         .eq("profile_id", user.profile?.id ?? user.authUser.id)
         .single();
 
@@ -91,9 +97,16 @@ export default async function ApplicationDetailPage({
     const turnaroundFee = application?.turnaround_fee ?? 0;
 
     const travellers = application?.travellers ?? [];
+    const { payment } = await searchParams;
+    const showPaymentSuccess = payment === "success";
 
     return (
         <div className="min-h-screen bg-bg-light-grey pt-6 sm:pt-12 pb-12 px-4 sm:px-6">
+            {showPaymentSuccess && (
+                <div className="max-w-3xl mx-auto mb-6 rounded-xl bg-green-50 border border-green-200 px-4 py-3 text-green-800">
+                    Payment successful. Your application has been submitted.
+                </div>
+            )}
             <div className="max-w-3xl mx-auto">
                 <Link
                     href="/applications"
@@ -231,6 +244,26 @@ export default async function ApplicationDetailPage({
                                     ${totalCost.toFixed(2)}
                                 </span>
                             </div>
+                            {(application.amount_refunded_cents ?? 0) > 0 && (
+                                <>
+                                    <div className="flex justify-between items-center pt-2 text-orange-600">
+                                        <span className="font-semibold text-primary-copy">
+                                            Refunded
+                                        </span>
+                                        <span className="font-semibold">
+                                            -${((application.amount_refunded_cents ?? 0) / 100).toFixed(2)}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between items-center pt-1 text-sm">
+                                        <span className="text-secondary-copy">
+                                            Net amount
+                                        </span>
+                                        <span className="font-semibold text-primary-copy">
+                                            ${(totalCost - (application.amount_refunded_cents ?? 0) / 100).toFixed(2)}
+                                        </span>
+                                    </div>
+                                </>
+                            )}
                         </CardContent>
                     </Card>
 

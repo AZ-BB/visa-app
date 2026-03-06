@@ -4,8 +4,23 @@ import { Tables } from "@/database.types";
 import GeneralResponse from "@/types/general";
 import { createSupabaseAdminServerClient, createSupabaseServerClient } from "@/lib/supabase/supabase-server";
 import { revalidatePath } from "next/cache";
+import { getUser } from "@/lib/get-user";
 
 export type AdminWithEmail = Tables<"admin"> & { email: string };
+
+export type AdminRole = "ADMIN" | "SUPER_ADMIN" | "SUPERVISOR";
+
+/** Returns the current logged-in admin with role, or null if not an admin. */
+export async function getCurrentAdmin(): Promise<GeneralResponse<AdminWithEmail | null>> {
+    try {
+        const user = await getUser();
+        const userId = user?.authUser?.id;
+        if (!userId) return { status: true, data: null };
+        return getAdminById(userId);
+    } catch {
+        return { status: true, data: null };
+    }
+}
 
 export async function getAdminById(
     id: string
@@ -37,7 +52,7 @@ export async function getAdminById(
 
 export async function getAdmins(page: number = 1, limit: number = 10, filter: {
     search?: string;
-    role?: "ADMIN" | "SUPER_ADMIN";
+    role?: AdminRole;
     sort: 'first_name' | 'role' | "created_at" | "updated_at";
     order: "asc" | "desc";
 }): Promise<GeneralResponse<{ admins: AdminWithEmail[]; total: number }>> {
@@ -88,7 +103,7 @@ export async function createAdmin(data: {
     phone: string;
     password: string;
     confirm_password?: string;
-    role?: "ADMIN" | "SUPER_ADMIN";
+    role?: AdminRole;
 }): Promise<GeneralResponse<null>> {
     try {
         const { first_name, last_name, email, phone, password, confirm_password } = data;
@@ -255,7 +270,7 @@ export async function updateAdmin(id: string, admin: {
     first_name?: string;
     last_name?: string;
     phone?: string;
-    role?: "ADMIN" | "SUPER_ADMIN";
+    role?: AdminRole;
 }): Promise<GeneralResponse<null>> {
     try {
         const supabase = await createSupabaseServerClient();

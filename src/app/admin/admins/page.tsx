@@ -25,7 +25,7 @@ export default async function AdminsPage({
   const rawPageSize = parseInt(params.page_size ?? "10", 10) || 10
   const pageSize = PAGE_SIZE_OPTIONS.includes(rawPageSize as (typeof PAGE_SIZE_OPTIONS)[number]) ? rawPageSize : 10
   const search = params.search?.trim() ?? undefined
-  const role = params.role === "ADMIN" || params.role === "SUPER_ADMIN" ? params.role : undefined
+  const role = params.role === "ADMIN" || params.role === "SUPER_ADMIN" || params.role === "SUPERVISOR" ? params.role : undefined
 
   const res = await getAdmins(page, pageSize, {
     search,

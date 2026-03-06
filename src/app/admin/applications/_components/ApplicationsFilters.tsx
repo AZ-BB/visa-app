@@ -33,9 +33,10 @@ interface CountryOption {
 interface ApplicationsFiltersProps {
   admins: AdminOption[]
   countries: CountryOption[]
+  refunded?: string
 }
 
-export default function ApplicationsFilters({ admins, countries }: ApplicationsFiltersProps) {
+export default function ApplicationsFilters({ admins, countries, refunded = "" }: ApplicationsFiltersProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -46,6 +47,7 @@ export default function ApplicationsFilters({ admins, countries }: ApplicationsF
   const assignedTo = searchParams.get("assigned_to_id") ?? ""
   const destination = searchParams.get("destination") ?? ""
   const nationality = searchParams.get("nationality") ?? ""
+  const refundedParam = searchParams.get("refunded") || refunded || ""
 
   const [searchValue, setSearchValue] = useState(search)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
@@ -87,7 +89,7 @@ export default function ApplicationsFilters({ admins, countries }: ApplicationsF
   }, [searchValue, search, updateParams])
 
   return (
-    <div className="grid min-w-0 flex-1 grid-cols-[60fr_35fr_35fr_35fr_35fr] items-center gap-3 font-medium">
+    <div className="grid min-w-0 flex-1 grid-cols-[50fr_30fr_30fr_30fr_30fr_30fr] items-center gap-3 font-medium">
       <div className="relative min-w-0">
         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
@@ -174,6 +176,29 @@ export default function ApplicationsFilters({ admins, countries }: ApplicationsF
           aria-label="Filter by nationality"
           className="h-9 min-h-10 w-full rounded-lg border-border-default px-3 py-2 text-base"
         />
+      </div>
+
+      <div className="min-w-0">
+        <Select
+          value={refundedParam || "all"}
+          onValueChange={(v) => updateParams({ refunded: v === "all" ? "" : v })}
+        >
+          <SelectTrigger
+            className={cn(
+              "h-9 w-full rounded-lg px-3 text-base shadow-none",
+              (refundedParam || "all") === "all" && "text-secondary-copy"
+            )}
+            size="sm"
+          >
+            <SelectValue placeholder="Refunded" />
+          </SelectTrigger>
+          <SelectContent align="start">
+            <SelectGroup>
+              <SelectItem className="font-medium" value="all">All</SelectItem>
+              <SelectItem className="font-medium" value="refunded_only">Refunded only</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   )

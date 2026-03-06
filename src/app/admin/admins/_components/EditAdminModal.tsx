@@ -134,6 +134,7 @@ export default function EditAdminModal({
               <SelectContent>
                 <SelectItem value="ADMIN">Admin</SelectItem>
                 <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
+                <SelectItem value="SUPERVISOR">Supervisor</SelectItem>
               </SelectContent>
             </Select>
           </div>
