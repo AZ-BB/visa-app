@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { CountryDropdown } from "@/components/ui/country-dropdown"
 import {
@@ -51,6 +51,31 @@ export function ApplyFormSection({
     setSelectedProductId(firstId)
   }, [products])
 
+  const buttonSentinelRef = useRef<HTMLDivElement>(null)
+  const [showFixedButton, setShowFixedButton] = useState(true)
+
+  useEffect(() => {
+    const sentinel = buttonSentinelRef.current
+    if (!sentinel) return
+
+    const FIXED_BAR_HEIGHT = 100
+
+    const checkVisibility = () => {
+      const rect = sentinel.getBoundingClientRect()
+      const visibleThreshold = window.innerHeight - FIXED_BAR_HEIGHT
+      const isInView = rect.top < visibleThreshold && rect.bottom > 0
+      setShowFixedButton(!isInView)
+    }
+
+    checkVisibility()
+    window.addEventListener("scroll", checkVisibility, { passive: true })
+    window.addEventListener("resize", checkVisibility)
+    return () => {
+      window.removeEventListener("scroll", checkVisibility)
+      window.removeEventListener("resize", checkVisibility)
+    }
+  }, [])
+
   const handleStartApplication = () => {
     const selectedProduct = products.find((p) => p.id.toString() === selectedProductId)
     const count = Math.min(20, Math.max(1, numberOfTravellers))
@@ -90,9 +115,14 @@ export function ApplyFormSection({
       </h2>
 
       <ResumeApplicationBanner />
-      <div className="flex gap-12">
-        <div className="w-2/3 space-y-8">
-          <TipCard>
+      <div
+        className={cn(
+          "grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-12 items-start",
+          showFixedButton && "pb-24 md:pb-0"
+        )}
+      >
+        <div className="space-y-6 md:space-y-8 order-1 md:col-span-2 md:col-start-1 md:row-start-1">
+          <TipCard className="sm:block hidden">
             <span>
               A visa is <span className="font-semibold">required</span> when
               travelling to {destinationCountry.name} with a passport from{" "}
@@ -184,20 +214,10 @@ export function ApplyFormSection({
               </Button>
             </div>
           </div>
-
-          <div className="w-full flex items-center justify-end">
-            <ArrowButton
-              className=""
-              type="button"
-              onClick={handleStartApplication}
-            >
-              Start your application
-            </ArrowButton>
-          </div>
         </div>
 
-        <div className="w-1/3">
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-border-default/50">
+        <div className="w-full md:w-full order-2 md:order-0 md:col-start-3 md:row-start-1 md:row-span-2">
+          <div className="bg-white rounded-2xl p-4 md:p-5 shadow-sm border border-border-default/50">
             <h3 className="text-xl font-semibold">
               {destinationCountry.name} {products[0]?.visa?.name ?? ""}
             </h3>
@@ -310,7 +330,32 @@ export function ApplyFormSection({
             </div>
           </div>
         </div>
+
+        <div
+          ref={buttonSentinelRef}
+          className="order-3 md:col-span-2 md:col-start-1 md:row-start-2 w-full flex items-center justify-end"
+        >
+          <ArrowButton
+            className="w-full md:w-auto"
+            type="button"
+            onClick={handleStartApplication}
+          >
+            Start your application
+          </ArrowButton>
+        </div>
       </div>
+
+      {showFixedButton && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80 border-t border-border-default z-50 md:hidden">
+          <ArrowButton
+            className="w-full"
+            type="button"
+            onClick={handleStartApplication}
+          >
+            Start your application
+          </ArrowButton>
+        </div>
+      )}
     </>
   )
 }
