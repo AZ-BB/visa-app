@@ -122,7 +122,7 @@ export function ApplyFormSection({
         )}
       >
         <div className="space-y-6 md:space-y-8 order-1 md:col-span-2 md:col-start-1 md:row-start-1">
-          <TipCard className="sm:block hidden">
+          <TipCard className="sm:inline-flex w-full hidden">
             <span>
               A visa is <span className="font-semibold">required</span> when
               travelling to {destinationCountry.name} with a passport from{" "}
