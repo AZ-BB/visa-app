@@ -21,6 +21,7 @@ import { StatusDropdown } from "./_components/StatusDropdown"
 import { AssigneeDropdown } from "../_components/AssigneeDropdown"
 import { RefundButton } from "./_components/RefundButton"
 import { EditApplicationButton } from "./_components/EditApplicationButton"
+import { DeleteApplicationButton } from "./_components/DeleteApplicationButton"
 import { ActivityTimeline } from "./_components/ActivityTimeline"
 import { CountryFlag } from "@/components/ui/country-flag"
 import { getCountryNameFromCode } from "@/lib/contries-name"
@@ -115,6 +116,9 @@ export default async function AdminApplicationDetailPage({
   ])
   const application: Application | null =
     res.status && res.data ? res.data : null
+
+  if (!application) notFound()
+
   const admins =
     adminsRes.status && adminsRes.data ? adminsRes.data.admins : []
   const currentAdmin = currentAdminRes.status && currentAdminRes.data ? currentAdminRes.data : null
@@ -122,7 +126,6 @@ export default async function AdminApplicationDetailPage({
   const canEdit =
     currentAdmin?.role === "SUPER_ADMIN" || currentAdmin?.role === "SUPERVISOR"
 
-  if (!application) notFound()
 
   const destinationCountry = application.destination_country
   const visaType = application.visa_type
@@ -189,38 +192,47 @@ export default async function AdminApplicationDetailPage({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-end gap-3">
-          <EditApplicationButton application={application} canEdit={canEdit} />
-          {application.is_paid &&
-            application.stripe_payment_intent_id &&
-            Math.round(totalCost * 100) - (application.amount_refunded_cents ?? 0) >= 50 && (
-              <div className="flex flex-col gap-1">
-                <span className="text-xs text-secondary-copy">Refund</span>
-                <RefundButton
-                  applicationId={application.id}
-                  totalFee={totalCost}
-                  amountRefundedCents={application.amount_refunded_cents ?? 0}
-                  stripePaymentIntentId={application.stripe_payment_intent_id}
-                  isPaid={application.is_paid ?? false}
-                />
-              </div>
-            )}
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-secondary-copy">Status</span>
-            <StatusDropdown
+        <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:w-auto sm:gap-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3 [&_button]:w-full sm:[&_button]:w-auto">
+            <DeleteApplicationButton
               applicationId={application.id}
-              status={application.status as ApplicationStatus}
-              amountRefundedCents={application.amount_refunded_cents ?? 0}
+              canEdit={canEdit}
+              isDeleted={!!(application as { deleted_at?: string | null }).deleted_at}
             />
+            <EditApplicationButton application={application} canEdit={canEdit} />
+            {application.is_paid &&
+              application.stripe_payment_intent_id &&
+              Math.round(totalCost * 100) - (application.amount_refunded_cents ?? 0) >= 50 && (
+                <div className="flex flex-col gap-1">
+                  <RefundButton
+                    applicationId={application.id}
+                    totalFee={totalCost}
+                    amountRefundedCents={application.amount_refunded_cents ?? 0}
+                    stripePaymentIntentId={application.stripe_payment_intent_id}
+                    isPaid={application.is_paid ?? false}
+                  />
+                </div>
+              )}
           </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-secondary-copy">Assigned to</span>
-            <AssigneeDropdown
-              applicationId={application.id}
-              assignedToId={application.assigned_to ?? null}
-              admins={admins}
-              className="w-44"
-            />
+          <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-nowrap sm:items-end sm:gap-3">
+            <div className="flex min-w-0 flex-col gap-1">
+              <span className="text-xs text-secondary-copy">Status</span>
+              <StatusDropdown
+                applicationId={application.id}
+                status={application.status as ApplicationStatus}
+                amountRefundedCents={application.amount_refunded_cents ?? 0}
+                className="w-full sm:w-auto"
+              />
+            </div>
+            <div className="flex min-w-0 flex-col gap-1">
+              <span className="text-xs text-secondary-copy">Assigned to</span>
+              <AssigneeDropdown
+                applicationId={application.id}
+                assignedToId={application.assigned_to ?? null}
+                admins={admins}
+                className="w-full sm:w-44"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -554,7 +566,7 @@ export default async function AdminApplicationDetailPage({
                 application.is_paid &&
                 Math.abs(
                   totalCost -
-                    ((application as { amount_paid_cents: number }).amount_paid_cents ?? 0) / 100
+                  ((application as { amount_paid_cents: number }).amount_paid_cents ?? 0) / 100
                 ) > 0.001 && (
                   <div className="border-t border-border-default/50 px-5 py-3">
                     <div className="flex items-center justify-between text-sm">
@@ -628,35 +640,35 @@ export default async function AdminApplicationDetailPage({
           {/* Stripe */}
           {(application.stripe_checkout_session_id ||
             application.stripe_payment_intent_id) && (
-            <div className="overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
-              <div className="flex items-center gap-2 border-b border-border-default px-5 py-3">
-                <CreditCard className="size-4 text-secondary-copy" />
-                <p className="text-sm font-medium text-primary-copy">Stripe</p>
+              <div className="overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
+                <div className="flex items-center gap-2 border-b border-border-default px-5 py-3">
+                  <CreditCard className="size-4 text-secondary-copy" />
+                  <p className="text-sm font-medium text-primary-copy">Stripe</p>
+                </div>
+                <div className="divide-y divide-border-default/60">
+                  {application.stripe_checkout_session_id && (
+                    <div className="px-5 py-3">
+                      <p className="text-xs text-secondary-copy mb-1">
+                        Checkout session ID
+                      </p>
+                      <p className="font-mono text-xs text-primary-copy break-all">
+                        {application.stripe_checkout_session_id}
+                      </p>
+                    </div>
+                  )}
+                  {application.stripe_payment_intent_id && (
+                    <div className="px-5 py-3">
+                      <p className="text-xs text-secondary-copy mb-1">
+                        Payment intent ID
+                      </p>
+                      <p className="font-mono text-xs text-primary-copy break-all">
+                        {application.stripe_payment_intent_id}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="divide-y divide-border-default/60">
-                {application.stripe_checkout_session_id && (
-                  <div className="px-5 py-3">
-                    <p className="text-xs text-secondary-copy mb-1">
-                      Checkout session ID
-                    </p>
-                    <p className="font-mono text-xs text-primary-copy break-all">
-                      {application.stripe_checkout_session_id}
-                    </p>
-                  </div>
-                )}
-                {application.stripe_payment_intent_id && (
-                  <div className="px-5 py-3">
-                    <p className="text-xs text-secondary-copy mb-1">
-                      Payment intent ID
-                    </p>
-                    <p className="font-mono text-xs text-primary-copy break-all">
-                      {application.stripe_payment_intent_id}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+            )}
 
           {/* Metadata */}
           <div className="overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">

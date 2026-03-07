@@ -15,7 +15,7 @@ import {
   LogOut,
   ChevronDown,
 } from "lucide-react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -68,9 +68,8 @@ export default function AdminNavbar({ user }: { user: AdminNavbarUser }) {
             {links.map(({ href, label, icon: Icon }) => {
               const isActive = isActiveLink(href);
               return (
-                <>
+                <Fragment key={href}>
                   <Link
-                    key={href}
                     href={href}
                     className={cn(
                       "inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
@@ -87,7 +86,7 @@ export default function AdminNavbar({ user }: { user: AdminNavbarUser }) {
                       className="h-6 w-px bg-white"
                     ></div>
                   )}
-                </>
+                </Fragment>
               );
             })}
           </div>

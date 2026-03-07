@@ -8,7 +8,8 @@ export type ActivityActionType =
   | "STATUS_CHANGED"
   | "REFUNDED"
   | "APPLICATION_EDITED"
-  | "APPLICATION_CREATED";
+  | "APPLICATION_CREATED"
+  | "APPLICATION_DELETED";
 
 export type ActivityActorType = "admin" | "client";
 

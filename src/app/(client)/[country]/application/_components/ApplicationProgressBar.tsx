@@ -50,7 +50,7 @@ export function ApplicationProgressBar({
                 </div>
                 <span
                   className={cn(
-                    "ml-2 shrink-0 text-[16px] font-semibold whitespace-nowrap",
+                    "ml-2 shrink-0 text-[16px] font-semibold whitespace-nowrap hidden sm:inline",
                     isActive || isPast ? "text-primary-copy" : "text-gray-400",
                   )}
                 >
@@ -58,7 +58,7 @@ export function ApplicationProgressBar({
                 </span>
               </li>
               {!isLast && (
-                <li className="flex min-w-12 flex-1 items-center" aria-hidden>
+                <li className="flex flex-1 items-center" aria-hidden>
                   <div
                     className={cn(
                       "h-[3px] mx-2 w-full rounded transition-colors",

@@ -35,6 +35,9 @@ export async function signUp(
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const confirmPassword = formData.get("confirmPassword") as string;
+    const phoneExtension = (formData.get("phoneExtension") as string)?.trim() || "";
+    const phoneNumber = (formData.get("phone") as string)?.trim() || "";
+    const phone = phoneNumber ? `${phoneExtension} ${phoneNumber}`.trim() : "";
 
     if (!firstName?.trim()) {
         return { error: "First name is required" };
@@ -70,7 +73,7 @@ export async function signUp(
             email: email.trim(),
             first_name: firstName.trim(),
             last_name: lastName.trim(),
-            phone: ""
+            phone,
         });
 
         if (profileError) {

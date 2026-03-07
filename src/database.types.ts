@@ -93,6 +93,7 @@ export type Database = {
           assigned_to: string | null
           contact_email: string
           created_at: string
+          deleted_at: string | null
           destination_country_id: string
           gov_fee: number
           id: string
@@ -115,6 +116,7 @@ export type Database = {
           assigned_to?: string | null
           contact_email: string
           created_at?: string
+          deleted_at?: string | null
           destination_country_id: string
           gov_fee?: number
           id?: string
@@ -137,6 +139,7 @@ export type Database = {
           assigned_to?: string | null
           contact_email?: string
           created_at?: string
+          deleted_at?: string | null
           destination_country_id?: string
           gov_fee?: number
           id?: string
@@ -589,6 +592,7 @@ export type Database = {
         | "REFUNDED"
         | "APPLICATION_EDITED"
         | "APPLICATION_CREATED"
+        | "APPLICATION_DELETED"
       activity_actor_type: "admin" | "client"
       admin_role: "ADMIN" | "SUPER_ADMIN" | "SUPERVISOR"
       application_status:
@@ -729,6 +733,7 @@ export const Constants = {
         "REFUNDED",
         "APPLICATION_EDITED",
         "APPLICATION_CREATED",
+        "APPLICATION_DELETED",
       ],
       activity_actor_type: ["admin", "client"],
       admin_role: ["ADMIN", "SUPER_ADMIN", "SUPERVISOR"],

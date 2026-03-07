@@ -55,7 +55,7 @@ export default function ChangePasswordModal({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {children ?? (
-          <Button variant="outline" className="h-9 shadow-none gap-2">
+          <Button variant="outline" className="shadow-none gap-2">
             <KeyRound className="size-4" />
             Change password
           </Button>

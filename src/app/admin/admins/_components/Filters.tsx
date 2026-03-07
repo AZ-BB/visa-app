@@ -67,8 +67,8 @@ export default function Filters() {
   }
 
   return (
-    <div className="flex flex-1 flex-wrap items-center gap-3 font-medium">
-      <div className="relative sm:min-w-[400px] max-w-sm">
+    <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3 font-medium">
+      <div className="relative min-w-0 flex-1 sm:min-w-[300px] sm:max-w-sm">
         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           type="search"
@@ -84,7 +84,7 @@ export default function Filters() {
         value={role || "all"}
         onValueChange={(v) => handleRoleChange(v === "all" ? "" : v)}
       >
-        <SelectTrigger className="h-9 w-[140px] rounded-lg shadow-none" size="sm">
+        <SelectTrigger className="h-9 w-[140px] min-w-[140px] shrink-0 rounded-lg shadow-none" size="sm">
           <SelectValue placeholder="All roles" />
         </SelectTrigger>
         <SelectContent align="start">

@@ -42,7 +42,7 @@ export default async function VisaDetailPage({
     .filter(Boolean) as string[]
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 max-w-full space-y-6 overflow-x-hidden">
       {/* Breadcrumb */}
       <Link
         href={`/admin/countries/${v.destination_country}/visas`}
@@ -53,8 +53,8 @@ export default async function VisaDetailPage({
       </Link>
 
       {/* Page header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-4">
+      <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 shrink items-center gap-4">
           <div className="flex size-14 items-center justify-center overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
             <CountryFlag
               code={v.destination_country}
@@ -62,8 +62,8 @@ export default async function VisaDetailPage({
               round={false}
             />
           </div>
-          <div>
-            <h1 className="text-xl font-semibold text-primary-copy">
+          <div className="min-w-0">
+            <h1 className="truncate text-xl font-semibold text-primary-copy">
               {v.name}
             </h1>
             <Link

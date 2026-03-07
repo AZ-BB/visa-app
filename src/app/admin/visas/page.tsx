@@ -60,7 +60,7 @@ export default async function VisasPage({
 
   if (visasResponse.error || !visasResponse.data) {
     return (
-      <div className="space-y-6">
+      <div className="min-w-0 max-w-full space-y-6 overflow-x-hidden">
         <div>
           <h1 className="text-xl font-semibold text-primary-copy">Visa types</h1>
           <p className="mt-0.5 text-sm text-secondary-copy">
@@ -107,7 +107,7 @@ export default async function VisasPage({
   const fromItem = visas.length === 0 ? 0 : (currentPage - 1) * currentPageSize + 1
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 max-w-full space-y-6 overflow-x-hidden">
       {/* Page header */}
       <div>
         <h1 className="text-xl font-semibold text-primary-copy">Visa types</h1>
@@ -117,7 +117,7 @@ export default async function VisasPage({
       </div>
 
       {/* Content */}
-      <div className="overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
+      <div className="min-w-0 overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
         {/* Toolbar */}
         <div className="border-b border-border-default px-5 py-3">
           <VisasSearchForm
@@ -143,29 +143,29 @@ export default async function VisasPage({
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+          <div className="min-w-0 overflow-x-auto">
+            <table className="w-full min-w-[640px] text-sm">
               <thead>
                 <tr className="border-b border-border-default bg-bg-light-grey/80">
-                  <th className="w-12 py-3 pl-5 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                  <th className="w-12 min-w-12 py-3 pl-4 sm:pl-5 pr-3 sm:pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     #
                   </th>
-                  <th className="py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                  <th className="min-w-[140px] py-3 pl-2 pr-3 sm:pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     Visa type
                   </th>
-                  <th className="py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                  <th className="min-w-[130px] py-3 pl-2 pr-3 sm:pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     Destination
                   </th>
-                  <th className="py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                  <th className="min-w-[100px] py-3 pl-2 pr-3 sm:pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     Valid for
                   </th>
-                  <th className="py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                  <th className="min-w-[140px] py-3 pl-2 pr-3 sm:pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     Entries / Max stay
                   </th>
-                  <th className="py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                  <th className="min-w-[90px] py-3 pl-2 pr-3 sm:pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     Status
                   </th>
-                  <th className="w-24 py-3 pr-5 text-right text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                  <th className="w-24 min-w-[72px] py-3 pl-2 pr-4 sm:pr-5 text-right text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                   </th>
                 </tr>
               </thead>
@@ -175,44 +175,44 @@ export default async function VisasPage({
                     key={visa.id}
                     className="group transition-colors hover:bg-primary/2"
                   >
-                    <td className="w-12 py-3.5 pl-5 pr-2 text-xs tabular-nums text-secondary-copy">
+                    <td className="w-12 min-w-12 py-3.5 pl-4 sm:pl-5 pr-3 sm:pr-2 text-xs tabular-nums text-secondary-copy">
                       {fromItem + index}
                     </td>
 
-                    <td className="py-3.5 pr-2">
+                    <td className="min-w-[140px] py-3.5 pl-2 pr-3 sm:pr-2">
                       <Link
                         href={`/admin/visas/${visa.id}`}
-                        className="font-medium text-primary-copy transition-colors hover:text-primary"
+                        className="font-medium text-primary-copy transition-colors hover:text-primary block min-w-0 truncate"
                       >
                         {visa.name}
                       </Link>
                     </td>
 
-                    <td className="py-3.5 pr-2">
+                    <td className="min-w-[130px] py-3.5 pl-2 pr-3 sm:pr-2">
                       <Link
                         href={`/admin/countries/${visa.destination_country}`}
-                        className="inline-flex items-center gap-2 transition-colors hover:text-primary"
+                        className="inline-flex min-w-0 items-center gap-2 transition-colors hover:text-primary"
                       >
                         <CountryFlag
                           code={visa.destination_country}
                           className="size-5 shrink-0 rounded shadow-sm ring-1 ring-black/5"
                           round={false}
                         />
-                        <span className="text-primary-copy">
+                        <span className="truncate text-primary-copy">
                           {visa.destination_country_data?.name ?? visa.destination_country}
                         </span>
                       </Link>
                     </td>
 
-                    <td className="py-3.5 pr-2">
+                    <td className="min-w-[100px] py-3.5 pl-2 pr-3 sm:pr-2">
                       <div className="flex items-center gap-1.5 text-secondary-copy">
                         <CalendarDays className="size-3.5 shrink-0 opacity-50" />
-                        {visa.valid_for}
+                        <span className="truncate">{visa.valid_for}</span>
                       </div>
                     </td>
 
-                    <td className="py-3.5 pr-2">
-                      <div className="flex items-center gap-3 text-secondary-copy">
+                    <td className="min-w-[140px] py-3.5 pl-2 pr-3 sm:pr-2">
+                      <div className="flex items-center gap-3 text-secondary-copy whitespace-nowrap">
                         <span className="inline-flex items-center gap-1.5">
                           <DoorOpen className="size-3.5 shrink-0 opacity-50" />
                           {visa.number_of_entries === -1
@@ -227,7 +227,7 @@ export default async function VisasPage({
                       </div>
                     </td>
 
-                    <td className="py-3.5 pr-2">
+                    <td className="min-w-[90px] py-3.5 pl-2 pr-3 sm:pr-2">
                       <VisaStatusToggle
                         visaId={visa.id}
                         visaName={visa.name}
@@ -235,10 +235,10 @@ export default async function VisasPage({
                       />
                     </td>
 
-                    <td className="w-24 py-3.5 pr-5 text-right">
+                    <td className="w-24 min-w-[72px] py-3.5 pl-2 pr-4 sm:pr-5 text-right">
                       <Link
                         href={`/admin/visas/${visa.id}`}
-                        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border-default bg-white px-3 text-xs font-medium text-primary-copy shadow-sm transition-all hover:border-primary/40 hover:text-primary group-hover:border-primary/30"
+                        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border-default bg-white px-3 text-xs font-medium text-primary-copy shadow-sm transition-all hover:border-primary/40 hover:text-primary group-hover:border-primary/30 whitespace-nowrap"
                       >
                         <Eye className="size-3.5" />
                         View

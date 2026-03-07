@@ -19,7 +19,7 @@ export function EditApplicationButton({
 
   return (
     <>
-      <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
+      <Button variant="outline" onClick={() => setOpen(true)}>
         <Pencil className="size-4 mr-1.5" />
         Edit application
       </Button>
