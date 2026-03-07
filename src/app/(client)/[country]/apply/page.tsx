@@ -139,7 +139,7 @@ export default async function ApplyPage({ params, searchParams }: { params: Prom
     const user = await getUser();
 
     return (
-        <div className="max-w-7xl mx-auto min-h-screen px-6 pt-10 space-y-10">
+        <div className="max-w-7xl mx-auto min-h-screen pb-10 sm:pb-0 px-5 md:px-6 pt-6 md:pt-10 space-y-6 md:space-y-10">
             <ApplyFormSection
                 user={user}
                 products={products ?? []}

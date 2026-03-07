@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 export default function ArrowButton({ children, variant = "default", isLoading = false, className, iconClassName, iconContainerClassName, ...rest }: { children: React.ReactNode, variant?: "default" | "outline", isLoading?: boolean, className?: string, iconClassName?: string, iconContainerClassName?: string } & React.ComponentProps<typeof Button>) {
     return (
         <Button
-            className={cn("flex gap-3 group items-center pl-6 pr-4 py-8 rounded-full text-lg", className)}
+            className={cn("flex gap-3 group items-center pl-6 pr-4 py-10 rounded-full text-xl sm:text-lg sm:py-8", className)}
             variant={variant}
             {...rest}
             disabled={isLoading || rest.disabled}

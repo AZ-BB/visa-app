@@ -6,7 +6,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ArrowLeft, ArrowRight, Calendar, Info, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -18,7 +18,7 @@ import {
 import { DatePicker } from "@/components/ui/date-picker";
 import TipCard from "@/components/TipCard";
 import { Separator } from "@/components/ui/separator";
-import ArrowButton from "@/components/ArrowButton";
+import { StepActionButtons } from "../StepActionButtons";
 import { YesNoRadioGroup } from "@/components/YesNoRadioGroup";
 
 interface Step2PersonalInfoProps {
@@ -251,33 +251,12 @@ export function Step2PersonalInfo({ onNext, onBack, errors }: Step2PersonalInfoP
           </div>
         </button>
 
-        <div className="mt-10 flex items-center justify-between">
-          {onBack ? (
-            <button
-              type="button"
-              onClick={onBack}
-              className={cn(
-                "inline-flex items-center gap-2 text-primary font-semibold",
-                "hover:text-primary-dark transition-colors"
-              )}
-            >
-              <ArrowLeft className="size-5" aria-hidden />
-              Previous step
-            </button>
-          ) : (
-            <span />
-          )}
-          {onNext && (
-            <ArrowButton
-              variant="default"
-              className="text-base"
-              onClick={onNext}
-              disabled={hasAnyDeniedVisa}
-            >
-              Save & continue
-            </ArrowButton>
-          )}
-        </div>
+        <StepActionButtons
+          onBack={onBack}
+          primaryLabel="Save & continue"
+          primaryOnClick={onNext}
+          primaryDisabled={hasAnyDeniedVisa}
+        />
       </div>
 
       <ApplicationSidebar travellerCount={travellers.length} />

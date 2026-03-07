@@ -2,12 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
-import { cn, formatValidFor } from "@/lib/utils";
+import { formatValidFor } from "@/lib/utils";
 import { useApplicationOrder } from "../ApplicationOrderContext";
 import type { TempTraveller } from "../ApplicationOrderContext";
 import TipCard from "@/components/TipCard";
-import ArrowButton from "@/components/ArrowButton";
+import { StepActionButtons } from "../StepActionButtons";
 import { getCountryNameFromCode } from "@/lib/contries-name";
 import { Separator } from "@/components/ui/separator";
 import InfoIcon from "@/components/svgs/info";

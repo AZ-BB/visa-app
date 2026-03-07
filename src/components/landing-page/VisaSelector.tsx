@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 import { fetchAllCountriesList } from "@/actions/countries";
 
 export function VisaSelector({ rounded = true, shadow = true }: { rounded?: boolean; shadow?: boolean }) {
-  const [fromCountry, setFromCountry] = useState("GB");
+  const [fromCountry, setFromCountry] = useState<string | undefined>(undefined);
   const [toCountry, setToCountry] = useState<string | undefined>(undefined);
   const [countries, setCountries] = useState<{ id: string; name: string; is_disabled: boolean }[]>([]);
 
@@ -15,6 +15,19 @@ export function VisaSelector({ rounded = true, shadow = true }: { rounded?: bool
     fetchAllCountriesList().then((res) => {
       if (res.data) setCountries(res.data);
     });
+  }, []);
+
+  useEffect(() => {
+    fetch("http://ip-api.com/json/?fields=countryCode,status")
+      .then((res) => res.json())
+      .then((data: { status: string; countryCode?: string }) => {
+        if (data.status === "success" && data.countryCode) {
+          setFromCountry(data.countryCode);
+        }
+      })
+      .catch(() => {
+        // Silently ignore geolocation errors (e.g. network, CORS, rate limit)
+      });
   }, []);
 
   return (
@@ -30,8 +43,8 @@ export function VisaSelector({ rounded = true, shadow = true }: { rounded?: bool
         <div className="w-full flex flex-1 p-5 items-stretch justify-between">
           <CountryDropdown
             label="Where am I from?"
-            value={fromCountry}
-            onValueChange={setFromCountry}
+            value={fromCountry ?? ""}
+            onValueChange={(v) => setFromCountry(v || undefined)}
             placeholder="Choose country"
             aria-label="Country of origin"
             className=""
@@ -62,7 +75,7 @@ export function VisaSelector({ rounded = true, shadow = true }: { rounded?: bool
         {/* Choose your visa button */}
         <div className="shrink-0 p-3 md:w-fit w-full">
           <a
-            href={`/${toCountry}/apply?from=${fromCountry}`}
+            href={toCountry && fromCountry ? `/${toCountry}/apply?from=${fromCountry}` : "#"}
             className="flex items-center justify-between gap-3 rounded-full bg-primary px-6 py-4 text-base font-medium text-white transition hover:bg-primary-dark "
           >
             <span className="w-8 block md:hidden"></span>
