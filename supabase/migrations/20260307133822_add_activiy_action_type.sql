@@ -1,0 +1,1 @@
+ALTER TYPE activity_action_type ADD VALUE 'APPLICATION_DELETED';

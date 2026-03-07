@@ -485,7 +485,9 @@ export async function getApplication(
             turnaround_times(*),
             travellers(*, product:products(*))
         `)
-      .eq("id", id).eq("is_paid", true)
+      .eq("id", id)
+      .eq("is_paid", true)
+      .is("deleted_at", null)
       .single();
 
     if (error || !data) {
@@ -914,6 +916,51 @@ export async function updateApplicationAdmin(
   } catch (error) {
     console.error(error);
     return { status: false, error: "Failed to update application" };
+  }
+}
+
+/** Soft-delete application (flag as deleted). Only super admins and supervisors. */
+export async function deleteApplication(
+  applicationId: string,
+): Promise<GeneralResponse<void>> {
+  try {
+    const { getCurrentAdmin } = await import("@/actions/admins");
+    const adminRes = await getCurrentAdmin();
+    if (!adminRes.status || !adminRes.data) {
+      return { status: false, error: "Unauthorized" };
+    }
+    const role = adminRes.data.role;
+    if (role !== "SUPER_ADMIN" && role !== "SUPERVISOR") {
+      return {
+        status: false,
+        error: "Only super admins and supervisors can delete applications",
+      };
+    }
+
+    const supabase = await createSupabaseServerClient();
+    const { error } = await supabase
+      .from("applications")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("id", applicationId);
+
+    if (error) {
+      return { status: false, error: error.message };
+    }
+
+    await logApplicationActivity({
+      applicationId,
+      actionType: "APPLICATION_DELETED",
+      actorId: adminRes.data.id,
+      actorType: "admin",
+      content: { summary: "Application flagged as deleted (soft delete)" },
+    });
+
+    revalidatePath(`/admin/applications/${applicationId}`);
+    revalidatePath("/admin/applications");
+    return { status: true };
+  } catch (error) {
+    console.error(error);
+    return { status: false, error: "Failed to delete application" };
   }
 }
 

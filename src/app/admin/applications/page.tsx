@@ -12,6 +12,7 @@ import { SortableTableHeader } from "./_components/SortableTableHeader"
 import { TravellersCell } from "./_components/TravellersCell"
 import { AssigneeDropdown } from "./_components/AssigneeDropdown"
 import { ApplicationStatus } from "@/enums"
+import { notFound } from "next/navigation"
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50] as const
 const SORT_OPTIONS = ["arrival_date", "created_at", "updated_at", "status", "client_name", "total_fee"] as const
