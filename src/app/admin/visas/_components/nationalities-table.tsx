@@ -178,7 +178,7 @@ export function NationalitiesTable({
   }
 
   return (
-    <div className="relative">
+    <div className="relative min-w-0">
       {/* Bulk action bar */}
       {selected.size > 0 && (
         <div className="flex items-center justify-between gap-4 border-b border-border-default bg-primary/[0.03] px-5 py-3">
@@ -227,11 +227,11 @@ export function NationalitiesTable({
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+        <div className="min-w-0 overflow-x-auto">
+          <table className="w-full min-w-[720px] text-sm">
             <thead>
               <tr className="border-b border-border-default bg-bg-light-grey/80">
-                <th className="w-10 py-3 pl-5 pr-1">
+                <th className="w-10 min-w-10 py-3 pl-4 sm:pl-5 pr-1">
                   <input
                     type="checkbox"
                     checked={allVisibleSelected}
@@ -239,16 +239,16 @@ export function NationalitiesTable({
                     className="size-4 rounded border-border-default text-primary accent-primary"
                   />
                 </th>
-                <th className="w-10 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                <th className="w-10 min-w-10 py-3 pl-1 pr-3 sm:pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                   #
                 </th>
-                <SortableHeader column="nationality" label="Nationality" currentKey={sortKey} currentDir={sortDir} onToggle={toggleSort} icon={<SortIcon column="nationality" />} />
-                <SortableHeader column="processing_fee" label="Processing fee" currentKey={sortKey} currentDir={sortDir} onToggle={toggleSort} icon={<SortIcon column="processing_fee" />} />
-                <SortableHeader column="gov_fee" label="Gov fee" currentKey={sortKey} currentDir={sortDir} onToggle={toggleSort} icon={<SortIcon column="gov_fee" />} />
-                <SortableHeader column="total" label="Total price" currentKey={sortKey} currentDir={sortDir} onToggle={toggleSort} icon={<SortIcon column="total" />} />
-                <SortableHeader column="override" label="Fee override" currentKey={sortKey} currentDir={sortDir} onToggle={toggleSort} icon={<SortIcon column="override" />} />
-                <SortableHeader column="status" label="Product status" currentKey={sortKey} currentDir={sortDir} onToggle={toggleSort} icon={<SortIcon column="status" />} />
-                <th className="py-3 pr-5 text-right text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                <SortableHeader column="nationality" label="Nationality" currentKey={sortKey} currentDir={sortDir} onToggle={toggleSort} icon={<SortIcon column="nationality" />} className="min-w-[130px] py-3 pl-2 pr-3 sm:pr-2" />
+                <SortableHeader column="processing_fee" label="Processing fee" currentKey={sortKey} currentDir={sortDir} onToggle={toggleSort} icon={<SortIcon column="processing_fee" />} className="min-w-[100px] py-3 pl-2 pr-3 sm:pr-2" />
+                <SortableHeader column="gov_fee" label="Gov fee" currentKey={sortKey} currentDir={sortDir} onToggle={toggleSort} icon={<SortIcon column="gov_fee" />} className="min-w-[80px] py-3 pl-2 pr-3 sm:pr-2" />
+                <SortableHeader column="total" label="Total price" currentKey={sortKey} currentDir={sortDir} onToggle={toggleSort} icon={<SortIcon column="total" />} className="min-w-[90px] py-3 pl-2 pr-3 sm:pr-2" />
+                <SortableHeader column="override" label="Fee override" currentKey={sortKey} currentDir={sortDir} onToggle={toggleSort} icon={<SortIcon column="override" />} className="min-w-[100px] py-3 pl-2 pr-3 sm:pr-2" />
+                <SortableHeader column="status" label="Product status" currentKey={sortKey} currentDir={sortDir} onToggle={toggleSort} icon={<SortIcon column="status" />} className="min-w-[110px] py-3 pl-2 pr-3 sm:pr-2" />
+                <th className="min-w-[100px] py-3 pl-2 pr-4 sm:pr-5 text-right text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                   Actions
                 </th>
               </tr>
@@ -269,7 +269,7 @@ export function NationalitiesTable({
                       isChecked ? "bg-primary/[0.03]" : "hover:bg-primary/[0.02]"
                     )}
                   >
-                    <td className="w-10 py-3.5 pl-5 pr-1">
+                    <td className="w-10 min-w-10 py-3.5 pl-4 sm:pl-5 pr-1">
                       <input
                         type="checkbox"
                         checked={isChecked}
@@ -278,12 +278,12 @@ export function NationalitiesTable({
                       />
                     </td>
 
-                    <td className="w-10 py-3.5 pr-2 text-xs tabular-nums text-secondary-copy">
+                    <td className="w-10 min-w-10 py-3.5 pl-1 pr-3 sm:pr-2 text-xs tabular-nums text-secondary-copy">
                       {index + 1}
                     </td>
 
-                    <td className="py-3.5 pr-2">
-                      <div className="flex items-center gap-2.5">
+                    <td className="min-w-[130px] py-3.5 pl-2 pr-3 sm:pr-2">
+                      <div className="flex min-w-0 items-center gap-2 sm:gap-2.5">
                         {rule && (
                           <CountryFlag
                             code={rule.nationality}
@@ -291,31 +291,31 @@ export function NationalitiesTable({
                             round={false}
                           />
                         )}
-                        <span className="font-medium text-primary-copy">
+                        <span className="min-w-0 truncate font-medium text-primary-copy">
                           {natCountry?.name ?? rule?.nationality ?? "—"}
                         </span>
                       </div>
                     </td>
 
-                    <td className="py-3.5 pr-2">
+                    <td className="min-w-[100px] py-3.5 pl-2 pr-3 sm:pr-2">
                       <span className="font-medium tabular-nums text-primary-copy">
                         ${processingFee.toFixed(2)}
                       </span>
                     </td>
 
-                    <td className="py-3.5 pr-2">
+                    <td className="min-w-[80px] py-3.5 pl-2 pr-3 sm:pr-2">
                       <span className="font-medium tabular-nums text-primary-copy">
                         ${govFee.toFixed(2)}
                       </span>
                     </td>
 
-                    <td className="py-3.5 pr-2">
+                    <td className="min-w-[90px] py-3.5 pl-2 pr-3 sm:pr-2">
                       <span className="font-medium tabular-nums text-primary-copy">
                         ${(processingFee + govFee).toFixed(2)}
                       </span>
                     </td>
 
-                    <td className="py-3.5 pr-2">
+                    <td className="min-w-[100px] py-3.5 pl-2 pr-3 sm:pr-2">
                       {product.processing_fee_override != null || product.gov_fee_override != null ? (
                         <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-200/80">
                           <span className="size-1.5 rounded-full bg-blue-500" />
@@ -328,7 +328,7 @@ export function NationalitiesTable({
                       )}
                     </td>
 
-                    <td className="py-3.5 pr-2">
+                    <td className="min-w-[110px] py-3.5 pl-2 pr-3 sm:pr-2">
                       <ProductStatusToggle
                         productId={product.id}
                         visaTypeId={visaTypeId}
@@ -337,7 +337,7 @@ export function NationalitiesTable({
                       />
                     </td>
 
-                    <td className="py-3.5 pr-5 text-right">
+                    <td className="min-w-[100px] py-3.5 pl-2 pr-4 sm:pr-5 text-right">
                       <div className="flex items-center justify-end gap-2">
                         <EditProductModal
                           product={product}
@@ -489,6 +489,7 @@ function SortableHeader({
   onToggle,
   icon,
   isLast = false,
+  className,
 }: {
   column: SortKey
   label: string
@@ -497,9 +498,10 @@ function SortableHeader({
   onToggle: (key: SortKey) => void
   icon: React.ReactNode
   isLast?: boolean
+  className?: string
 }) {
   return (
-    <th className={`py-3 ${isLast ? "pr-5" : "pr-2"} text-left`}>
+    <th className={cn("py-3 text-left", isLast ? "pr-5" : "pr-2", className)}>
       <button
         type="button"
         onClick={() => onToggle(column)}

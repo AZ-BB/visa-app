@@ -154,10 +154,10 @@ export default async function ClientsPage({
         ) : (
           <>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[640px] text-sm">
                 <thead>
                   <tr className="border-b border-border-default bg-bg-light-grey/80">
-                    <th className="w-12 py-3 pl-5 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                    <th className="w-12 min-w-12 py-3 pl-4 sm:pl-5 pr-3 sm:pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                       #
                     </th>
                     <SortableTh
@@ -166,6 +166,7 @@ export default async function ClientsPage({
                       currentSort={sortKey}
                       currentSortDir={sortDir}
                       baseParams={baseParams}
+                      className="min-w-[140px] py-3 pl-2 pr-3 sm:pr-2"
                     />
                     <SortableTh
                       column="email"
@@ -173,8 +174,9 @@ export default async function ClientsPage({
                       currentSort={sortKey}
                       currentSortDir={sortDir}
                       baseParams={baseParams}
+                      className="min-w-[160px] py-3 pl-2 pr-3 sm:pr-2"
                     />
-                    <th className="py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                    <th className="min-w-[110px] py-3 pl-2 pr-3 sm:pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                       Phone
                     </th>
                     <SortableTh
@@ -183,6 +185,7 @@ export default async function ClientsPage({
                       currentSort={sortKey}
                       currentSortDir={sortDir}
                       baseParams={baseParams}
+                      className="min-w-[100px] py-3 pl-2 pr-3 sm:pr-2"
                     />
                     <SortableTh
                       column="created_at"
@@ -190,8 +193,9 @@ export default async function ClientsPage({
                       currentSort={sortKey}
                       currentSortDir={sortDir}
                       baseParams={baseParams}
+                      className="min-w-[110px] py-3 pl-2 pr-3 sm:pr-2"
                     />
-                    <th className="w-20 py-3 pr-5 text-right text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                    <th className="w-20 min-w-[72px] py-3 pl-2 pr-4 sm:pr-5 text-right text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     </th>
                   </tr>
                 </thead>
@@ -205,46 +209,46 @@ export default async function ClientsPage({
                         key={client.id}
                         className="group transition-colors hover:bg-primary/2"
                       >
-                        <td className="w-12 py-3.5 pl-5 pr-2 text-xs tabular-nums text-secondary-copy">
+                        <td className="w-12 min-w-12 py-3.5 pl-4 sm:pl-5 pr-3 sm:pr-2 text-xs tabular-nums text-secondary-copy">
                           {fromItem + index}
                         </td>
 
-                        <td className="py-3.5 pr-2">
+                        <td className="min-w-[140px] py-3.5 pl-2 pr-3 sm:pr-2">
                           <Link
                             href={`/admin/clients/${client.id}`}
-                            className="flex items-center gap-3"
+                            className="flex items-center gap-2 sm:gap-3"
                           >
                             <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
                               {initials}
                             </div>
-                            <span className="font-medium text-primary-copy transition-colors group-hover:text-primary">
+                            <span className="font-medium text-primary-copy transition-colors group-hover:text-primary min-w-0 truncate">
                               {client.first_name} {client.last_name}
                             </span>
                           </Link>
                         </td>
 
-                        <td className="py-3.5 pr-2">
-                          <div className="flex items-center gap-2 text-secondary-copy">
+                        <td className="min-w-[160px] py-3.5 pl-2 pr-3 sm:pr-2">
+                          <div className="flex items-center gap-2 text-secondary-copy min-w-0">
                             <Mail className="size-3.5 shrink-0 opacity-50" />
                             <span className="truncate">{client.email}</span>
                           </div>
                         </td>
 
-                        <td className="py-3.5 pr-2">
+                        <td className="min-w-[110px] py-3.5 pl-2 pr-3 sm:pr-2">
                           <div className="flex items-center gap-2 text-secondary-copy">
                             <Phone className="size-3.5 shrink-0 opacity-50" />
-                            <span>{client.phone || "—"}</span>
+                            <span className="truncate">{client.phone || "—"}</span>
                           </div>
                         </td>
 
-                        <td className="py-3.5 pr-2">
+                        <td className="min-w-[100px] py-3.5 pl-2 pr-3 sm:pr-2">
                           <div className="flex items-center gap-2 text-secondary-copy">
                             <FileText className="size-3.5 shrink-0 opacity-50" />
                             <span className="tabular-nums">{appCount}</span>
                           </div>
                         </td>
 
-                        <td className="py-3.5 pr-2 text-secondary-copy">
+                        <td className="min-w-[110px] py-3.5 pl-2 pr-3 sm:pr-2 text-secondary-copy whitespace-nowrap">
                           {new Date(client.created_at).toLocaleDateString("en-US", {
                             month: "short",
                             day: "numeric",
@@ -252,13 +256,13 @@ export default async function ClientsPage({
                           })}
                         </td>
 
-                        <td className="w-20 py-3.5 pr-5 text-right">
+                        <td className="w-20 min-w-[72px] py-3.5 pl-2 pr-4 sm:pr-5 text-right">
                           <Link
                             href={`/admin/clients/${client.id}`}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-border-default bg-white px-2.5 py-1.5 text-xs font-medium text-secondary-copy shadow-sm transition-all hover:border-primary/40 hover:text-primary"
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-border-default bg-white px-2.5 py-1.5 text-xs font-medium text-secondary-copy shadow-sm transition-all hover:border-primary/40 hover:text-primary whitespace-nowrap"
                           >
                             View
-                            <ExternalLink className="size-3 opacity-50" />
+                            <ExternalLink className="size-3 opacity-50 shrink-0" />
                           </Link>
                         </td>
                       </tr>

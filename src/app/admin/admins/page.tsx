@@ -36,7 +36,7 @@ export default async function AdminsPage({
 
   if (!res.status || !res.data) {
     return (
-      <div className="space-y-6">
+      <div className="min-w-0 max-w-full space-y-6 overflow-x-hidden">
         <PageHeader title="Admins" description="Manage admin users" />
         <div className="flex flex-col items-center justify-center rounded-xl border border-border-default bg-white px-6 py-20 text-center shadow-sm">
           <p className="text-sm text-red-600">{res.error ?? "Failed to load admins"}</p>
@@ -48,11 +48,10 @@ export default async function AdminsPage({
   const { admins, total } = res.data
 
   return (
-    <div className="space-y-6">
-      <div className="overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border-default px-5 py-3">
+    <div className="min-w-0 max-w-full space-y-6 overflow-x-hidden">
+      <div className="min-w-0 overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
+        <div className="flex min-w-0 flex-col gap-3 border-b border-border-default px-5 py-3 sm:flex-row sm:items-center sm:justify-between">
           <Filters />
-
           <CreateAdminModal />
         </div>
 
@@ -70,29 +69,29 @@ export default async function AdminsPage({
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
-            <table className="w-full table-fixed text-sm">
+            <div className="min-w-0 overflow-x-auto">
+            <table className="w-full min-w-[640px] text-sm">
               <thead>
                 <tr className="border-b border-border-default bg-bg-light-grey/80">
-                  <th className="w-12 py-3 pl-5 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                  <th className="w-12 min-w-12 py-3 pl-4 sm:pl-5 pr-3 sm:pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     #
                   </th>
-                  <th className="w-36 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                  <th className="min-w-[140px] py-3 pl-2 pr-3 sm:pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     Name
                   </th>
-                  <th className="w-48 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                  <th className="min-w-[160px] py-3 pl-2 pr-3 sm:pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     Email
                   </th>
-                  <th className="w-30 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                  <th className="min-w-[110px] py-3 pl-2 pr-3 sm:pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     Phone
                   </th>
-                  <th className="w-32 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                  <th className="min-w-[180px] py-3 pl-2 pr-3 sm:pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     Role
                   </th>
-                  <th className="w-24 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                  <th className="min-w-[100px] py-3 pl-2 pr-3 sm:pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     Created
                   </th>
-                  <th className="w-28 py-3 pl-2 pr-5 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                  <th className="min-w-[90px] py-3 pl-2 pr-4 sm:pr-5 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     Actions
                   </th>
                 </tr>
@@ -104,36 +103,36 @@ export default async function AdminsPage({
                     key={admin.id}
                     className="group transition-colors hover:bg-primary/2"
                   >
-                    <td className="w-12 py-3.5 pl-5 pr-2 text-xs tabular-nums text-secondary-copy">
+                    <td className="w-12 min-w-12 py-3.5 pl-4 sm:pl-5 pr-3 sm:pr-2 text-xs tabular-nums text-secondary-copy">
                       {(page - 1) * pageSize + index + 1}
                     </td>
 
-                    <td className="w-36 py-3.5 pr-2">
+                    <td className="min-w-[140px] py-3.5 pl-2 pr-3 sm:pr-2">
                       <Link
                         href={`/admin/admins/${admin.id}`}
-                        className="block truncate text-base hover:underline font-medium text-primary-copy transition-colors hover:text-primary"
+                        className="block min-w-0 truncate font-medium text-primary-copy transition-colors hover:text-primary hover:underline"
                       >
                         {admin.first_name} {admin.last_name}
                       </Link>
                     </td>
 
-                    <td className="w-48 py-3.5 pr-2 text-base text-secondary-copy">
-                      <span className="block truncate">{admin.email}</span>
+                    <td className="min-w-[160px] py-3.5 pl-2 pr-3 sm:pr-2 text-secondary-copy">
+                      <span className="block min-w-0 truncate">{admin.email}</span>
                     </td>
 
-                    <td className="w-30 py-3.5 pr-2 text-secondary-copy">
-                      <span className="block truncate">{admin.phone}</span>
+                    <td className="min-w-[110px] py-3.5 pl-2 pr-3 sm:pr-2 text-secondary-copy">
+                      <span className="block min-w-0 truncate">{admin.phone ?? "—"}</span>
                     </td>
 
-                    <td className="w-28 py-3.5 pr-4">
+                    <td className="min-w-[180px] py-3.5 pl-2 pr-3 sm:pr-2">
                       <RoleDropdown adminId={admin.id} currentRole={admin.role} />
                     </td>
 
-                    <td className="w-24 py-3.5 pr-2 text-secondary-copy">
+                    <td className="min-w-[100px] py-3.5 pl-2 pr-3 sm:pr-2 text-secondary-copy whitespace-nowrap">
                       {new Date(admin.created_at).toLocaleDateString()}
                     </td>
 
-                    <td className="w-28 py-3.5 pl-2 pr-5">
+                    <td className="min-w-[90px] py-3.5 pl-2 pr-4 sm:pr-5">
                       <AdminRowActions adminId={admin.id} />
                     </td>
                   </tr>

@@ -192,42 +192,47 @@ export default async function AdminApplicationDetailPage({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-end gap-3">
-          <DeleteApplicationButton
-            applicationId={application.id}
-            canEdit={canEdit}
-            isDeleted={!!(application as { deleted_at?: string | null }).deleted_at}
-          />
-          <EditApplicationButton application={application} canEdit={canEdit} />
-          {application.is_paid &&
-            application.stripe_payment_intent_id &&
-            Math.round(totalCost * 100) - (application.amount_refunded_cents ?? 0) >= 50 && (
-              <div className="flex flex-col gap-1">
-                <RefundButton
-                  applicationId={application.id}
-                  totalFee={totalCost}
-                  amountRefundedCents={application.amount_refunded_cents ?? 0}
-                  stripePaymentIntentId={application.stripe_payment_intent_id}
-                  isPaid={application.is_paid ?? false}
-                />
-              </div>
-            )}
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-secondary-copy">Status</span>
-            <StatusDropdown
+        <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:w-auto sm:gap-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3 [&_button]:w-full sm:[&_button]:w-auto">
+            <DeleteApplicationButton
               applicationId={application.id}
-              status={application.status as ApplicationStatus}
-              amountRefundedCents={application.amount_refunded_cents ?? 0}
+              canEdit={canEdit}
+              isDeleted={!!(application as { deleted_at?: string | null }).deleted_at}
             />
+            <EditApplicationButton application={application} canEdit={canEdit} />
+            {application.is_paid &&
+              application.stripe_payment_intent_id &&
+              Math.round(totalCost * 100) - (application.amount_refunded_cents ?? 0) >= 50 && (
+                <div className="flex flex-col gap-1">
+                  <RefundButton
+                    applicationId={application.id}
+                    totalFee={totalCost}
+                    amountRefundedCents={application.amount_refunded_cents ?? 0}
+                    stripePaymentIntentId={application.stripe_payment_intent_id}
+                    isPaid={application.is_paid ?? false}
+                  />
+                </div>
+              )}
           </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-secondary-copy">Assigned to</span>
-            <AssigneeDropdown
-              applicationId={application.id}
-              assignedToId={application.assigned_to ?? null}
-              admins={admins}
-              className="w-44"
-            />
+          <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-nowrap sm:items-end sm:gap-3">
+            <div className="flex min-w-0 flex-col gap-1">
+              <span className="text-xs text-secondary-copy">Status</span>
+              <StatusDropdown
+                applicationId={application.id}
+                status={application.status as ApplicationStatus}
+                amountRefundedCents={application.amount_refunded_cents ?? 0}
+                className="w-full sm:w-auto"
+              />
+            </div>
+            <div className="flex min-w-0 flex-col gap-1">
+              <span className="text-xs text-secondary-copy">Assigned to</span>
+              <AssigneeDropdown
+                applicationId={application.id}
+                assignedToId={application.assigned_to ?? null}
+                admins={admins}
+                className="w-full sm:w-44"
+              />
+            </div>
           </div>
         </div>
       </div>

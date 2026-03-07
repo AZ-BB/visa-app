@@ -199,10 +199,10 @@ export function VisaRulesTable({
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[640px] text-sm">
             <thead>
               <tr className="border-b border-border-default bg-bg-light-grey/80">
-                <th className="w-12 py-3 pl-5 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                <th className="w-12 min-w-12 py-3 pl-4 sm:pl-5 pr-3 sm:pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                   #
                 </th>
                 <SortableHeader
@@ -211,14 +211,16 @@ export function VisaRulesTable({
                   sortKey={sortKey}
                   sortOrder={sortOrder}
                   onSort={handleSort}
+                  className="min-w-[130px] py-3 pl-2 pr-3 sm:pr-2"
                 />
-                <th className="w-10 px-0 text-center text-xs text-secondary-copy/50" />
+                <th className="w-10 min-w-10 px-0 text-center text-xs text-secondary-copy/50" />
                 <SortableHeader
                   label="Destination"
                   column="destination"
                   sortKey={sortKey}
                   sortOrder={sortOrder}
                   onSort={handleSort}
+                  className="min-w-[130px] py-3 pl-2 pr-3 sm:pr-2"
                 />
                 <SortableHeader
                   label="Visa Req."
@@ -226,6 +228,7 @@ export function VisaRulesTable({
                   sortKey={sortKey}
                   sortOrder={sortOrder}
                   onSort={handleSort}
+                  className="min-w-[180px] py-3 pl-2 pr-3 sm:pr-2"
                 />
                 <SortableHeader
                   label="Supported"
@@ -233,6 +236,7 @@ export function VisaRulesTable({
                   sortKey={sortKey}
                   sortOrder={sortOrder}
                   onSort={handleSort}
+                  className="min-w-[90px] py-3 pl-2 pr-3 sm:pr-2"
                 />
                 <SortableHeader
                   label="Visas"
@@ -241,6 +245,7 @@ export function VisaRulesTable({
                   sortOrder={sortOrder}
                   onSort={handleSort}
                   align="right"
+                  className="min-w-[80px] py-3 pl-2 pr-4 sm:pr-5"
                 />
               </tr>
             </thead>
@@ -263,23 +268,19 @@ export function VisaRulesTable({
                     key={rule.id}
                     className="group transition-colors hover:bg-primary/2"
                   >
-                    <td className="w-12 py-3.5 pl-5 pr-2 text-xs tabular-nums text-secondary-copy">
+                    <td className="w-12 min-w-12 py-3.5 pl-4 sm:pl-5 pr-3 sm:pr-2 text-xs tabular-nums text-secondary-copy">
                       {index + 1}
                     </td>
 
-                    <td className="py-3.5 pr-2">
-                      <div className="flex items-center gap-2.5">
+                    <td className="min-w-[130px] py-3.5 pl-2 pr-3 sm:pr-2">
+                      <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
                         <CountryFlag
                           code={rule.nationality}
                           className="size-6 shrink-0 rounded shadow-sm ring-1 ring-black/5"
                           round={false}
                         />
                         <span
-                          className={
-                            isCurrentNationality
-                              ? "font-semibold text-primary-copy"
-                              : "font-medium text-primary-copy"
-                          }
+                          className={`min-w-0 truncate ${isCurrentNationality ? "font-semibold text-primary-copy" : "font-medium text-primary-copy"}`}
                         >
                           {nationalityCountry?.name ?? rule.nationality}
                         </span>
@@ -291,23 +292,19 @@ export function VisaRulesTable({
                       </div>
                     </td>
 
-                    <td className="w-10 px-0 text-center">
+                    <td className="w-10 min-w-10 px-0 text-center">
                       <ArrowRight className="mx-auto size-3.5 text-secondary-copy/40" />
                     </td>
 
-                    <td className="py-3.5 pr-2">
-                      <div className="flex items-center gap-2.5">
+                    <td className="min-w-[130px] py-3.5 pl-2 pr-3 sm:pr-2">
+                      <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
                         <CountryFlag
                           code={rule.destination_country}
                           className="size-6 shrink-0 rounded shadow-sm ring-1 ring-black/5"
                           round={false}
                         />
                         <span
-                          className={
-                            isCurrentDestination
-                              ? "font-semibold text-primary-copy"
-                              : "font-medium text-primary-copy"
-                          }
+                          className={`min-w-0 truncate ${isCurrentDestination ? "font-semibold text-primary-copy" : "font-medium text-primary-copy"}`}
                         >
                           {destinationCountry?.name ??
                             rule.destination_country}
@@ -320,7 +317,7 @@ export function VisaRulesTable({
                       </div>
                     </td>
 
-                    <td className="py-3.5 pr-2">
+                    <td className="min-w-[180px] py-3.5 pl-2 pr-3 sm:pr-2">
                       <VisaRequiredToggle
                         ruleId={rule.id}
                         isVisaRequired={rule.is_visa_required}
@@ -335,7 +332,7 @@ export function VisaRulesTable({
                       />
                     </td>
 
-                    <td className="py-3.5 pr-2">
+                    <td className="min-w-[90px] py-3.5 pl-2 pr-3 sm:pr-2">
                       <SupportedToggle
                         ruleId={rule.id}
                         isSupported={rule.is_supported}
@@ -350,10 +347,10 @@ export function VisaRulesTable({
                       />
                     </td>
 
-                    <td className="py-3.5 pr-5 text-right">
+                    <td className="min-w-[80px] py-3.5 pl-2 pr-4 sm:pr-5 text-right">
                       <Link
                         href={`/admin/countries/${countryId}/nationality/${otherId}?view_as=${resolvedView}`}
-                        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border-default bg-white px-3 text-xs font-medium text-primary-copy shadow-sm transition-all hover:border-primary/40 hover:text-primary group-hover:border-primary/30"
+                        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border-default bg-white px-3 text-xs font-medium text-primary-copy shadow-sm transition-all hover:border-primary/40 hover:text-primary group-hover:border-primary/30 whitespace-nowrap"
                       >
                         <Eye className="size-3.5" />
                         Visas
@@ -384,6 +381,7 @@ function SortableHeader({
   sortOrder,
   onSort,
   align = "left",
+  className,
 }: {
   label: string
   column: SortKey
@@ -391,12 +389,13 @@ function SortableHeader({
   sortOrder: SortOrder
   onSort: (key: SortKey) => void
   align?: "left" | "right"
+  className?: string
 }) {
   const isActive = sortKey === column
 
   return (
     <th
-      className={`py-3 ${align === "right" ? "pr-5 text-right" : "pr-2 text-left"} text-xs font-semibold uppercase tracking-wider text-secondary-copy`}
+      className={`py-3 text-xs font-semibold uppercase tracking-wider text-secondary-copy ${align === "right" ? "text-right" : "text-left"} ${className ?? ""}`}
     >
       <button
         type="button"

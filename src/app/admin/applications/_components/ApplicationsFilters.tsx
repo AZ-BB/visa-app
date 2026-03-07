@@ -89,8 +89,8 @@ export default function ApplicationsFilters({ admins, countries, refunded = "" }
   }, [searchValue, search, updateParams])
 
   return (
-    <div className="grid min-w-0 flex-1 grid-cols-[50fr_30fr_30fr_30fr_30fr_30fr] items-center gap-3 font-medium">
-      <div className="relative min-w-0">
+    <div className="grid min-w-0 flex-1 grid-cols-2 gap-2 items-center font-medium lg:grid-cols-[50fr_30fr_30fr_30fr_30fr_30fr] lg:gap-3">
+      <div className="relative min-w-0 col-span-2 lg:col-span-1">
         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           type="search"
@@ -109,7 +109,7 @@ export default function ApplicationsFilters({ admins, countries, refunded = "" }
         >
           <SelectTrigger
             className={cn(
-              "h-9 w-full rounded-lg px-3 text-base shadow-none",
+              "h-9 w-full rounded-lg px-3 text-sm shadow-none",
               (status || "all") === "all" && "text-secondary-copy"
             )}
             size="sm"
@@ -135,7 +135,7 @@ export default function ApplicationsFilters({ admins, countries, refunded = "" }
         >
           <SelectTrigger
             className={cn(
-              "h-9 w-full rounded-lg px-3 text-base shadow-none",
+              "h-9 w-full rounded-lg px-3 text-sm shadow-none",
               (assignedTo || "all") === "all" && "text-secondary-copy"
             )}
             size="sm"
@@ -163,7 +163,7 @@ export default function ApplicationsFilters({ admins, countries, refunded = "" }
           onValueChange={(v) => updateParams({ destination: v })}
           placeholder="All Destinations"
           aria-label="Filter by destination"
-          className="h-9 min-h-10 w-full rounded-lg border-border-default px-3 py-2 text-base"
+          className="h-9 min-h-10 w-full rounded-lg border-border-default px-3 py-2 text-sm"
         />
       </div>
 
@@ -174,7 +174,7 @@ export default function ApplicationsFilters({ admins, countries, refunded = "" }
           onValueChange={(v) => updateParams({ nationality: v })}
           placeholder="All Nationalities"
           aria-label="Filter by nationality"
-          className="h-9 min-h-10 w-full rounded-lg border-border-default px-3 py-2 text-base"
+          className="h-9 min-h-10 w-full rounded-lg border-border-default px-3 py-2 text-sm"
         />
       </div>
 
@@ -185,7 +185,7 @@ export default function ApplicationsFilters({ admins, countries, refunded = "" }
         >
           <SelectTrigger
             className={cn(
-              "h-9 w-full rounded-lg px-3 text-base shadow-none",
+              "h-9 w-full rounded-lg px-3 text-sm shadow-none",
               (refundedParam || "all") === "all" && "text-secondary-copy"
             )}
             size="sm"

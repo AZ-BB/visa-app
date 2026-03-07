@@ -27,7 +27,6 @@ export default function AdminDetailActions({ admin }: { admin: AdminWithEmail })
       <EditAdminModal admin={admin} />
       <Button
         variant="default"
-        size="sm"
         onClick={handleDelete}
         disabled={isPending}
         className="h-9 gap-2 bg-red-600 hover:bg-red-600/80 text-white"

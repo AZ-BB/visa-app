@@ -98,57 +98,56 @@ export default async function ApplicationsPage({
   return (
     <div className="space-y-6">
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
-
-        <div className="rounded-xl border border-border-default bg-white px-5 py-3 shadow-sm">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wider text-secondary-copy">Total</p>
-            <div className="flex size-8 items-center justify-center rounded-lg bg-primary/8 text-primary">
-              <FileText className="size-4" />
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
+          <div className="flex min-w-0 flex-col rounded-xl border border-border-default bg-white px-3 py-2.5 shadow-sm sm:px-5 sm:py-3">
+            <div className="flex items-center justify-between gap-2">
+              <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-secondary-copy sm:text-xs">Total</p>
+              <div className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-primary/8 text-primary sm:size-8">
+                <FileText className="size-3.5 sm:size-4" />
+              </div>
             </div>
+            <p className="mt-0.5 truncate text-lg font-bold tabular-nums text-primary-copy sm:mt-1 sm:text-2xl">{count.data?.total ?? 0}</p>
           </div>
-          <p className="text-2xl font-bold tabular-nums text-primary-copy">{count.data?.total ?? 0}</p>
-        </div>
 
-        <div className="rounded-xl border border-border-default bg-white px-5 py-3 shadow-sm">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wider text-secondary-copy">In Progress</p>
-            <div className="flex size-8 items-center justify-center rounded-lg bg-amber-50 text-amber-500">
-              <Clock className="size-4" />
+          <div className="flex min-w-0 flex-col rounded-xl border border-border-default bg-white px-3 py-2.5 shadow-sm sm:px-5 sm:py-3">
+            <div className="flex items-center justify-between gap-2">
+              <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-secondary-copy sm:text-xs">In Progress</p>
+              <div className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-amber-500 sm:size-8">
+                <Clock className="size-3.5 sm:size-4" />
+              </div>
             </div>
+            <p className="mt-0.5 truncate text-lg font-bold tabular-nums text-primary-copy sm:mt-1 sm:text-2xl">{count.data?.in_progress ?? 0}</p>
           </div>
-          <p className="text-2xl font-bold tabular-nums text-primary-copy">{count.data?.in_progress ?? 0}</p>
-        </div>
 
-        <div className="rounded-xl border border-border-default bg-white px-5 py-3 shadow-sm">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wider text-secondary-copy">Total Paid</p>
-            <div className="flex size-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-              <DollarSign className="size-4" />
+          <div className="flex min-w-0 flex-col rounded-xl border border-border-default bg-white px-3 py-2.5 shadow-sm sm:px-5 sm:py-3">
+            <div className="flex items-center justify-between gap-2">
+              <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-secondary-copy sm:text-xs">Total Paid</p>
+              <div className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 sm:size-8">
+                <DollarSign className="size-3.5 sm:size-4" />
+              </div>
             </div>
+            <p className="mt-0.5 truncate text-lg font-bold tabular-nums text-primary-copy sm:mt-1 sm:text-2xl">${(count.data?.total_paid ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           </div>
-          <p className="text-2xl font-bold tabular-nums text-primary-copy">${(count.data?.total_paid ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-        </div>
 
-        <div className="rounded-xl border border-border-default bg-white px-5 py-3 shadow-sm">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wider text-secondary-copy">Refunded</p>
-            <div className="flex size-8 items-center justify-center rounded-lg bg-orange-50 text-orange-600">
-              <DollarSign className="size-4" />
+          <div className="flex min-w-0 flex-col rounded-xl border border-border-default bg-white px-3 py-2.5 shadow-sm sm:px-5 sm:py-3">
+            <div className="flex items-center justify-between gap-2">
+              <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-secondary-copy sm:text-xs">Refunded</p>
+              <div className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-600 sm:size-8">
+                <DollarSign className="size-3.5 sm:size-4" />
+              </div>
             </div>
+            <p className="mt-0.5 truncate text-lg font-bold tabular-nums text-primary-copy sm:mt-1 sm:text-2xl">${(count.data?.refunded_amount ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           </div>
-          <p className="text-2xl font-bold tabular-nums text-primary-copy">${(count.data?.refunded_amount ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-        </div>
 
-        <div className="rounded-xl border border-border-default bg-white px-5 py-3 shadow-sm">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wider text-secondary-copy">Revenue</p>
-            <div className="flex size-8 items-center justify-center rounded-lg bg-green-50 text-green-600">
-              <DollarSign className="size-4" />
+          <div className="flex min-w-0 flex-col rounded-xl border border-border-default bg-white px-3 py-2.5 shadow-sm sm:px-5 sm:py-3">
+            <div className="flex items-center justify-between gap-2">
+              <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-secondary-copy sm:text-xs">Revenue</p>
+              <div className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-green-50 text-green-600 sm:size-8">
+                <DollarSign className="size-3.5 sm:size-4" />
+              </div>
             </div>
+            <p className="mt-0.5 truncate text-lg font-bold tabular-nums text-primary-copy sm:mt-1 sm:text-2xl">${(count.data?.total_revenue ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           </div>
-          <p className="text-2xl font-bold tabular-nums text-primary-copy">${(count.data?.total_revenue ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-        </div>
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
@@ -207,7 +206,7 @@ export default async function ApplicationsPage({
                       currentSort={sort}
                       currentOrder={order}
                       params={tableParams}
-                      className="w-22"
+                      className="w-32 sm:w-28"
                     >
                       Status
                     </SortableTableHeader>
@@ -277,7 +276,7 @@ export default async function ApplicationsPage({
                         {(app.amount_refunded_cents ?? 0) > 0 ? `$${((app.amount_refunded_cents ?? 0) / 100).toFixed(2)}` : "—"}
                       </td>
 
-                      <td className="w-28 py-3.5 pr-2">
+                      <td className="w-32 sm:w-28 py-3.5 pr-2">
                         <ApplicationStatusBadge status={app.status} />
                       </td>
 

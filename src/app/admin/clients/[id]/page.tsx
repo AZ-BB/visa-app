@@ -182,7 +182,7 @@ export default async function ClientDetailPage({
       {/* Applications table */}
       <div className="overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border-default px-5 py-3">
-          <div className="flex items-center gap-2">
+          <div className="sm:block hidden flex items-center gap-2">
             <FileText className="size-4 text-secondary-copy" />
             <p className="text-sm font-medium text-primary-copy">Applications</p>
             <span className="rounded-full bg-bg-light-grey px-2 py-0.5 text-xs font-medium text-secondary-copy">
@@ -235,7 +235,7 @@ export default async function ClientDetailPage({
                     currentSort={sort}
                     currentOrder={order}
                     params={tableParams}
-                    className="w-22"
+                    className="w-32 sm:w-22"
                   >
                     Status
                   </SortableTableHeader>

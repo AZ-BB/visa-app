@@ -165,10 +165,10 @@ export function VisaTypesTable({ visas: allVisas, countryId }: VisaTypesTablePro
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[640px] text-sm">
             <thead>
               <tr className="border-b border-border-default bg-bg-light-grey/80">
-                <th className="w-12 py-3 pl-5 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                <th className="w-12 min-w-12 py-3 pl-4 sm:pl-5 pr-3 sm:pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                   #
                 </th>
                 <SortableHeader
@@ -177,6 +177,7 @@ export function VisaTypesTable({ visas: allVisas, countryId }: VisaTypesTablePro
                   sortKey={sortKey}
                   sortOrder={sortOrder}
                   onSort={handleSort}
+                  className="min-w-[140px] py-3 pl-2 pr-3 sm:pr-2"
                 />
                 <SortableHeader
                   label="Valid for"
@@ -184,6 +185,7 @@ export function VisaTypesTable({ visas: allVisas, countryId }: VisaTypesTablePro
                   sortKey={sortKey}
                   sortOrder={sortOrder}
                   onSort={handleSort}
+                  className="min-w-[100px] py-3 pl-2 pr-3 sm:pr-2"
                 />
                 <SortableHeader
                   label="Entries / Max stay"
@@ -191,6 +193,7 @@ export function VisaTypesTable({ visas: allVisas, countryId }: VisaTypesTablePro
                   sortKey={sortKey}
                   sortOrder={sortOrder}
                   onSort={handleSort}
+                  className="min-w-[140px] py-3 pl-2 pr-3 sm:pr-2"
                 />
                 <SortableHeader
                   label="Status"
@@ -198,6 +201,7 @@ export function VisaTypesTable({ visas: allVisas, countryId }: VisaTypesTablePro
                   sortKey={sortKey}
                   sortOrder={sortOrder}
                   onSort={handleSort}
+                  className="min-w-[90px] py-3 pl-2 pr-3 sm:pr-2"
                 />
                 <SortableHeader
                   label="Countries"
@@ -205,8 +209,9 @@ export function VisaTypesTable({ visas: allVisas, countryId }: VisaTypesTablePro
                   sortKey={sortKey}
                   sortOrder={sortOrder}
                   onSort={handleSort}
+                  className="min-w-[90px] py-3 pl-2 pr-3 sm:pr-2"
                 />
-                <th className="py-3 pr-5 text-right text-xs font-semibold uppercase tracking-wider text-secondary-copy" />
+                <th className="min-w-[72px] py-3 pl-2 pr-4 sm:pr-5 text-right text-xs font-semibold uppercase tracking-wider text-secondary-copy" />
               </tr>
             </thead>
 
@@ -216,28 +221,28 @@ export function VisaTypesTable({ visas: allVisas, countryId }: VisaTypesTablePro
                   key={visa.id}
                   className="group transition-colors hover:bg-primary/[0.02]"
                 >
-                  <td className="w-12 py-3.5 pl-5 pr-2 text-xs tabular-nums text-secondary-copy">
+                  <td className="w-12 min-w-12 py-3.5 pl-4 sm:pl-5 pr-3 sm:pr-2 text-xs tabular-nums text-secondary-copy">
                     {index + 1}
                   </td>
 
-                  <td className="py-3.5 pr-2">
+                  <td className="min-w-[140px] py-3.5 pl-2 pr-3 sm:pr-2">
                     <Link
                       href={`/admin/visas/${visa.id}`}
-                      className="font-medium text-primary-copy transition-colors hover:text-primary"
+                      className="font-medium text-primary-copy transition-colors hover:text-primary block min-w-0 truncate"
                     >
                       {visa.name}
                     </Link>
                   </td>
 
-                  <td className="py-3.5 pr-2">
+                  <td className="min-w-[100px] py-3.5 pl-2 pr-3 sm:pr-2">
                     <div className="flex items-center gap-1.5 text-secondary-copy">
                       <CalendarDays className="size-3.5 shrink-0 opacity-50" />
-                      {visa.valid_for}
+                      <span className="truncate">{visa.valid_for}</span>
                     </div>
                   </td>
 
-                  <td className="py-3.5 pr-2">
-                    <div className="flex items-center gap-3 text-secondary-copy">
+                  <td className="min-w-[140px] py-3.5 pl-2 pr-3 sm:pr-2">
+                    <div className="flex items-center gap-3 text-secondary-copy whitespace-nowrap">
                       <span className="inline-flex items-center gap-1.5">
                         <DoorOpen className="size-3.5 shrink-0 opacity-50" />
                         {visa.number_of_entries === -1
@@ -252,7 +257,7 @@ export function VisaTypesTable({ visas: allVisas, countryId }: VisaTypesTablePro
                     </div>
                   </td>
 
-                  <td className="py-3.5 pr-2">
+                  <td className="min-w-[90px] py-3.5 pl-2 pr-3 sm:pr-2">
                     <VisaStatusToggle
                       visaId={visa.id}
                       visaName={visa.name}
@@ -260,7 +265,7 @@ export function VisaTypesTable({ visas: allVisas, countryId }: VisaTypesTablePro
                     />
                   </td>
 
-                  <td className="py-3.5 pr-2">
+                  <td className="min-w-[90px] py-3.5 pl-2 pr-3 sm:pr-2">
                     <span className="inline-flex items-center gap-1.5 text-sm font-medium tabular-nums text-primary-copy">
                       <Users className="size-3.5 text-secondary-copy/60" />
                       {statsLoaded ? (
@@ -271,7 +276,7 @@ export function VisaTypesTable({ visas: allVisas, countryId }: VisaTypesTablePro
                     </span>
                   </td>
 
-                  <td className="py-3.5 pr-5 text-right">
+                  <td className="min-w-[72px] py-3.5 pl-2 pr-4 sm:pr-5 text-right">
                     <CountryVisasActions visa={visa} />
                   </td>
                 </tr>
@@ -291,6 +296,7 @@ function SortableHeader({
   sortOrder,
   onSort,
   align = "left",
+  className,
 }: {
   label: string
   column: SortKey
@@ -298,12 +304,13 @@ function SortableHeader({
   sortOrder: SortOrder
   onSort: (key: SortKey) => void
   align?: "left" | "right"
+  className?: string
 }) {
   const isActive = sortKey === column
 
   return (
     <th
-      className={`py-3 ${align === "right" ? "pr-5 text-right" : "pr-2 text-left"} text-xs font-semibold uppercase tracking-wider text-secondary-copy`}
+      className={`py-3 text-xs font-semibold uppercase tracking-wider text-secondary-copy ${align === "right" ? "text-right" : "text-left"} ${className ?? ""}`}
     >
       <button
         type="button"
