@@ -11,21 +11,39 @@ import {
 const faqs = [
     {
         id: 1,
-        question: "{question}",
+        question: "How do I know if I need a visa for my trip?",
         answer:
-            "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.",
+            "Select your country of origin and your destination on our homepage. We'll instantly check the visa requirements for your trip. If a visa is needed, we'll guide you through the application process step by step.",
     },
     {
         id: 2,
-        question: "{question}",
+        question: "How long does the visa application process take?",
         answer:
-            "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.",
+            "Processing times vary by destination and visa type. Most e-Visas (e.g. ESTA, ETA) are processed within 24–72 hours. We offer different turnaround options so you can choose the speed that suits your travel plans.",
     },
     {
         id: 3,
-        question: "{question}",
+        question: "What documents do I need to apply?",
         answer:
-            "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.",
+            "Requirements depend on your destination. Typically you'll need a valid passport, travel details, and personal information. We'll tell you exactly what's required for your specific visa before you start your application.",
+    },
+    {
+        id: 4,
+        question: "Can I apply for multiple travellers at once?",
+        answer:
+            "Yes. When a visa is required, you can add all travellers in your group to a single application. We'll collect the necessary details for each person and process them together for your convenience.",
+    },
+    {
+        id: 5,
+        question: "What if my application is rejected?",
+        answer:
+            "We have a 99% approval rate. If an application is unsuccessful, we'll explain the reason and advise on next steps. In most cases, reapplying with corrected information resolves the issue.",
+    },
+    {
+        id: 6,
+        question: "Is my payment secure?",
+        answer:
+            "Absolutely. We use secure payment processing and never store your card details. You'll see a clear breakdown of our service fee and any government fees before you pay.",
     },
 ];
 
@@ -64,7 +82,7 @@ export function QA() {
 
             <div className="flex flex-col md:flex-row gap-4 w-full">
                 <Accordion type="single" collapsible className="w-full md:w-1/2 flex flex-col gap-4">
-                    {faqs.map((faq, index) => (
+                    {faqs.slice(0, 3).map((faq, index) => (
                         <AccordionItem key={faq.id} value={`item-left-${index}`}>
                             <AccordionTrigger className="text-base sm:text-lg md:text-xl cursor-pointer">{faq.question}</AccordionTrigger>
                             <AccordionContent className="text-sm sm:text-base text-secondary-copy">{faq.answer}</AccordionContent>
@@ -72,7 +90,7 @@ export function QA() {
                     ))}
                 </Accordion>
                 <Accordion type="single" collapsible className="w-full md:w-1/2 flex flex-col gap-4">
-                    {faqs.map((faq, index) => (
+                    {faqs.slice(3, 6).map((faq, index) => (
                         <AccordionItem key={faq.id} value={`item-right-${index}`}>
                             <AccordionTrigger className="text-base sm:text-lg md:text-xl cursor-pointer">{faq.question}</AccordionTrigger>
                             <AccordionContent className="text-sm sm:text-base text-secondary-copy">{faq.answer}</AccordionContent>

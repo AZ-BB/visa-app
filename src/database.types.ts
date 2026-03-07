@@ -47,8 +47,48 @@ export type Database = {
         }
         Relationships: []
       }
+      application_activity_log: {
+        Row: {
+          action_type: Database["public"]["Enums"]["activity_action_type"]
+          actor_id: string | null
+          actor_type: Database["public"]["Enums"]["activity_actor_type"]
+          application_id: string
+          content: Json
+          created_at: string
+          id: string
+        }
+        Insert: {
+          action_type: Database["public"]["Enums"]["activity_action_type"]
+          actor_id?: string | null
+          actor_type: Database["public"]["Enums"]["activity_actor_type"]
+          application_id: string
+          content?: Json
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          action_type?: Database["public"]["Enums"]["activity_action_type"]
+          actor_id?: string | null
+          actor_type?: Database["public"]["Enums"]["activity_actor_type"]
+          application_id?: string
+          content?: Json
+          created_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "application_activity_log_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       applications: {
         Row: {
+          amount_paid_cents: number | null
+          amount_refunded_cents: number
           arrival_date: string
           assigned_to: string | null
           contact_email: string
@@ -56,9 +96,12 @@ export type Database = {
           destination_country_id: string
           gov_fee: number
           id: string
+          is_paid: boolean
           processing_fee: number
           profile_id: string
           status: Database["public"]["Enums"]["application_status"]
+          stripe_checkout_session_id: string | null
+          stripe_payment_intent_id: string | null
           total_fee: number
           turnaround_fee: number
           turnaround_time_id: number
@@ -66,6 +109,8 @@ export type Database = {
           visa_type_id: number
         }
         Insert: {
+          amount_paid_cents?: number | null
+          amount_refunded_cents?: number
           arrival_date: string
           assigned_to?: string | null
           contact_email: string
@@ -73,9 +118,12 @@ export type Database = {
           destination_country_id: string
           gov_fee?: number
           id?: string
+          is_paid?: boolean
           processing_fee?: number
           profile_id: string
           status: Database["public"]["Enums"]["application_status"]
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
           total_fee?: number
           turnaround_fee?: number
           turnaround_time_id: number
@@ -83,6 +131,8 @@ export type Database = {
           visa_type_id: number
         }
         Update: {
+          amount_paid_cents?: number | null
+          amount_refunded_cents?: number
           arrival_date?: string
           assigned_to?: string | null
           contact_email?: string
@@ -90,9 +140,12 @@ export type Database = {
           destination_country_id?: string
           gov_fee?: number
           id?: string
+          is_paid?: boolean
           processing_fee?: number
           profile_id?: string
           status?: Database["public"]["Enums"]["application_status"]
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
           total_fee?: number
           turnaround_fee?: number
           turnaround_time_id?: number
@@ -511,55 +564,33 @@ export type Database = {
         }[]
       }
       is_admin: { Args: never; Returns: boolean }
-      list_applications_admin:
-        | {
-            Args: {
-              p_assigned_to_id?: string
-              p_destination_id?: string
-              p_limit?: number
-              p_nationality_id?: string
-              p_order?: string
-              p_page?: number
-              p_search?: string
-              p_sort?: string
-              p_status?: string
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_assigned_to_id?: string
-              p_destination_id?: string
-              p_filter_unassigned?: boolean
-              p_limit?: number
-              p_nationality_id?: string
-              p_order?: string
-              p_page?: number
-              p_search?: string
-              p_sort?: string
-              p_status?: string
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_assigned_to_id?: string
-              p_destination_id?: string
-              p_filter_unassigned?: boolean
-              p_limit?: number
-              p_nationality_id?: string
-              p_order?: string
-              p_page?: number
-              p_profile_id?: string
-              p_search?: string
-              p_sort?: string
-              p_status?: string
-            }
-            Returns: Json
-          }
+      list_applications_admin: {
+        Args: {
+          p_assigned_to_id?: string
+          p_destination_id?: string
+          p_filter_unassigned?: boolean
+          p_limit?: number
+          p_nationality_id?: string
+          p_order?: string
+          p_page?: number
+          p_profile_id?: string
+          p_refunded_filter?: string
+          p_search?: string
+          p_sort?: string
+          p_status?: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
-      admin_role: "ADMIN" | "SUPER_ADMIN"
+      activity_action_type:
+        | "ASSIGNED_ADMIN"
+        | "STATUS_CHANGED"
+        | "REFUNDED"
+        | "APPLICATION_EDITED"
+        | "APPLICATION_CREATED"
+      activity_actor_type: "admin" | "client"
+      admin_role: "ADMIN" | "SUPER_ADMIN" | "SUPERVISOR"
       application_status:
         | "NOT_STARTED"
         | "IN_PROGRESS"
@@ -692,7 +723,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      admin_role: ["ADMIN", "SUPER_ADMIN"],
+      activity_action_type: [
+        "ASSIGNED_ADMIN",
+        "STATUS_CHANGED",
+        "REFUNDED",
+        "APPLICATION_EDITED",
+        "APPLICATION_CREATED",
+      ],
+      activity_actor_type: ["admin", "client"],
+      admin_role: ["ADMIN", "SUPER_ADMIN", "SUPERVISOR"],
       application_status: [
         "NOT_STARTED",
         "IN_PROGRESS",

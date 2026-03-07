@@ -11,11 +11,12 @@ import {
 import { updateAdmin } from "@/actions/admins"
 import { cn } from "@/lib/utils"
 
-type AdminRole = "ADMIN" | "SUPER_ADMIN"
+type AdminRole = "ADMIN" | "SUPER_ADMIN" | "SUPERVISOR"
 
 const ROLE_OPTIONS: { value: AdminRole; label: string }[] = [
   { value: "ADMIN", label: "Admin" },
   { value: "SUPER_ADMIN", label: "Super Admin" },
+  { value: "SUPERVISOR", label: "Supervisor" },
 ]
 
 const ROLE_STYLES: Record<AdminRole, string> = {
@@ -23,6 +24,8 @@ const ROLE_STYLES: Record<AdminRole, string> = {
     "bg-primary/10 text-primary ring-primary/20",
   ADMIN:
     "bg-emerald-50 text-emerald-700 ring-emerald-200/80",
+  SUPERVISOR:
+    "bg-amber-50 text-amber-700 ring-amber-200/80",
 }
 
 export default function RoleDropdown({

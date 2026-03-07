@@ -27,14 +27,20 @@ function formatCost(value: number | null): string {
 }
 
 /** Get governmental fee: product override if set, else visaType default */
-function getGovFee(traveller: TempTraveller, visaType: { gov_fee?: number } | null): number {
+function getGovFee(
+  traveller: TempTraveller,
+  visaType: { gov_fee?: number } | null,
+): number {
   const override = traveller.product?.gov_fee_override;
   if (override != null) return override;
   return visaType?.gov_fee ?? 0;
 }
 
 /** Get processing fee: product override if set, else visaType default */
-function getProcessingFee(traveller: TempTraveller, visaType: { processing_fee?: number } | null): number {
+function getProcessingFee(
+  traveller: TempTraveller,
+  visaType: { processing_fee?: number } | null,
+): number {
   const override = traveller.product?.processing_fee_override;
   if (override != null) return override;
   return visaType?.processing_fee ?? 0;
@@ -53,9 +59,10 @@ export function Step5Checkout({
   visaName,
   isAuthenticated,
   onBack,
-  onContinueToPayment
+  onContinueToPayment,
 }: Step5CheckoutProps) {
-  const { order, turnaroundTimes, visaType, handleCheckoutApplication } = useApplicationOrder();
+  const { order, turnaroundTimes, visaType, handleCheckoutApplication } =
+    useApplicationOrder();
   const { travellers, turnaround_time_id, destination_country } = order;
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -77,25 +84,43 @@ export function Step5Checkout({
     }
   }, [isAuthenticated, order.contact_email]);
 
-  const selectedTurnaround = turnaroundTimes.find((tt) => tt.id === turnaround_time_id);
-  const turnaroundHours = (selectedTurnaround as { turnaround_time_hours?: number } | undefined)?.turnaround_time_hours ?? 24;
+  const selectedTurnaround = turnaroundTimes.find(
+    (tt) => tt.id === turnaround_time_id,
+  );
+  const turnaroundHours =
+    (selectedTurnaround as { turnaround_time_hours?: number } | undefined)
+      ?.turnaround_time_hours ?? 24;
 
   // Fee breakdown: per-traveller gov + processing, plus turnaround fee
   const visaTypeWithFees = visaType as Tables<"visa_types"> | null;
-  const travellerFees = useMemo(() => travellers.map((t) => ({
-    govFee: getGovFee(t, visaTypeWithFees),
-    processingFee: getProcessingFee(t, visaTypeWithFees),
-    subtotal: getGovFee(t, visaTypeWithFees) + getProcessingFee(t, visaTypeWithFees),
-  })), [travellers, visaTypeWithFees]);
+  const travellerFees = useMemo(
+    () =>
+      travellers.map((t) => ({
+        govFee: getGovFee(t, visaTypeWithFees),
+        processingFee: getProcessingFee(t, visaTypeWithFees),
+        subtotal:
+          getGovFee(t, visaTypeWithFees) +
+          getProcessingFee(t, visaTypeWithFees),
+      })),
+    [travellers, visaTypeWithFees],
+  );
 
-  const turnaroundFee = (selectedTurnaround as { fee?: number } | undefined)?.fee ?? 0;
-  const travellersSubtotal = travellerFees.reduce((sum, f) => sum + f.subtotal, 0);
+  const turnaroundFee =
+    (selectedTurnaround as { fee?: number } | undefined)?.fee ?? 0;
+  const travellersSubtotal = travellerFees.reduce(
+    (sum, f) => sum + f.subtotal,
+    0,
+  );
   const totalAmount = travellersSubtotal + turnaroundFee;
 
   const readyByDate = (() => {
     const ready = new Date();
     ready.setTime(ready.getTime() + turnaroundHours * 60 * 60 * 1000);
-    return ready.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+    return ready.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
   })();
   const redirectUrl = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
 
@@ -106,14 +131,32 @@ export function Step5Checkout({
     }
     setCheckoutError(null);
     setIsSubmitting(true);
+
     const result = await handleCheckoutApplication();
     setIsSubmitting(false);
+
     if (result.status && result.data) {
-      localStorage.removeItem('visa-application-order');
+      localStorage.removeItem("visa-application-order");
+      const applicationId = result.data;
+      const res = await fetch("/api/stripe/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ applicationId }),
+      });
+
+      const data = (await res.json()) as { url?: string; error?: string };
+      setIsSubmitting(false);
+
+      if (!res.ok || !data.url) {
+        setCheckoutError(data.error ?? "Failed to create checkout session");
+        return;
+      }
+
       onContinueToPayment?.();
-      router.push(`/applications/${result.data}`);
+      window.location.href = data.url;
     } else {
       setCheckoutError(result.error ?? "Failed to create application");
+      return;
     }
   };
 
@@ -121,17 +164,16 @@ export function Step5Checkout({
 
   return (
     <div className="max-w-2xl mx-auto space-y-5 min-h-screen">
-      <h2 className="text-2xl font-bold text-primary-copy">
-        Checkout
-      </h2>
+      <h2 className="text-2xl font-bold text-primary-copy">Checkout</h2>
 
       {/* Application readiness */}
       <TipCard>
         <p className="text-base">
-          Your application will be ready by the{" "}
-          <strong>{readyByDate}</strong>{" "}
-          <span className="text-secondary-copy">(in {turnaroundHours} hours)</span>. We&apos;ll make sure to
-          contact you and let you know.
+          Your application will be ready by the <strong>{readyByDate}</strong>{" "}
+          <span className="text-secondary-copy">
+            (in {turnaroundHours} hours)
+          </span>
+          . We&apos;ll make sure to contact you and let you know.
         </p>
       </TipCard>
 
@@ -143,7 +185,8 @@ export function Step5Checkout({
               {countryName} {visaName}
             </h3>
             <span className="rounded-full text-primary bg-primary/5 px-3 py-1 text-base font-semibold">
-              {turnaroundTimes.find((tt) => tt.id === turnaround_time_id)?.name ?? "—"}
+              {turnaroundTimes.find((tt) => tt.id === turnaround_time_id)
+                ?.name ?? "—"}
             </span>
           </div>
 
@@ -152,15 +195,21 @@ export function Step5Checkout({
           <dl className="space-y-2 text-primary-copy">
             <div className="flex justify-between gap-4">
               <dt className="text-secondary-copy">Valid for</dt>
-              <dd className="font-semibold">{formatValidFor(visaType?.valid_for)} after issue</dd>
+              <dd className="font-semibold">
+                {formatValidFor(visaType?.valid_for)} after issue
+              </dd>
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-secondary-copy">Number of entries</dt>
-              <dd className="font-semibold">{visaType?.number_of_entries ?? "—"} entries</dd>
+              <dd className="font-semibold">
+                {visaType?.number_of_entries ?? "—"} entries
+              </dd>
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-secondary-copy">Max stay</dt>
-              <dd className="font-semibold">{visaType?.max_stay ?? "—"} days per entry</dd>
+              <dd className="font-semibold">
+                {visaType?.max_stay ?? "—"} days per entry
+              </dd>
             </div>
           </dl>
         </section>
@@ -182,17 +231,26 @@ export function Step5Checkout({
                       Traveller #{i + 1}
                     </div>
                     <div className="font-semibold">
-                      {[t.first_name, t.last_name].filter(Boolean).join(" ") || "—"}
+                      {[t.first_name, t.last_name].filter(Boolean).join(" ") ||
+                        "—"}
                     </div>
                   </div>
                   <div className="space-y-2 mt-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-secondary-copy">Governmental Fee</span>
-                      <span className="font-semibold">{formatCost(fees?.govFee ?? 0)}</span>
+                      <span className="text-secondary-copy">
+                        Governmental Fee
+                      </span>
+                      <span className="font-semibold">
+                        {formatCost(fees?.govFee ?? 0)}
+                      </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-secondary-copy">Processing Fee</span>
-                      <span className="font-semibold">{formatCost(fees?.processingFee ?? 0)}</span>
+                      <span className="text-secondary-copy">
+                        Processing Fee
+                      </span>
+                      <span className="font-semibold">
+                        {formatCost(fees?.processingFee ?? 0)}
+                      </span>
                     </div>
                   </div>
                   {i < travellers.length - 1 && <Separator className="my-4" />}
@@ -223,7 +281,9 @@ export function Step5Checkout({
                   Including taxes & fees
                 </p>
               </div>
-              <span className="text-xl font-bold text-primary-copy">{formatCost(totalAmount)}</span>
+              <span className="text-xl font-bold text-primary-copy">
+                {formatCost(totalAmount)}
+              </span>
             </div>
           </div>
         </section>
@@ -232,7 +292,10 @@ export function Step5Checkout({
 
         {/* Privacy link */}
         <p className="text-base text-primary-copy flex items-center gap-2">
-          <InfoIcon className="inline-block size-5 fill-primary" aria-hidden />
+          <InfoIcon
+            className="inline-block size-5 fill-primary"
+            aria-hidden
+          />
           <Link
             href="/terms"
             className="font-semibold underline underline-offset-2 hover:text-primary"
@@ -244,13 +307,41 @@ export function Step5Checkout({
       </div>
 
       {/* Navigation */}
-      <StepActionButtons
-        onBack={onBack}
-        primaryLabel="Continue to payment"
-        primaryOnClick={onContinueToPayment ? handleContinueClick : undefined}
-        primaryLoading={isSubmitting}
-        errorMessage={checkoutError}
-      />
+      <div className="flex items-center justify-between">
+        {onBack ? (
+          <button
+            type="button"
+            onClick={onBack}
+            className={cn(
+              "inline-flex items-center gap-2 text-primary font-semibold",
+              "hover:text-primary-dark transition-colors",
+            )}
+          >
+            <ArrowLeft
+              className="size-5"
+              aria-hidden
+            />
+            Previous step
+          </button>
+        ) : (
+          <span />
+        )}
+        {onContinueToPayment && (
+          <div className="flex flex-col items-end gap-2">
+            {checkoutError && (
+              <p className="text-sm text-red-600">{checkoutError}</p>
+            )}
+            <ArrowButton
+              variant="default"
+              className="text-base"
+              onClick={handleContinueClick}
+              isLoading={isSubmitting}
+            >
+              Continue to payment
+            </ArrowButton>
+          </div>
+        )}
+      </div>
 
       {!isAuthenticated && (
         <CheckoutAuthModal

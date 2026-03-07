@@ -28,6 +28,7 @@ export default async function ApplicationsPage({
     assigned_to_id?: string
     destination?: string
     nationality?: string
+    refunded?: string
     sort?: string
     order?: string
   }>
@@ -47,6 +48,7 @@ export default async function ApplicationsPage({
     ? (params.sort as "arrival_date" | "created_at" | "updated_at" | "status" | "client_name" | "total_fee")
     : "created_at"
   const order = params.order === "asc" ? "asc" : "desc"
+  const refundedFilter = params.refunded === "refunded_only" ? "refunded_only" as const : "all" as const
 
   const [res, adminsRes, countriesRes, countRes] = await Promise.all([
     getApplications(page, pageSize, {
@@ -55,6 +57,7 @@ export default async function ApplicationsPage({
       assigned_to_id: assignedToId,
       destination,
       nationality,
+      refunded_filter: refundedFilter,
       sort,
       order,
     }),
@@ -88,12 +91,13 @@ export default async function ApplicationsPage({
     assigned_to_id: params.assigned_to_id,
     destination: params.destination,
     nationality: params.nationality,
+    refunded: params.refunded,
   }
 
   return (
     <div className="space-y-6">
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
 
         <div className="rounded-xl border border-border-default bg-white px-5 py-3 shadow-sm">
           <div className="flex items-center justify-between">
@@ -117,28 +121,38 @@ export default async function ApplicationsPage({
 
         <div className="rounded-xl border border-border-default bg-white px-5 py-3 shadow-sm">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wider text-secondary-copy">Completed</p>
-            <div className="flex size-8 items-center justify-center rounded-lg bg-green-50 text-green-500">
-              <CheckCircle2 className="size-4" />
+            <p className="text-xs font-semibold uppercase tracking-wider text-secondary-copy">Total Paid</p>
+            <div className="flex size-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+              <DollarSign className="size-4" />
             </div>
           </div>
-          <p className="text-2xl font-bold tabular-nums text-primary-copy">{count.data?.completed ?? 0}</p>
+          <p className="text-2xl font-bold tabular-nums text-primary-copy">${(count.data?.total_paid ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
         </div>
 
         <div className="rounded-xl border border-border-default bg-white px-5 py-3 shadow-sm">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wider text-secondary-copy">Total Revenue</p>
-            <div className="flex size-8 items-center justify-center rounded-lg bg-primary/8 text-primary">
+            <p className="text-xs font-semibold uppercase tracking-wider text-secondary-copy">Refunded</p>
+            <div className="flex size-8 items-center justify-center rounded-lg bg-orange-50 text-orange-600">
               <DollarSign className="size-4" />
             </div>
           </div>
-          <p className="text-2xl font-bold tabular-nums text-primary-copy">${(count.data?.total_fee ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+          <p className="text-2xl font-bold tabular-nums text-primary-copy">${(count.data?.refunded_amount ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+        </div>
+
+        <div className="rounded-xl border border-border-default bg-white px-5 py-3 shadow-sm">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold uppercase tracking-wider text-secondary-copy">Revenue</p>
+            <div className="flex size-8 items-center justify-center rounded-lg bg-green-50 text-green-600">
+              <DollarSign className="size-4" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold tabular-nums text-primary-copy">${(count.data?.total_revenue ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
         </div>
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border-default px-5 py-3">
-          <ApplicationsFilters admins={admins} countries={countries} />
+          <ApplicationsFilters admins={admins} countries={countries} refunded={params.refunded} />
         </div>
 
         {applications.length === 0 ? (
@@ -184,6 +198,9 @@ export default async function ApplicationsPage({
                     >
                       Total
                     </SortableTableHeader>
+                    <th className="w-20 py-3 pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                      Refunded
+                    </th>
                     <SortableTableHeader
                       sortKey="status"
                       currentSort={sort}
@@ -220,9 +237,7 @@ export default async function ApplicationsPage({
 
                       <td className="w-40 py-3.5 pr-2">
                         <Link href={`/admin/applications/${app.id}`} className="hover:underline group/link">
-                          <span
-                            className="block truncate text-base font-semibold text-primary-copy transition-colors group-hover/link:text-primary"
-                          >
+                          <span className="block truncate text-base font-semibold text-primary-copy transition-colors group-hover/link:text-primary">
                             {app.client_name}
                           </span>
                           <div className="mt-0.5 text-xs text-secondary-copy truncate">
@@ -235,7 +250,7 @@ export default async function ApplicationsPage({
                         <TravellersCell travellers={app.travellers} />
                       </td>
 
-                      <td className="w-48 ">
+                      <td className="w-48">
                         <Link href={`/admin/countries/${app.destination_country_id}`} className="py-3.5 pr-2 flex items-center gap-2 hover:underline">
                           <CountryFlag code={app.destination_country_id} className="size-8 rounded-md shrink-0 border border-border-default shadow-sm" loading="lazy" />
                           <div>
@@ -245,8 +260,20 @@ export default async function ApplicationsPage({
                         </Link>
                       </td>
 
-                      <td className="w-22 py-3.5 pr-5 text-base font-semibold text-primary-copy tabular-nums">
-                        ${app.total_fee.toFixed(2)}
+                      <td className="w-22 py-3.5 pr-5">
+                        <div className="text-base font-semibold text-primary-copy tabular-nums">
+                          ${app.total_fee.toFixed(2)}
+                        </div>
+                        {app.amount_paid_cents != null &&
+                          Math.abs(app.amount_paid_cents / 100 - app.total_fee) > 0.001 && (
+                            <div className="mt-0.5 text-xs text-secondary-copy tabular-nums">
+                              Paid: ${(app.amount_paid_cents / 100).toFixed(2)}
+                            </div>
+                          )}
+                      </td>
+
+                      <td className="w-20 py-3.5 pr-2 text-sm text-secondary-copy tabular-nums">
+                        {(app.amount_refunded_cents ?? 0) > 0 ? `$${((app.amount_refunded_cents ?? 0) / 100).toFixed(2)}` : "—"}
                       </td>
 
                       <td className="w-28 py-3.5 pr-2">

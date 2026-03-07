@@ -1,0 +1,2 @@
+-- Add SUPERVISOR to admin_role enum
+ALTER TYPE admin_role ADD VALUE IF NOT EXISTS 'SUPERVISOR';
