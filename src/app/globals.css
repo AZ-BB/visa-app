@@ -46,3 +46,12 @@ body.sticky-visa-bar-active #hero-visa-selector {
 button {
   cursor: pointer;
 }
+
+[data-radix-popper-content-wrapper] {
+  z-index: 100 !important;
+  pointer-events: auto !important;
+}
+
+[data-slot="select-content"] {
+  pointer-events: auto !important;
+}

@@ -83,7 +83,7 @@ export function StatusDropdown({ applicationId, status, amountRefundedCents = 0,
       <Select value={status} onValueChange={handleChange} disabled={isPending}>
         <SelectTrigger
           className={cn(
-            "!min-h-0 h-10 w-auto gap-1 border-2 px-2.5 rounded-lg text-sm font-semibold shadow-none opacity-75 focus:ring-0",
+            "!min-h-0 h-10 w-[130px] gap-1 border-2 px-2.5 rounded-lg text-sm font-semibold shadow-none opacity-75 focus:ring-0",
             config.triggerClass,
             isPending && "opacity-50 cursor-not-allowed",
             className
@@ -91,7 +91,7 @@ export function StatusDropdown({ applicationId, status, amountRefundedCents = 0,
         >
           <SelectValue />
         </SelectTrigger>
-        <SelectContent align="end">
+        <SelectContent align="end" isContentMenuFullWidth={false}>
           {Object.values(ApplicationStatus).map((s) => (
             <SelectItem key={s} value={s}>
               {statusConfig[s].label}

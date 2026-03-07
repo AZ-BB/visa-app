@@ -1,18 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useActionState } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { ChevronRightIcon } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/supabase-browser";
 import { signUp } from "@/actions/auth";
@@ -24,8 +17,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import type { ApplicationOrder } from "./ApplicationOrderContext";
-import { PHONE_DIAL_CODES } from "@/lib/phone-codes";
-import { CountryFlag } from "@/components/ui/country-flag";
+import { PhoneNumberInput } from "@/components/ui/phone-number-input";
 
 interface CheckoutAuthModalProps {
   open: boolean;
@@ -46,28 +38,10 @@ export function CheckoutAuthModal({
   const [state, formAction, isPending] = useActionState(signUp, null);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [loginIsPending, setLoginIsPending] = useState(false);
-  const [selectedExtension, setSelectedExtension] = useState(PHONE_DIAL_CODES[0]?.code || "+1");
-  const [phoneInput, setPhoneInput] = useState("");
 
   const firstName = order.travellers[0]?.first_name ?? "";
   const lastName = order.travellers[0]?.last_name ?? "";
   const contactEmail = order.contact_email ?? "";
-
-  useEffect(() => {
-    if (phoneInput.startsWith("+")) {
-      for (let i = phoneInput.length; i >= 2; i--) {
-        const prefix = phoneInput.substring(0, i);
-        const match = PHONE_DIAL_CODES.find((c) => c.code === prefix);
-        if (match) {
-          setSelectedExtension(match.code);
-          setPhoneInput(phoneInput.substring(i));
-          break;
-        }
-      }
-    }
-  }, [phoneInput]);
-
-  const selectedCountry = PHONE_DIAL_CODES.find((c) => c.code === selectedExtension);
 
   async function handleLoginSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -109,7 +83,7 @@ export function CheckoutAuthModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         {emailExists === null ? (
           <div className="flex min-h-[200px] items-center justify-center">
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
@@ -240,45 +214,10 @@ export function CheckoutAuthModal({
                 />
               </section>
               <section className="flex flex-col gap-2">
-                <Label htmlFor="checkout-phone" className="text-sm">
+                <Label htmlFor="phone" className="text-sm">
                   Phone <span className="text-secondary-copy text-base italic font-normal">(Optional)</span>
                 </Label>
-                <div className="flex gap-2">
-                  <input type="hidden" name="phoneExtension" value={selectedExtension} />
-                  <Select
-                    value={selectedExtension}
-                    onValueChange={setSelectedExtension}
-                    disabled={isPending}
-                  >
-                    <SelectTrigger className="w-[140px] shrink-0 px-4 py-3.5 text-base rounded-xl" size="sm">
-                      <SelectValue>
-                        {selectedCountry && (
-                          <>
-                            <CountryFlag code={selectedCountry.countryCode} className="w-5 h-5" />
-                            <span>{selectedCountry.code}</span>
-                          </>
-                        )}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent className="max-h-[300px]">
-                      {PHONE_DIAL_CODES.map(({ code, label, countryCode }, index) => (
-                        <SelectItem key={`${countryCode}-${index}`} value={code}>
-                          {label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    type="tel"
-                    id="checkout-phone"
-                    name="phone"
-                    value={phoneInput}
-                    onChange={(e) => setPhoneInput(e.target.value)}
-                    placeholder="Enter your phone number"
-                    disabled={isPending}
-                    className="px-4 py-3.5 text-base rounded-xl flex-1"
-                  />
-                </div>
+                <PhoneNumberInput disabled={isPending} />
               </section>
               <section className="flex flex-col gap-2">
                 <Label htmlFor="checkout-password" className="text-sm">
