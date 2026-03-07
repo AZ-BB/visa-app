@@ -50,7 +50,7 @@ export function StepActionButtons({
   const primaryButton = primaryOnClick ? (
     <ArrowButton
       variant="default"
-      className="text-lg sm:text-base w-full md:w-auto"
+      className="text-xl sm:text-base w-full md:w-auto"
       onClick={primaryOnClick}
       disabled={primaryDisabled}
       isLoading={primaryLoading}
@@ -95,7 +95,7 @@ export function StepActionButtons({
         </div>
 
         {/* Mobile: primary first, Previous as text link below */}
-        <div className="flex flex-col gap-4 md:hidden">
+        <div className="flex flex-col gap-6 md:hidden">
           <div ref={sentinelRef} className="flex flex-col gap-2">
             {errorMessage && (
               <p className="text-sm text-red-600">{errorMessage}</p>
@@ -107,11 +107,11 @@ export function StepActionButtons({
               type="button"
               onClick={onBack}
               className={cn(
-                "inline-flex items-center justify-center gap-2 text-primary font-semibold",
+                "inline-flex items-center justify-center gap-2 text-primary font-semibold text-xl",
                 "hover:text-primary-dark transition-colors"
               )}
             >
-              <ArrowLeft className="size-5" aria-hidden />
+              <ArrowLeft className="size-6" aria-hidden />
               Previous step
             </button>
           )}
@@ -124,7 +124,7 @@ export function StepActionButtons({
           <div className="flex flex-col gap-4">
             {primaryOnClick && (
               <ArrowButton
-                className="w-full"
+                className="w-full text-xl py-9!"
                 type="button"
                 onClick={primaryOnClick}
                 disabled={primaryDisabled}
@@ -138,7 +138,7 @@ export function StepActionButtons({
                 type="button"
                 onClick={onBack}
                 className={cn(
-                  "inline-flex items-center justify-center gap-2 text-primary font-semibold",
+                  "inline-flex items-center justify-center gap-2 text-primary text-lg font-semibold",
                   "hover:text-primary-dark transition-colors"
                 )}
               >
