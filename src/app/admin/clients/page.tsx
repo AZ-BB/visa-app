@@ -130,13 +130,7 @@ export default async function ClientsPage({
       <div className="overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
         {/* Toolbar */}
         <div className="border-b border-border-default px-5 py-3">
-          <ClientsSearchForm
-            key={`${params.search ?? ""}-${sortKey}-${sortDir}-${hasApplications}`}
-            defaultSearch={params.search ?? ""}
-            defaultSort={sortKey}
-            defaultSortDir={sortDir}
-            defaultHasApplications={hasApplications}
-          />
+          <ClientsSearchForm />
         </div>
 
         {clients.length === 0 ? (

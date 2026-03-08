@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { ChevronUp, ChevronDown } from "lucide-react"
+import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 type SortKey = "arrival_date" | "created_at" | "updated_at" | "status" | "client_name" | "total_fee"
@@ -45,25 +45,28 @@ export function SortableTableHeader({
   return (
     <th
       className={cn(
-        "py-3 text-xs font-semibold uppercase tracking-wider text-secondary-copy",
-        align === "right" ? "pr-5 text-right" : "pr-2 text-left",
+        "py-3 pr-2 text-left",
+        align === "right" && "pr-5 text-right",
         className
       )}
     >
       <Link
         href={href}
         className={cn(
-          "inline-flex items-center gap-1 transition-colors hover:text-primary-copy",
-          isActive && "text-primary-copy"
+          "inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider transition-colors",
+          isActive ? "text-primary-copy" : "text-secondary-copy hover:text-primary-copy"
         )}
       >
         {children}
-        {isActive &&
-          (currentOrder === "asc" ? (
-            <ChevronUp className="size-4 shrink-0" />
+        {isActive ? (
+          currentOrder === "asc" ? (
+            <ArrowUp className="size-3" />
           ) : (
-            <ChevronDown className="size-4 shrink-0" />
-          ))}
+            <ArrowDown className="size-3" />
+          )
+        ) : (
+          <ArrowUpDown className="size-3 opacity-40" />
+        )}
       </Link>
     </th>
   )

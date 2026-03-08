@@ -117,8 +117,8 @@ export default async function ClientDetailPage({
       {/* Page header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex size-14 items-center justify-center overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
-            <div className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-lg font-semibold text-primary">
+          <div className="flex size-14 items-center justify-center overflow-hidden bg-primary/10 rounded-xl border border-border-default shadow-sm">
+            <div className="flex size-12 items-center justify-center rounded-full text-lg font-semibold text-primary">
               {initials}
             </div>
           </div>
@@ -129,15 +129,6 @@ export default async function ClientDetailPage({
             <p className="mt-0.5 text-sm text-secondary-copy">{client.email}</p>
           </div>
         </div>
-
-        <Link
-          href="/admin/clients"
-          className="inline-flex h-10 items-center gap-2 rounded-lg border border-border-default bg-white px-5 text-sm font-semibold text-primary-copy shadow-sm transition-all hover:border-primary/40 hover:text-primary"
-        >
-          <FileText className="size-4" />
-          All clients
-          <ExternalLink className="size-3.5 opacity-60" />
-        </Link>
       </div>
 
       {/* Details */}
@@ -182,13 +173,6 @@ export default async function ClientDetailPage({
       {/* Applications table */}
       <div className="overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border-default px-5 py-3">
-          <div className="sm:block hidden flex items-center gap-2">
-            <FileText className="size-4 text-secondary-copy" />
-            <p className="text-sm font-medium text-primary-copy">Applications</p>
-            <span className="rounded-full bg-bg-light-grey px-2 py-0.5 text-xs font-medium text-secondary-copy">
-              {total}
-            </span>
-          </div>
           <ApplicationsFilters admins={admins} countries={countries} refunded={sp.refunded} />
         </div>
 

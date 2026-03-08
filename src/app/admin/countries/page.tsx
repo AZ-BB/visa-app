@@ -93,14 +93,10 @@ export default async function CountriesPage({
   return (
     <div className="space-y-6">
       {/* Table card */}
-      <Card className="overflow-hidden rounded-xl border-border-default bg-white shadow-sm">
+      <Card className="overflow-hidden rounded-xl border-border-default bg-white shadow-sm py-0">
         {/* Toolbar */}
-        <div className="flex flex-col gap-3 border-b border-border-default bg-white px-4 pb-5 sm:flex-row sm:items-center sm:justify-between md:px-5">
-          <CountriesSearchForm
-            key={`${search ?? ""}-${statusFilter}`}
-            defaultValue={search ?? ""}
-            defaultStatus={statusFilter}
-          />
+        <div className="border-b border-border-default px-5 py-3">
+          <CountriesSearchForm />
         </div>
 
         <CardContent className="p-0">

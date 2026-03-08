@@ -120,13 +120,7 @@ export default async function VisasPage({
       <div className="min-w-0 overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
         {/* Toolbar */}
         <div className="border-b border-border-default px-5 py-3">
-          <VisasSearchForm
-            key={`${params.search ?? ""}-${statusFilter}-${params.country ?? ""}`}
-            defaultSearch={params.search ?? ""}
-            defaultStatus={statusFilter}
-            defaultCountry={params.country ?? ""}
-            countries={allCountries}
-          />
+          <VisasSearchForm countries={allCountries} />
         </div>
 
         {/* Table */}

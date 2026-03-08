@@ -1,7 +1,7 @@
 "use client"
 
 import { usePathname, useSearchParams, useRouter } from "next/navigation"
-import { Search } from "lucide-react"
+import { Search, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import {
   Select,
@@ -11,13 +11,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Button } from "@/components/ui/button"
 import { CountryDropdown } from "@/components/ui/country-dropdown"
 import { cn } from "@/lib/utils"
 import { useCallback, useEffect, useRef, useState, useTransition } from "react"
 import { ApplicationStatus } from "@/enums"
 import { ApplicationStatusBadge } from "@/components/ApplicationStatusBadge"
 
-const DEBOUNCE_MS = 100
+const DEBOUNCE_MS = 200
 
 interface AdminOption {
   id: string
@@ -51,8 +52,13 @@ export default function ApplicationsFilters({ admins, countries, refunded = "" }
 
   const [searchValue, setSearchValue] = useState(search)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const lastPushedSearchRef = useRef<string | null>(null)
 
   useEffect(() => {
+    if (lastPushedSearchRef.current !== null && lastPushedSearchRef.current === search) {
+      lastPushedSearchRef.current = null
+      return
+    }
     setSearchValue(search)
   }, [search])
 
@@ -79,6 +85,7 @@ export default function ApplicationsFilters({ admins, countries, refunded = "" }
     debounceRef.current = setTimeout(() => {
       const trimmed = searchValue.trim()
       if (trimmed !== search) {
+        lastPushedSearchRef.current = trimmed
         updateParams({ search: trimmed })
       }
       debounceRef.current = undefined
@@ -88,8 +95,29 @@ export default function ApplicationsFilters({ admins, countries, refunded = "" }
     }
   }, [searchValue, search, updateParams])
 
+  const hasFilters =
+    search.trim() !== "" ||
+    (status && status !== "all") ||
+    (assignedTo && assignedTo !== "all") ||
+    destination !== "" ||
+    nationality !== "" ||
+    (refundedParam && refundedParam !== "all")
+
+  const handleClear = () => {
+    setSearchValue("")
+    updateParams({
+      search: "",
+      status: "",
+      assigned_to_id: "",
+      destination: "",
+      nationality: "",
+      refunded: "",
+    })
+  }
+
   return (
-    <div className="grid min-w-0 flex-1 grid-cols-2 gap-2 items-center font-medium lg:grid-cols-[50fr_30fr_30fr_30fr_30fr_30fr] lg:gap-3">
+    <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 lg:gap-3">
+      <div className="grid min-w-0 flex-1 grid-cols-2 gap-2 items-center font-medium lg:grid-cols-[50fr_30fr_30fr_30fr_30fr_30fr] lg:gap-3">
       <div className="relative min-w-0 col-span-2 lg:col-span-1">
         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
@@ -116,7 +144,7 @@ export default function ApplicationsFilters({ admins, countries, refunded = "" }
           >
             <SelectValue placeholder="All statuses" />
           </SelectTrigger>
-          <SelectContent align="start">
+          <SelectContent align="start" isContentMenuFullWidth={false}>
             <SelectGroup>
               <SelectItem className="font-medium" value="all">All Statuses</SelectItem>
               <SelectItem className="font-medium" value={ApplicationStatus.NOT_STARTED}><ApplicationStatusBadge status={ApplicationStatus.NOT_STARTED} /></SelectItem>
@@ -200,6 +228,20 @@ export default function ApplicationsFilters({ admins, countries, refunded = "" }
           </SelectContent>
         </Select>
       </div>
+      </div>
+
+      {hasFilters && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="ml-auto h-9 gap-1.5 rounded-lg px-3 text-secondary-copy hover:bg-muted/10 hover:text-primary-copy shrink-0"
+          onClick={handleClear}
+        >
+          <X className="size-3.5" />
+          Clear
+        </Button>
+      )}
     </div>
   )
 }

@@ -1,114 +1,145 @@
 "use client"
 
-import { useRouter, useSearchParams } from "next/navigation"
-import { useCallback, useState, useTransition } from "react"
-import { Search, X, Loader2 } from "lucide-react"
+import { usePathname, useSearchParams, useRouter } from "next/navigation"
+import { Search, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { cn } from "@/lib/utils"
+import { useCallback, useEffect, useRef, useState, useTransition } from "react"
+
+const DEBOUNCE_MS = 100
 
 interface CountriesSearchFormProps {
-  defaultValue?: string
-  defaultStatus?: string
   className?: string
 }
 
-export function CountriesSearchForm({
-  defaultValue = "",
-  defaultStatus = "all",
-  className,
-}: CountriesSearchFormProps) {
-  const router = useRouter()
+export function CountriesSearchForm({ className }: CountriesSearchFormProps) {
+  const pathname = usePathname()
   const searchParams = useSearchParams()
-  const [value, setValue] = useState(defaultValue)
-  const [status, setStatus] = useState(defaultStatus)
-  const [isPending, startTransition] = useTransition()
+  const router = useRouter()
+  const [, startTransition] = useTransition()
 
-  const navigate = useCallback(
-    (searchVal: string, statusVal: string) => {
-      const params = new URLSearchParams()
-      if (searchVal.trim()) {
-        params.set("search", searchVal.trim())
-      }
-      if (statusVal && statusVal !== "all") {
-        params.set("status", statusVal)
-      }
-      const pageSize = searchParams.get("pageSize")
-      if (pageSize) {
-        params.set("pageSize", pageSize)
-      }
-      const queryString = params.toString()
+  const search = searchParams.get("search") ?? ""
+  const status = searchParams.get("status") ?? ""
+
+  const [searchValue, setSearchValue] = useState(search)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const lastPushedSearchRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (lastPushedSearchRef.current !== null && lastPushedSearchRef.current === search) {
+      lastPushedSearchRef.current = null
+      return
+    }
+    setSearchValue(search)
+  }, [search])
+
+  const updateParams = useCallback(
+    (updates: Record<string, string>) => {
       startTransition(() => {
-        router.push(queryString ? `/admin/countries?${queryString}` : "/admin/countries")
+        const params = new URLSearchParams(searchParams.toString())
+        Object.entries(updates).forEach(([key, value]) => {
+          if (value) {
+            params.set(key, value)
+          } else {
+            params.delete(key)
+          }
+        })
+        params.set("page", "1")
+        router.push(`${pathname}?${params.toString()}`)
       })
     },
-    [router, searchParams]
+    [pathname, router, searchParams]
   )
 
-  const handleStatusChange = (newStatus: string) => {
-    setStatus(newStatus)
-    navigate(value, newStatus)
-  }
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      const trimmed = searchValue.trim()
+      if (trimmed !== search) {
+        lastPushedSearchRef.current = trimmed
+        updateParams({ search: trimmed })
+      }
+      debounceRef.current = undefined
+    }, DEBOUNCE_MS)
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
+  }, [searchValue, search, updateParams])
 
   const handleClear = () => {
-    setValue("")
-    setStatus("all")
-    navigate("", "all")
+    setSearchValue("")
+    updateParams({ search: "", status: "" })
   }
 
-  const hasFilters = value.trim() !== "" || status !== "all"
+  const hasFilters = search.trim() !== "" || (status && status !== "all")
 
   return (
-    <form
-      className={cn("flex flex-col gap-3 sm:flex-row sm:items-center", className)}
-      onSubmit={(e) => {
-        e.preventDefault()
-        navigate(value, status)
-      }}
+    <div
+      className={cn(
+        "grid w-full min-w-0 grid-cols-1 gap-2 items-center font-medium sm:w-fit sm:grid-cols-2 lg:gap-3",
+        hasFilters ? "sm:grid-cols-2 lg:grid-cols-[auto_auto_auto]" : "sm:grid-cols-[auto_auto]",
+        className
+      )}
     >
-      <div className="relative flex-1 sm:max-w-xs">
-        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-secondary-copy" />
+      <div className="relative min-w-0 w-full sm:w-96">
+        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           type="search"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
           placeholder="Search countries..."
           aria-label="Search countries"
-          className="h-9 rounded-lg border-border-default bg-white pl-9 text-sm shadow-none transition focus-visible:border-primary focus-visible:ring-primary/20"
+          className="h-10 w-full pl-9 rounded-lg"
         />
       </div>
 
-      <select
-        value={status}
-        onChange={(e) => handleStatusChange(e.target.value)}
-        aria-label="Filter by status"
-        className="h-9 rounded-lg border border-border-default bg-white px-3 text-sm text-primary-copy focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-      >
-        <option value="all">All statuses</option>
-        <option value="active">Active only</option>
-        <option value="disabled">Disabled only</option>
-      </select>
-
-      <Button
-        type="submit"
-        size="sm"
-        className="h-9 rounded-lg bg-primary px-4 text-white shadow-none transition hover:bg-primary/90"
-      >
-        {isPending ? <Loader2 className="size-4 animate-spin" /> : "Search"}
-      </Button>
+      <div className="min-w-[180px]">
+        <Select
+          value={status || "all"}
+          onValueChange={(v) => updateParams({ status: v === "all" ? "" : v })}
+        >
+          <SelectTrigger
+            className={cn(
+              "h-9 w-full rounded-lg px-3 text-sm shadow-none",
+              (status || "all") === "all" && "text-secondary-copy"
+            )}
+            size="sm"
+          >
+            <SelectValue placeholder="All statuses" />
+          </SelectTrigger>
+          <SelectContent align="start" isContentMenuFullWidth={false}>
+            <SelectGroup>
+              <SelectItem className="font-medium" value="all">All statuses</SelectItem>
+              <SelectItem className="font-medium" value="active">Active only</SelectItem>
+              <SelectItem className="font-medium" value="disabled">Disabled only</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
 
       {hasFilters && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-9 gap-1.5 rounded-lg px-3 text-secondary-copy hover:bg-muted/10 hover:text-primary-copy"
-          onClick={handleClear}
-        >
-          <X className="size-3.5" />
-          Clear
-        </Button>
+        <div className="min-w-0 lg:justify-self-end">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-9 gap-1.5 rounded-lg px-3 text-secondary-copy hover:bg-muted/10 hover:text-primary-copy"
+            onClick={handleClear}
+          >
+            <X className="size-3.5" />
+            Clear
+          </Button>
+        </div>
       )}
-    </form>
+    </div>
   )
 }
