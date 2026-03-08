@@ -40,12 +40,16 @@ export async function fetchVisas({
     search = "",
     status = "all",
     country = "",
+    sort = "name",
+    order = "asc",
 }: {
     page?: number;
     pageSize?: number;
     search?: string;
     status?: "all" | "active" | "disabled";
     country?: string;
+    sort?: "name" | "created_at" | "updated_at" | "status";
+    order?: "asc" | "desc";
 } = {}): Promise<GeneralResponse<VisaTypesPageData>> {
     const supabase = await createSupabaseServerClient();
     const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
@@ -54,11 +58,17 @@ export async function fetchVisas({
     const from = (safePage - 1) * safePageSize;
     const to = from + safePageSize - 1;
 
+    const sortOrder = order === "asc" ? true : false;
+
+    const validSorts = ['created_at', 'updated_at', 'name', 'status'] as const;
+    const rawSort = sort && validSorts.includes(sort) ? sort : 'name';
+    const dbSortColumn = rawSort === 'status' ? 'is_disabled' : rawSort;
+
     let query = supabase
         .from("visa_types")
         .select("*, destination_country_data:countries!destination_country(*)", { count: "exact" })
         .is("deleted_at", null)
-        .order("name", { ascending: true });
+        .order(dbSortColumn, { ascending: sortOrder });
 
     if (search.trim()) {
         query = query.ilike("name", `%${search.trim()}%`);
@@ -316,7 +326,7 @@ export default async function isVisaAvailable(destinationCountry: string, nation
             }
         }
 
-        if(!visaRuleData.is_visa_required) {
+        if (!visaRuleData.is_visa_required) {
             return {
                 data: null,
                 status: false,
