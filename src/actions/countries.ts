@@ -37,11 +37,19 @@ export async function fetchCountries({
   const from = (safePage - 1) * safePageSize
   const to = from + safePageSize - 1
 
+  const searchFilter =
+    search.trim() === ""
+      ? undefined
+      : `name.ilike.%${search}%,id.ilike.%${search}%`
+
   let query = supabase
     .from("countries")
     .select("*", { count: "exact" })
     .order("name", { ascending: true })
-    .ilike("name", `%${search}%`)
+
+  if (searchFilter) {
+    query = query.or(searchFilter)
+  }
 
   if (status === "active") {
     query = query.eq("is_disabled", false)

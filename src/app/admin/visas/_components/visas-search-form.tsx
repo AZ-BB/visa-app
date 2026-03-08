@@ -1,238 +1,159 @@
 "use client"
 
-import { useRouter, useSearchParams } from "next/navigation"
-import { useCallback, useMemo, useState, useTransition } from "react"
-import { Search, X, Loader2, ChevronsUpDown, Check } from "lucide-react"
+import { usePathname, useSearchParams, useRouter } from "next/navigation"
+import { Search, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import { CountryFlag } from "@/components/ui/country-flag"
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { CountryDropdown } from "@/components/ui/country-dropdown"
 import { cn } from "@/lib/utils"
+import { useCallback, useEffect, useRef, useState, useTransition } from "react"
+
+const DEBOUNCE_MS = 100
 
 interface VisasSearchFormProps {
-  defaultSearch?: string
-  defaultStatus?: string
-  defaultCountry?: string
   countries: { id: string; name: string }[]
   className?: string
 }
 
-export function VisasSearchForm({
-  defaultSearch = "",
-  defaultStatus = "all",
-  defaultCountry = "",
-  countries,
-  className,
-}: VisasSearchFormProps) {
-  const router = useRouter()
+export function VisasSearchForm({ countries, className }: VisasSearchFormProps) {
+  const pathname = usePathname()
   const searchParams = useSearchParams()
-  const [search, setSearch] = useState(defaultSearch)
-  const [status, setStatus] = useState(defaultStatus)
-  const [country, setCountry] = useState(defaultCountry)
-  const [isPending, startTransition] = useTransition()
-  const [countryOpen, setCountryOpen] = useState(false)
-  const [countrySearch, setCountrySearch] = useState("")
+  const router = useRouter()
+  const [, startTransition] = useTransition()
 
-  const selectedCountry = countries.find((c) => c.id === country)
+  const search = searchParams.get("search") ?? ""
+  const status = searchParams.get("status") ?? ""
+  const country = searchParams.get("country") ?? ""
 
-  const filteredCountries = useMemo(() => {
-    const q = countrySearch.toLowerCase().trim()
-    if (!q) return countries
-    return countries.filter(
-      (c) =>
-        c.name.toLowerCase().includes(q) ||
-        c.id.toLowerCase().includes(q)
-    )
-  }, [countrySearch, countries])
+  const [searchValue, setSearchValue] = useState(search)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const lastPushedSearchRef = useRef<string | null>(null)
 
-  const navigate = useCallback(
-    (searchVal: string, statusVal: string, countryVal: string) => {
-      const params = new URLSearchParams()
-      if (searchVal.trim()) params.set("search", searchVal.trim())
-      if (statusVal && statusVal !== "all") params.set("status", statusVal)
-      if (countryVal) params.set("country", countryVal)
-      const pageSize = searchParams.get("pageSize")
-      if (pageSize) params.set("pageSize", pageSize)
-      const qs = params.toString()
+  useEffect(() => {
+    if (lastPushedSearchRef.current !== null && lastPushedSearchRef.current === search) {
+      lastPushedSearchRef.current = null
+      return
+    }
+    setSearchValue(search)
+  }, [search])
+
+  const updateParams = useCallback(
+    (updates: Record<string, string>) => {
       startTransition(() => {
-        router.push(qs ? `/admin/visas?${qs}` : "/admin/visas")
+        const params = new URLSearchParams(searchParams.toString())
+        Object.entries(updates).forEach(([key, value]) => {
+          if (value) {
+            params.set(key, value)
+          } else {
+            params.delete(key)
+          }
+        })
+        params.set("page", "1")
+        router.push(`${pathname}?${params.toString()}`)
       })
     },
-    [router, searchParams]
+    [pathname, router, searchParams]
   )
 
-  const handleStatusChange = (val: string) => {
-    setStatus(val)
-    navigate(search, val, country)
-  }
-
-  const handleCountrySelect = (val: string) => {
-    const next = val === country ? "" : val
-    setCountry(next)
-    setCountryOpen(false)
-    setCountrySearch("")
-    navigate(search, status, next)
-  }
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      const trimmed = searchValue.trim()
+      if (trimmed !== search) {
+        lastPushedSearchRef.current = trimmed
+        updateParams({ search: trimmed })
+      }
+      debounceRef.current = undefined
+    }, DEBOUNCE_MS)
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
+  }, [searchValue, search, updateParams])
 
   const handleClear = () => {
-    setSearch("")
-    setStatus("all")
-    setCountry("")
-    setCountrySearch("")
-    navigate("", "all", "")
+    setSearchValue("")
+    updateParams({ search: "", status: "", country: "" })
   }
 
-  const hasFilters = search.trim() !== "" || status !== "all" || country !== ""
+  const hasFilters = search.trim() !== "" || (status && status !== "all") || country !== ""
 
   return (
-    <form
-      className={cn("flex flex-col gap-3 sm:flex-row sm:items-center", className)}
-      onSubmit={(e) => {
-        e.preventDefault()
-        navigate(search, status, country)
-      }}
+    <div
+      className={cn(
+        "grid w-full min-w-0 grid-cols-1 gap-2 items-center font-medium sm:w-fit sm:grid-cols-2 lg:gap-3",
+        hasFilters ? "lg:grid-cols-[auto_auto_auto_auto]" : "lg:grid-cols-[auto_auto_auto]",
+        className
+      )}
     >
-      <div className="relative flex-1 sm:max-w-xs">
-        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-secondary-copy" />
+      <div className="relative min-w-0 w-full sm:w-96">
+        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           type="search"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
           placeholder="Search visa name..."
           aria-label="Search visas"
-          className="h-9 rounded-lg border-border-default bg-white pl-9 text-sm shadow-none transition focus-visible:border-primary focus-visible:ring-primary/20"
+          className="h-10 w-full pl-9 rounded-lg"
         />
       </div>
 
-      {/* Country dropdown */}
-      <Popover open={countryOpen} onOpenChange={setCountryOpen}>
-        <PopoverTrigger asChild>
-          <button
-            type="button"
-            role="combobox"
-            aria-expanded={countryOpen}
-            aria-label="Filter by country"
-            className={cn(
-              "inline-flex h-9 items-center gap-2 rounded-lg border border-border-default bg-white px-3 text-sm outline-none transition-colors hover:border-primary/40",
-              "focus:border-primary focus:ring-1 focus:ring-primary/30",
-              selectedCountry ? "text-primary-copy" : "text-secondary-copy"
-            )}
-          >
-            {selectedCountry ? (
-              <>
-                <CountryFlag
-                  code={selectedCountry.id}
-                  className="size-4 shrink-0 rounded-sm shadow-sm ring-1 ring-black/5"
-                  round={false}
-                />
-                <span className="max-w-[120px] truncate">{selectedCountry.name}</span>
-              </>
-            ) : (
-              <span>All countries</span>
-            )}
-            <ChevronsUpDown className="ml-auto size-3.5 shrink-0 opacity-50" />
-          </button>
-        </PopoverTrigger>
-        <PopoverContent
-          align="start"
-          className="z-[60] w-64 border-border-default bg-white p-0 shadow-lg"
+      <div className="min-w-[300px]">
+        <CountryDropdown
+          values={[{ id: "", name: "All countries" }, ...countries]}
+          value={country}
+          onValueChange={(v) => updateParams({ country: v })}
+          placeholder="All countries"
+          aria-label="Filter by country"
+          className="h-9 min-h-10 w-full rounded-lg border-border-default px-3 py-2 text-sm"
+        />
+      </div>
+
+      <div className="min-w-[200px]">
+        <Select
+          value={status || "all"}
+          onValueChange={(v) => updateParams({ status: v === "all" ? "" : v })}
         >
-          <div className="border-b border-border-default p-2">
-            <div className="relative">
-              <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-secondary-copy/60" />
-              <input
-                type="text"
-                value={countrySearch}
-                onChange={(e) => setCountrySearch(e.target.value)}
-                placeholder="Search countries..."
-                className="h-8 w-full rounded-md border border-border-default bg-bg-light-grey pl-8 pr-3 text-sm text-primary-copy placeholder:text-secondary-copy/50 outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary/30"
-              />
-            </div>
-          </div>
-          <div className="max-h-64 overflow-y-auto p-1">
-            <button
-              type="button"
-              onClick={() => handleCountrySelect("")}
-              className={cn(
-                "flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-sm transition-colors",
-                !country
-                  ? "bg-primary/5 font-medium text-primary"
-                  : "text-primary-copy hover:bg-bg-light-grey"
-              )}
-            >
-              <span className="flex size-5 items-center justify-center">
-                {!country && <Check className="size-3.5 text-primary" />}
-              </span>
-              All countries
-            </button>
-            {filteredCountries.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => handleCountrySelect(c.id)}
-                className={cn(
-                  "flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-sm transition-colors",
-                  country === c.id
-                    ? "bg-primary/5 font-medium text-primary"
-                    : "text-primary-copy hover:bg-bg-light-grey"
-                )}
-              >
-                <span className="flex size-5 shrink-0 items-center justify-center">
-                  {country === c.id && <Check className="size-3.5 text-primary" />}
-                </span>
-                <CountryFlag
-                  code={c.id}
-                  className="size-5 shrink-0 rounded-sm shadow-sm ring-1 ring-black/5"
-                  round={false}
-                />
-                <span className="flex-1 truncate text-left">{c.name}</span>
-                <span className="text-xs text-secondary-copy">{c.id}</span>
-              </button>
-            ))}
-            {filteredCountries.length === 0 && (
-              <p className="py-4 text-center text-sm text-secondary-copy">
-                No countries found
-              </p>
+          <SelectTrigger
+            className={cn(
+              "h-9 w-full rounded-lg px-3 text-sm shadow-none",
+              (status || "all") === "all" && "text-secondary-copy"
             )}
-          </div>
-        </PopoverContent>
-      </Popover>
-
-      <select
-        value={status}
-        onChange={(e) => handleStatusChange(e.target.value)}
-        aria-label="Filter by status"
-        className="h-9 rounded-lg border border-border-default bg-white px-3 text-sm text-primary-copy outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary/30"
-      >
-        <option value="all">All statuses</option>
-        <option value="active">Active only</option>
-        <option value="disabled">Disabled only</option>
-      </select>
-
-      <Button
-        type="submit"
-        size="sm"
-        className="h-9 rounded-lg bg-primary px-4 text-white shadow-none transition hover:bg-primary/90"
-      >
-        {isPending ? <Loader2 className="size-4 animate-spin" /> : "Search"}
-      </Button>
+            size="sm"
+          >
+            <SelectValue placeholder="All statuses" />
+          </SelectTrigger>
+          <SelectContent align="start">
+            <SelectGroup>
+              <SelectItem className="font-medium" value="all">All statuses</SelectItem>
+              <SelectItem className="font-medium" value="active">Active only</SelectItem>
+              <SelectItem className="font-medium" value="disabled">Disabled only</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
 
       {hasFilters && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-9 gap-1.5 rounded-lg px-3 text-secondary-copy hover:bg-muted/10 hover:text-primary-copy"
-          onClick={handleClear}
-        >
-          <X className="size-3.5" />
-          Clear
-        </Button>
+        <div className="min-w-0 lg:justify-self-end">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-9 gap-1.5 rounded-lg px-3 text-secondary-copy hover:bg-muted/10 hover:text-primary-copy"
+            onClick={handleClear}
+          >
+            <X className="size-3.5" />
+            Clear
+          </Button>
+        </div>
       )}
-    </form>
+    </div>
   )
 }

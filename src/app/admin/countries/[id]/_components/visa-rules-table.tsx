@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { CountryFlag } from "@/components/ui/country-flag"
 import { VisaRequiredToggle } from "../../_components/visa-required-toggle"
@@ -48,6 +48,66 @@ type SortKey =
 
 type SortOrder = "asc" | "desc"
 
+function VisaRulesSearchInput({
+  placeholder,
+  onDebouncedChange,
+}: {
+  placeholder: string
+  onDebouncedChange: (value: string) => void
+}) {
+  const [value, setValue] = useState("")
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  )
+
+  useEffect(() => {
+    const trimmed = value.trim()
+    if (trimmed === "") {
+      onDebouncedChange("")
+      return
+    }
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      onDebouncedChange(trimmed.toLowerCase())
+      debounceRef.current = undefined
+    }, 150)
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
+  }, [value, onDebouncedChange])
+
+  const handleClear = () => {
+    setValue("")
+    onDebouncedChange("")
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <div className="relative flex-1 sm:min-w-[400px] sm:max-w-sm">
+        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-secondary-copy" />
+        <Input
+          type="search"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          placeholder={placeholder}
+          aria-label="Search visa rules"
+          className="h-9 rounded-lg border-border-default bg-white pl-9 pr-9 text-sm shadow-none transition focus-visible:border-primary focus-visible:ring-primary/20"
+        />
+      </div>
+      {value.trim().length > 0 && (
+        <button
+          type="button"
+          onClick={handleClear}
+          className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-xs font-medium text-secondary-copy transition-colors hover:bg-bg-light-grey hover:text-primary-copy"
+        >
+          <X className="size-3.5" />
+          Clear
+        </button>
+      )}
+    </div>
+  )
+}
+
 interface VisaRulesTableProps {
   rules: VisaRule[]
   countryId: string
@@ -59,7 +119,7 @@ export function VisaRulesTable({
   countryId,
   resolvedView,
 }: VisaRulesTableProps) {
-  const [searchTerm, setSearchTerm] = useState("")
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("")
   const [sortKey, setSortKey] = useState<SortKey | null>(null)
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc")
   const [productCounts, setProductCounts] = useState<Record<number, number>>({})
@@ -90,92 +150,68 @@ export function VisaRulesTable({
     }
   }
 
-  const filteredAndSorted = useMemo(() => {
-    const term = searchTerm.trim().toLowerCase()
-    let result = allRules
-
-    if (term) {
-      result = result.filter((rule) => {
-        const natName =
-          rule.nationality_country_data?.name?.toLowerCase() ?? ""
-        const destName =
-          rule.destination_country_data?.name?.toLowerCase() ?? ""
-        const natCode = rule.nationality.toLowerCase()
-        const destCode = rule.destination_country.toLowerCase()
-        return (
-          natName.includes(term) ||
-          destName.includes(term) ||
-          natCode.includes(term) ||
-          destCode.includes(term)
-        )
+  const term = debouncedSearchTerm
+  const searchNationality = resolvedView === "destination"
+  let filteredAndSorted = term
+    ? allRules.filter((rule) => {
+        const name = searchNationality
+          ? (rule.nationality_country_data?.name ?? "").toLowerCase()
+          : (rule.destination_country_data?.name ?? "").toLowerCase()
+        const code = searchNationality
+          ? rule.nationality.toLowerCase()
+          : rule.destination_country.toLowerCase()
+        const searchable = `${name} ${code}`.trim()
+        return searchable.includes(term)
       })
-    }
+    : allRules
 
-    if (sortKey) {
-      result = [...result].sort((a, b) => {
-        let cmp = 0
-        switch (sortKey) {
-          case "nationality":
-            cmp = (
-              a.nationality_country_data?.name ?? a.nationality
-            ).localeCompare(
-              b.nationality_country_data?.name ?? b.nationality
-            )
-            break
-          case "destination":
-            cmp = (
-              a.destination_country_data?.name ?? a.destination_country
-            ).localeCompare(
-              b.destination_country_data?.name ?? b.destination_country
-            )
-            break
-          case "visa_req":
-            cmp = Number(a.is_visa_required) - Number(b.is_visa_required)
-            break
-          case "supported":
-            cmp = Number(a.is_supported) - Number(b.is_supported)
-            break
-          case "visa_types":
-            cmp =
-              (visaTypeCounts[a.id] ?? 0) - (visaTypeCounts[b.id] ?? 0)
-            break
-        }
-        return sortOrder === "desc" ? -cmp : cmp
-      })
-    }
+  if (sortKey) {
+    filteredAndSorted = [...filteredAndSorted].sort((a, b) => {
+      let cmp = 0
+      switch (sortKey) {
+        case "nationality":
+          cmp = (
+            a.nationality_country_data?.name ?? a.nationality
+          ).localeCompare(
+            b.nationality_country_data?.name ?? b.nationality
+          )
+          break
+        case "destination":
+          cmp = (
+            a.destination_country_data?.name ?? a.destination_country
+          ).localeCompare(
+            b.destination_country_data?.name ?? b.destination_country
+          )
+          break
+        case "visa_req":
+          cmp = Number(a.is_visa_required) - Number(b.is_visa_required)
+          break
+        case "supported":
+          cmp = Number(a.is_supported) - Number(b.is_supported)
+          break
+        case "visa_types":
+          cmp =
+            (visaTypeCounts[a.id] ?? 0) - (visaTypeCounts[b.id] ?? 0)
+          break
+      }
+      return sortOrder === "desc" ? -cmp : cmp
+    })
+  }
 
-    return result
-  }, [allRules, searchTerm, sortKey, sortOrder, visaTypeCounts])
-
-  const hasSearch = searchTerm.trim().length > 0
+  const hasSearch = debouncedSearchTerm.length > 0
 
   return (
     <div className="overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
       {/* Toolbar */}
       <div className="flex flex-col gap-3 border-b border-border-default px-5 py-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1 sm:min-w-[300px] sm:max-w-sm">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-secondary-copy" />
-            <Input
-              type="search"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by name or code..."
-              aria-label="Search visa rules"
-              className="h-9 rounded-lg border-border-default bg-white pl-9 pr-9 text-sm shadow-none transition focus-visible:border-primary focus-visible:ring-primary/20"
-            />
-          </div>
-          {hasSearch && (
-            <button
-              type="button"
-              onClick={() => setSearchTerm("")}
-              className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-xs font-medium text-secondary-copy transition-colors hover:bg-bg-light-grey hover:text-primary-copy"
-            >
-              <X className="size-3.5" />
-              Clear
-            </button>
-          )}
-        </div>
+        <VisaRulesSearchInput
+          placeholder={
+            resolvedView === "destination"
+              ? "Search nationality by name or code..."
+              : "Search destination by name or code..."
+          }
+          onDebouncedChange={setDebouncedSearchTerm}
+        />
         <p className="shrink-0 text-sm font-medium text-secondary-copy">
           {hasSearch
             ? `${filteredAndSorted.length} of ${allRules.length} rules`

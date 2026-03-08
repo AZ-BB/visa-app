@@ -5,6 +5,7 @@ import { fetchAllCountriesList } from "@/actions/countries"
 import { CountryFlag } from "@/components/ui/country-flag"
 import { VisaStatusToggle } from "./_components/visa-status-toggle"
 import { VisasSearchForm } from "./_components/visas-search-form"
+import { SortableTableHeader } from "./_components/SortableTableHeader"
 import Pagination from "@/components/Pagination"
 import {
   Eye,
@@ -25,6 +26,8 @@ export default async function VisasPage({
     status?: string
     page?: string
     page_size?: string
+    sort?: "name" | "created_at" | "updated_at" | "status"
+    order?: "asc" | "desc"
   }>
 }) {
   const params = await searchParams
@@ -35,12 +38,20 @@ export default async function VisasPage({
       ? params.status
       : "all"
 
+  const SORT_OPTIONS = ["name", "created_at", "updated_at", "status"] as const
+  const sort = params.sort && SORT_OPTIONS.includes(params.sort as (typeof SORT_OPTIONS)[number])
+    ? (params.sort as "name" | "created_at" | "updated_at" | "status")
+    : "name"
+  const order = params.order === "asc" ? "asc" : "desc"
+
   if (Number.isFinite(parsedPage) && (parsedPage < 1 || !Number.isInteger(parsedPage))) {
     const p = new URLSearchParams()
     if (params.search?.trim()) p.set("search", params.search.trim())
     if (statusFilter !== "all") p.set("status", statusFilter)
     if (params.country?.trim()) p.set("country", params.country.trim())
     if (Number.isFinite(parsedPageSize) && parsedPageSize !== 20) p.set("page_size", String(parsedPageSize))
+    if (sort !== "name") p.set("sort", sort)
+    if (order !== "desc") p.set("order", order)
     const qs = p.toString()
     redirect(qs ? `/admin/visas?${qs}` : "/admin/visas")
   }
@@ -52,6 +63,8 @@ export default async function VisasPage({
       pageSize: Number.isFinite(parsedPageSize) ? parsedPageSize : undefined,
       status: statusFilter,
       country: params.country,
+      sort,
+      order,
     }),
     fetchAllCountriesList(),
   ])
@@ -100,11 +113,20 @@ export default async function VisasPage({
     if (statusFilter !== "all") p.set("status", statusFilter)
     if (params.country?.trim()) p.set("country", params.country.trim())
     if (currentPageSize !== 20) p.set("page_size", String(currentPageSize))
+    if (sort !== "name") p.set("sort", sort)
+    if (order !== "desc") p.set("order", order)
     p.set("page", String(totalPages))
     redirect(`/admin/visas?${p.toString()}`)
   }
 
   const fromItem = visas.length === 0 ? 0 : (currentPage - 1) * currentPageSize + 1
+
+  const tableParams: Record<string, string | undefined> = {
+    search: params.search,
+    status: statusFilter !== "all" ? statusFilter : undefined,
+    country: params.country,
+    page_size: params.page_size,
+  }
 
   return (
     <div className="min-w-0 max-w-full space-y-6 overflow-x-hidden">
@@ -120,13 +142,7 @@ export default async function VisasPage({
       <div className="min-w-0 overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
         {/* Toolbar */}
         <div className="border-b border-border-default px-5 py-3">
-          <VisasSearchForm
-            key={`${params.search ?? ""}-${statusFilter}-${params.country ?? ""}`}
-            defaultSearch={params.search ?? ""}
-            defaultStatus={statusFilter}
-            defaultCountry={params.country ?? ""}
-            countries={allCountries}
-          />
+          <VisasSearchForm countries={allCountries} />
         </div>
 
         {/* Table */}
@@ -150,9 +166,15 @@ export default async function VisasPage({
                   <th className="w-12 min-w-12 py-3 pl-4 sm:pl-5 pr-3 sm:pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     #
                   </th>
-                  <th className="min-w-[140px] py-3 pl-2 pr-3 sm:pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                  <SortableTableHeader
+                    sortKey="name"
+                    currentSort={sort}
+                    currentOrder={order}
+                    params={tableParams}
+                    className="min-w-[140px] pl-2"
+                  >
                     Visa type
-                  </th>
+                  </SortableTableHeader>
                   <th className="min-w-[130px] py-3 pl-2 pr-3 sm:pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     Destination
                   </th>
@@ -162,9 +184,33 @@ export default async function VisasPage({
                   <th className="min-w-[140px] py-3 pl-2 pr-3 sm:pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                     Entries / Max stay
                   </th>
-                  <th className="min-w-[90px] py-3 pl-2 pr-3 sm:pr-2 text-left text-xs font-semibold uppercase tracking-wider text-secondary-copy">
+                  <SortableTableHeader
+                    sortKey="status"
+                    currentSort={sort}
+                    currentOrder={order}
+                    params={tableParams}
+                    className="min-w-[90px] pl-2"
+                  >
                     Status
-                  </th>
+                  </SortableTableHeader>
+                  <SortableTableHeader
+                    sortKey="created_at"
+                    currentSort={sort}
+                    currentOrder={order}
+                    params={tableParams}
+                    className="min-w-[100px] pl-2"
+                  >
+                    Created
+                  </SortableTableHeader>
+                  <SortableTableHeader
+                    sortKey="updated_at"
+                    currentSort={sort}
+                    currentOrder={order}
+                    params={tableParams}
+                    className="min-w-[130px] pl-2"
+                  >
+                    Updated
+                  </SortableTableHeader>
                   <th className="w-24 min-w-[72px] py-3 pl-2 pr-4 sm:pr-5 text-right text-xs font-semibold uppercase tracking-wider text-secondary-copy">
                   </th>
                 </tr>
@@ -233,6 +279,30 @@ export default async function VisasPage({
                         visaName={visa.name}
                         isDisabled={visa.is_disabled}
                       />
+                    </td>
+
+                    <td className="min-w-[100px] py-3.5 pl-2 pr-3 sm:pr-2 text-secondary-copy">
+                      {visa.created_at
+                        ? `${new Date(visa.created_at).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                            timeZone: "UTC",
+                          })}`
+                        : "—"}
+                    </td>
+
+                    <td className="min-w-[130px] py-3.5 pl-2 pr-3 sm:pr-2 text-secondary-copy">
+                      {visa.updated_at
+                        ? `${new Date(visa.updated_at).toLocaleString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            timeZone: "UTC",
+                          })}`
+                        : "—"}
                     </td>
 
                     <td className="w-24 min-w-[72px] py-3.5 pl-2 pr-4 sm:pr-5 text-right">

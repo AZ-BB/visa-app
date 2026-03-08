@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation"
 import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-type SortKey = "arrival_date" | "created_at" | "updated_at" | "status" | "client_name" | "total_fee"
+type SortKey = "first_name" | "role" | "created_at" | "updated_at"
 type SortOrder = "asc" | "desc"
 
 interface SortableTableHeaderProps {

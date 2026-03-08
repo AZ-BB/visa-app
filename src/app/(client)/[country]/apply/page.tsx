@@ -5,6 +5,7 @@ import { ApplyFormSection } from "./_components/ApplyFormSection";
 import { createSupabaseServerClient } from "@/lib/supabase/supabase-server";
 import { notFound } from "next/navigation";
 import { getUser } from "@/lib/get-user";
+import { SelectAnotherCountry } from "./_components/SelectAnotherCountry";
 
 export default async function ApplyPage({ params, searchParams }: { params: Promise<{ country: string }>, searchParams: Promise<{ from: string }> }) {
     const { country } = await params;
@@ -24,15 +25,7 @@ export default async function ApplyPage({ params, searchParams }: { params: Prom
     const isDestinationDisabled = destinationCountry.is_disabled ?? false;
 
     if (isDestinationDisabled) {
-        return (
-            <div className="w-full flex flex-col items-center justify-start min-h-screen px-4 sm:px-0">
-                <div className="bg-red-50 mt-24 flex flex-col items-center justify-center gap-4 pt-10 pb-10 px-10 rounded-lg border border-red-200">
-                    <h2 className="text-2xl md:text-3xl font-bold text-center">
-                        We currently don&apos;t support any trips to {destinationCountry.name}
-                    </h2>
-                </div>
-            </div>
-        )
+        return notFound();
     }
 
     const { data: passportCountry, error: passportCountryError } = await supabase
@@ -89,19 +82,10 @@ export default async function ApplyPage({ params, searchParams }: { params: Prom
 
     if (!isSupported) {
         return (
-            <div className="w-full flex flex-col items-center justify-start min-h-screen px-4 sm:px-0">
-                <div className="bg-red-50 mt-24 flex flex-col items-center justify-center gap-4 pt-10 pb-10 px-10 rounded-lg border border-red-200">
-                    <h2 className="text-2xl md:text-4xl font-bold text-center">
-                        We currently don&apos;t support this trip
-                    </h2>
-
-                    <Link href="/">
-                        <ArrowButton>
-                            Try somewhere else
-                        </ArrowButton>
-                    </Link>
-                </div>
-            </div>
+            <SelectAnotherCountry
+                destinationCountry={destinationCountry}
+                passportCountry={passportCountry}
+            />
         );
     }
 

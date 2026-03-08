@@ -1,118 +1,144 @@
 "use client"
 
-import { useRouter, useSearchParams } from "next/navigation"
-import { useCallback, useState, useTransition } from "react"
-import { Search, X, Loader2 } from "lucide-react"
+import { usePathname, useSearchParams, useRouter } from "next/navigation"
+import { Search, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { cn } from "@/lib/utils"
-import type { ClientSortKey } from "@/actions/clients"
+import { useCallback, useEffect, useRef, useState, useTransition } from "react"
+
+const DEBOUNCE_MS = 200
 
 interface ClientsSearchFormProps {
-  defaultSearch?: string
-  defaultSort?: ClientSortKey
-  defaultSortDir?: "asc" | "desc"
-  defaultHasApplications?: "all" | "yes"
   className?: string
 }
 
-export function ClientsSearchForm({
-  defaultSearch = "",
-  defaultSort = "created_at",
-  defaultSortDir = "desc",
-  defaultHasApplications = "all",
-  className,
-}: ClientsSearchFormProps) {
-  const router = useRouter()
+export function ClientsSearchForm({ className }: ClientsSearchFormProps) {
+  const pathname = usePathname()
   const searchParams = useSearchParams()
-  const [search, setSearch] = useState(defaultSearch)
-  const [hasApplications, setHasApplications] = useState<"all" | "yes">(defaultHasApplications)
-  const [isPending, startTransition] = useTransition()
+  const router = useRouter()
+  const [, startTransition] = useTransition()
 
-  const navigate = useCallback(
-    (searchVal: string, filterVal: "all" | "yes", preserveSort = true) => {
-      const params = new URLSearchParams()
-      if (searchVal.trim()) params.set("search", searchVal.trim())
-      if (filterVal !== "all") params.set("has_applications", filterVal)
-      if (preserveSort) {
-        if (defaultSort !== "created_at") params.set("sort", defaultSort)
-        if (defaultSortDir !== "desc") params.set("sort_dir", defaultSortDir)
-      }
-      params.set("page", "1")
-      const pageSize = searchParams.get("page_size")
-      if (pageSize) params.set("page_size", pageSize)
-      const qs = params.toString()
+  const search = searchParams.get("search") ?? ""
+  const hasApplications = searchParams.get("has_applications") ?? ""
+
+  const [searchValue, setSearchValue] = useState(search)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const lastPushedSearchRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (lastPushedSearchRef.current !== null && lastPushedSearchRef.current === search) {
+      lastPushedSearchRef.current = null
+      return
+    }
+    setSearchValue(search)
+  }, [search])
+
+  const updateParams = useCallback(
+    (updates: Record<string, string>) => {
       startTransition(() => {
-        router.push(qs ? `/admin/clients?${qs}` : "/admin/clients")
+        const params = new URLSearchParams(searchParams.toString())
+        Object.entries(updates).forEach(([key, value]) => {
+          if (value) {
+            params.set(key, value)
+          } else {
+            params.delete(key)
+          }
+        })
+        params.set("page", "1")
+        router.push(`${pathname}?${params.toString()}`)
       })
     },
-    [router, searchParams, defaultSort, defaultSortDir]
+    [pathname, router, searchParams]
   )
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const val = e.target.value as "all" | "yes"
-    setHasApplications(val)
-    navigate(search, val)
-  }
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      const trimmed = searchValue.trim()
+      if (trimmed !== search) {
+        lastPushedSearchRef.current = trimmed
+        updateParams({ search: trimmed })
+      }
+      debounceRef.current = undefined
+    }, DEBOUNCE_MS)
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
+  }, [searchValue, search, updateParams])
 
   const handleClear = () => {
-    setSearch("")
-    setHasApplications("all")
-    navigate("", "all", false)
+    setSearchValue("")
+    updateParams({ search: "", has_applications: "" })
   }
 
-  const hasFilters = search.trim() !== "" || hasApplications !== "all"
+  const hasFilters = search.trim() !== "" || hasApplications !== ""
 
   return (
-    <form
-      className={cn("flex flex-col gap-3 sm:flex-row sm:items-center", className)}
-      onSubmit={(e) => {
-        e.preventDefault()
-        navigate(search, hasApplications)
-      }}
+    <div
+      className={cn(
+        "grid w-full min-w-0 grid-cols-1 gap-2 items-center font-medium sm:w-fit sm:grid-cols-2 lg:gap-3",
+        hasFilters ? "sm:grid-cols-2 lg:grid-cols-[auto_auto_auto]" : "sm:grid-cols-[auto_auto]",
+        className
+      )}
     >
-      <div className="relative flex-1 sm:max-w-xs">
-        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-secondary-copy" />
+      <div className="relative min-w-0 w-full sm:w-96">
+        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           type="search"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
           placeholder="Search by name or email..."
           aria-label="Search clients"
-          className="h-9 rounded-lg border-border-default bg-white pl-9 text-sm shadow-none transition focus-visible:border-primary focus-visible:ring-primary/20"
+          className="h-10 w-full pl-9 rounded-lg"
         />
       </div>
 
-      <select
-        value={hasApplications}
-        onChange={handleFilterChange}
-        aria-label="Filter by applications"
-        className="h-9 rounded-lg border border-border-default bg-white px-3 text-sm text-primary-copy outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary/30"
-      >
-        <option value="all">All clients</option>
-        <option value="yes">Has applications</option>
-      </select>
-
-      <Button
-        type="submit"
-        size="sm"
-        className="h-9 rounded-lg bg-primary px-4 text-white shadow-none transition hover:bg-primary/90"
-      >
-        {isPending ? <Loader2 className="size-4 animate-spin" /> : "Search"}
-      </Button>
+      <div className="min-w-[200px]">
+        <Select
+          value={hasApplications || "all"}
+          onValueChange={(v) => updateParams({ has_applications: v === "all" ? "" : v })}
+        >
+          <SelectTrigger
+            className={cn(
+              "h-9 w-full rounded-lg px-3 text-sm shadow-none",
+              (hasApplications || "all") === "all" && "text-secondary-copy"
+            )}
+            size="sm"
+          >
+            <SelectValue placeholder="All clients" />
+          </SelectTrigger>
+          <SelectContent align="start" isContentMenuFullWidth={false}>
+            <SelectGroup>
+              <SelectItem className="font-medium" value="all">All clients</SelectItem>
+              <SelectItem className="font-medium" value="yes">Has applications</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
 
       {hasFilters && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-9 gap-1.5 rounded-lg px-3 text-secondary-copy hover:bg-muted/10 hover:text-primary-copy"
-          onClick={handleClear}
-        >
-          <X className="size-3.5" />
-          Clear
-        </Button>
+        <div className="min-w-0 lg:justify-self-end">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-9 gap-1.5 rounded-lg px-3 text-secondary-copy hover:bg-muted/10 hover:text-primary-copy"
+            onClick={handleClear}
+          >
+            <X className="size-3.5" />
+            Clear
+          </Button>
+        </div>
       )}
-    </form>
+    </div>
   )
 }
