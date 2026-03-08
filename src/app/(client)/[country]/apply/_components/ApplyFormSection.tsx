@@ -171,7 +171,7 @@ export function ApplyFormSection({
             <label className="block text-base font-medium text-primary-copy">
               Number of travelers
             </label>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 border border-border-default rounded-2xl p-2 w-fit bg-white">
               <Button
                 type="button"
                 variant="outline"
@@ -323,7 +323,7 @@ export function ApplyFormSection({
                 <div>
                   <p className="text-secondary-copy text-sm">Max stay</p>
                   <p className="text-base font-semibold">
-                    {products.find((product) => product.id.toString() === selectedProductId)?.visa.max_stay ?? ""} per entry
+                    {products.find((product) => product.id.toString() === selectedProductId)?.visa.max_stay ?? ""} days per entry
                   </p>
                 </div>
               </div>
