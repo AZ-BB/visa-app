@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { updateAdmin } from "@/actions/admins"
+import { updateAdmin, type AdminRole } from "@/actions/admins"
 import type GeneralResponse from "@/types/general"
 import type { AdminWithEmail } from "@/actions/admins"
 
@@ -35,9 +35,15 @@ function editAdminAction(
     first_name: formData.get("first_name") as string,
     last_name: formData.get("last_name") as string,
     phone: formData.get("phone") as string,
-    role: (formData.get("role") as "ADMIN" | "SUPER_ADMIN") || "ADMIN",
+    role: (formData.get("role") as AdminRole) || "ADMIN",
   })
 }
+
+const ROLES = [
+  { value: "ADMIN", label: "Admin" },
+  { value: "SUPER_ADMIN", label: "Super Admin" },
+  { value: "SUPERVISOR", label: "Supervisor" },
+] as const
 
 export default function EditAdminModal({
   admin,
@@ -47,6 +53,7 @@ export default function EditAdminModal({
   children?: React.ReactNode
 }) {
   const [open, setOpen] = useState(false)
+  const [role, setRole] = useState<AdminRole>(admin.role)
 
   function formAction(prevState: GeneralResponse<null> | null, formData: FormData) {
     return editAdminAction(admin.id, prevState, formData)
@@ -59,6 +66,10 @@ export default function EditAdminModal({
       setOpen(false)
     }
   }, [state])
+
+  useEffect(() => {
+    if (open) setRole(admin.role)
+  }, [open, admin.role])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -127,14 +138,17 @@ export default function EditAdminModal({
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="edit-admin-role">Role</Label>
-            <Select name="role" defaultValue={admin.role} disabled={isPending}>
+            <input type="hidden" name="role" value={role} />
+            <Select value={role} onValueChange={(v) => setRole(v as typeof role)} disabled={isPending}>
               <SelectTrigger id="edit-admin-role" className="rounded-xl px-4 py-3 h-auto min-h-0">
                 <SelectValue placeholder="Select role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ADMIN">Admin</SelectItem>
-                <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
-                <SelectItem value="SUPERVISOR">Supervisor</SelectItem>
+                {ROLES.map((r) => (
+                  <SelectItem key={r.value} value={r.value}>
+                    {r.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
