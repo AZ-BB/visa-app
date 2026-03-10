@@ -110,8 +110,8 @@ export function ApplyFormSection({
   return (
     <>
       <h2 className="text-2xl md:text-4xl font-bold">
-        Apply for your {destinationCountry.name}{" "}
-        {products.find((p) => p.id.toString() === selectedProductId)?.visa?.name ?? ""}
+        Apply for your {" "}
+        {products.find((p) => p.id.toString() === selectedProductId)?.visa?.name?.split("- ")[0] ?? ""}
       </h2>
 
       <ResumeApplicationBanner />
@@ -195,7 +195,7 @@ export function ApplyFormSection({
               >
                 {numberOfTravellers}
               </span>
-              
+
               <Button
                 type="button"
                 variant="outline"
@@ -219,7 +219,7 @@ export function ApplyFormSection({
         <div className="w-full md:w-full order-2 md:order-0 md:col-start-3 md:row-start-1 md:row-span-2">
           <div className="bg-white rounded-2xl p-4 md:p-5 shadow-sm border border-border-default/50">
             <h3 className="text-xl font-semibold">
-              {destinationCountry.name} {products[0]?.visa?.name ?? ""}
+              {destinationCountry.name} {products[0]?.visa?.name?.split("- ")[0] ?? ""}
             </h3>
             <Separator className="my-4" />
             <div className="space-y-5">
@@ -289,7 +289,7 @@ export function ApplyFormSection({
                     Number of entries
                   </p>
                   <p className="text-base font-semibold">
-                    {products.find((product) => product.id.toString() === selectedProductId)?.visa.number_of_entries ?? ""}
+                    {(products.find((product) => product.id.toString() === selectedProductId)?.visa.number_of_entries === -1 ? "Multiple" : products.find((product) => product.id.toString() === selectedProductId)?.visa.number_of_entries)}
                   </p>
                 </div>
               </div>

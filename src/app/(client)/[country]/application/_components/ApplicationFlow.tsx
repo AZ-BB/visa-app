@@ -72,7 +72,7 @@ function ApplicationFlowContent({
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 md:py-12">
-      <div className="text-[36px] font-bold mb-10 text-primary-copy">{countryDisplay} {order.visa_name}</div>
+      <div className="text-[36px] font-bold mb-10 text-primary-copy">{order.visa_name}</div>
       <ApplicationProgressBar currentStep={currentStep} className="mb-10" />
 
       <section
