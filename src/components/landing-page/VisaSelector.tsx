@@ -18,15 +18,15 @@ export function VisaSelector({ rounded = true, shadow = true }: { rounded?: bool
   }, []);
 
   useEffect(() => {
-    fetch("/api/geolocation")
+    fetch("https://api.country.is/")
       .then((res) => res.json())
-      .then((data: { status: string; countryCode?: string }) => {
-        if (data.status === "success" && data.countryCode) {
-          setFromCountry(data.countryCode);
+      .then((data: { country?: string }) => {
+        if (data.country) {
+          setFromCountry(data.country);
         }
       })
       .catch(() => {
-        // Silently ignore geolocation errors (e.g. network, rate limit)
+        // Silently ignore geolocation errors (e.g. network)
       });
   }, []);
 
