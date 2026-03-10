@@ -202,7 +202,7 @@ export function Step5Checkout({
             <div className="flex justify-between gap-4">
               <dt className="text-secondary-copy">Number of entries</dt>
               <dd className="font-semibold">
-                {visaType?.number_of_entries ?? "—"} entries
+                {(visaType?.number_of_entries === -1 ? "Multiple" : visaType?.number_of_entries) ?? "—"} entries
               </dd>
             </div>
             <div className="flex justify-between gap-4">
