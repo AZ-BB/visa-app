@@ -18,7 +18,7 @@ export function VisaSelector({ rounded = true, shadow = true }: { rounded?: bool
   }, []);
 
   useEffect(() => {
-    fetch("http://ip-api.com/json/?fields=countryCode,status")
+    fetch("/api/geolocation")
       .then((res) => res.json())
       .then((data: { status: string; countryCode?: string }) => {
         if (data.status === "success" && data.countryCode) {
@@ -26,7 +26,7 @@ export function VisaSelector({ rounded = true, shadow = true }: { rounded?: bool
         }
       })
       .catch(() => {
-        // Silently ignore geolocation errors (e.g. network, CORS, rate limit)
+        // Silently ignore geolocation errors (e.g. network, rate limit)
       });
   }, []);
 
