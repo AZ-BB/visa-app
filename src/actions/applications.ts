@@ -465,6 +465,7 @@ export type Application = Tables<"applications"> & {
   destination_country: Tables<"countries">;
   visa_type: Tables<"visa_types">;
   turnaround_time: Tables<"turnaround_times">;
+  profile?: { phone: string } | null;
   travellers: Tables<"travellers"> &
     {
       product: Tables<"products">;
@@ -483,6 +484,7 @@ export async function getApplication(
             destination_country:countries(*),
             visa_type:visa_types(*),
             turnaround_times(*),
+            profile:profiles(phone),
             travellers(*, product:products(*))
         `)
       .eq("id", id)
