@@ -105,3 +105,37 @@ export async function logout(): Promise<void> {
     await serverClient.auth.signOut();
     redirect("/");
 }
+
+export async function requestPasswordReset(email: string): Promise<{ success: true } | { error: string }> {
+    if (!email?.trim()) {
+        return { error: "Email is required" };
+    }
+
+    try {
+        const supabase = await createSupabaseAdminServerClient();
+        const { data, error } = await supabase.auth.admin.generateLink({
+            type: "recovery",
+            email: email.trim(),
+        });
+
+        if (error) {
+            // Always return success for unknown emails (avoid email enumeration)
+            return { success: true };
+        }
+
+        const hashedToken = data?.properties?.hashed_token;
+        if (!hashedToken) {
+            return { error: "Failed to generate reset link" };
+        }
+
+        const origin = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+        const resetUrl = `${origin}/reset-password?token_hash=${hashedToken}&type=recovery`;
+
+        // Placeholder: Replace with your email integration
+        console.log("[Password Reset] Send this link to", email.trim(), ":", resetUrl);
+
+        return { success: true };
+    } catch {
+        return { error: "Failed to request password reset" };
+    }
+}

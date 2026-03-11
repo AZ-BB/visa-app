@@ -99,55 +99,55 @@ export default async function ApplicationsPage({
     <div className="space-y-6">
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
-          <div className="flex min-w-0 flex-col rounded-xl border border-border-default bg-white px-3 py-2.5 shadow-sm sm:px-5 sm:py-3">
-            <div className="flex items-center justify-between gap-2">
-              <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-secondary-copy sm:text-xs">Total</p>
-              <div className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-primary/8 text-primary sm:size-8">
-                <FileText className="size-3.5 sm:size-4" />
-              </div>
+        <div className="flex min-w-0 flex-col rounded-xl border border-border-default bg-white px-3 py-2.5 shadow-sm sm:px-5 sm:py-3">
+          <div className="flex items-center justify-between gap-2">
+            <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-secondary-copy sm:text-xs">Total</p>
+            <div className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-primary/8 text-primary sm:size-8">
+              <FileText className="size-3.5 sm:size-4" />
             </div>
-            <p className="mt-0.5 truncate text-lg font-bold tabular-nums text-primary-copy sm:mt-1 sm:text-2xl">{count.data?.total ?? 0}</p>
           </div>
+          <p className="mt-0.5 truncate text-lg font-bold tabular-nums text-primary-copy sm:mt-1 sm:text-2xl">{count.data?.total ?? 0}</p>
+        </div>
 
-          <div className="flex min-w-0 flex-col rounded-xl border border-border-default bg-white px-3 py-2.5 shadow-sm sm:px-5 sm:py-3">
-            <div className="flex items-center justify-between gap-2">
-              <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-secondary-copy sm:text-xs">In Progress</p>
-              <div className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-amber-500 sm:size-8">
-                <Clock className="size-3.5 sm:size-4" />
-              </div>
+        <div className="flex min-w-0 flex-col rounded-xl border border-border-default bg-white px-3 py-2.5 shadow-sm sm:px-5 sm:py-3">
+          <div className="flex items-center justify-between gap-2">
+            <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-secondary-copy sm:text-xs">In Progress</p>
+            <div className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-amber-500 sm:size-8">
+              <Clock className="size-3.5 sm:size-4" />
             </div>
-            <p className="mt-0.5 truncate text-lg font-bold tabular-nums text-primary-copy sm:mt-1 sm:text-2xl">{count.data?.in_progress ?? 0}</p>
           </div>
+          <p className="mt-0.5 truncate text-lg font-bold tabular-nums text-primary-copy sm:mt-1 sm:text-2xl">{count.data?.in_progress ?? 0}</p>
+        </div>
 
-          <div className="flex min-w-0 flex-col rounded-xl border border-border-default bg-white px-3 py-2.5 shadow-sm sm:px-5 sm:py-3">
-            <div className="flex items-center justify-between gap-2">
-              <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-secondary-copy sm:text-xs">Total Paid</p>
-              <div className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 sm:size-8">
-                <DollarSign className="size-3.5 sm:size-4" />
-              </div>
+        <div className="flex min-w-0 flex-col rounded-xl border border-border-default bg-white px-3 py-2.5 shadow-sm sm:px-5 sm:py-3">
+          <div className="flex items-center justify-between gap-2">
+            <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-secondary-copy sm:text-xs">Total Paid</p>
+            <div className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 sm:size-8">
+              <DollarSign className="size-3.5 sm:size-4" />
             </div>
-            <p className="mt-0.5 truncate text-lg font-bold tabular-nums text-primary-copy sm:mt-1 sm:text-2xl">${(count.data?.total_paid ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           </div>
+          <p className="mt-0.5 truncate text-lg font-bold tabular-nums text-primary-copy sm:mt-1 sm:text-2xl">${(count.data?.total_paid ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+        </div>
 
-          <div className="flex min-w-0 flex-col rounded-xl border border-border-default bg-white px-3 py-2.5 shadow-sm sm:px-5 sm:py-3">
-            <div className="flex items-center justify-between gap-2">
-              <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-secondary-copy sm:text-xs">Refunded</p>
-              <div className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-600 sm:size-8">
-                <DollarSign className="size-3.5 sm:size-4" />
-              </div>
+        <div className="flex min-w-0 flex-col rounded-xl border border-border-default bg-white px-3 py-2.5 shadow-sm sm:px-5 sm:py-3">
+          <div className="flex items-center justify-between gap-2">
+            <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-secondary-copy sm:text-xs">Refunded</p>
+            <div className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-600 sm:size-8">
+              <DollarSign className="size-3.5 sm:size-4" />
             </div>
-            <p className="mt-0.5 truncate text-lg font-bold tabular-nums text-primary-copy sm:mt-1 sm:text-2xl">${(count.data?.refunded_amount ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           </div>
+          <p className="mt-0.5 truncate text-lg font-bold tabular-nums text-primary-copy sm:mt-1 sm:text-2xl">${(count.data?.refunded_amount ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+        </div>
 
-          <div className="flex min-w-0 flex-col rounded-xl border border-border-default bg-white px-3 py-2.5 shadow-sm sm:px-5 sm:py-3">
-            <div className="flex items-center justify-between gap-2">
-              <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-secondary-copy sm:text-xs">Revenue</p>
-              <div className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-green-50 text-green-600 sm:size-8">
-                <DollarSign className="size-3.5 sm:size-4" />
-              </div>
+        <div className="flex min-w-0 flex-col rounded-xl border border-border-default bg-white px-3 py-2.5 shadow-sm sm:px-5 sm:py-3">
+          <div className="flex items-center justify-between gap-2">
+            <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-secondary-copy sm:text-xs">Revenue</p>
+            <div className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-green-50 text-green-600 sm:size-8">
+              <DollarSign className="size-3.5 sm:size-4" />
             </div>
-            <p className="mt-0.5 truncate text-lg font-bold tabular-nums text-primary-copy sm:mt-1 sm:text-2xl">${(count.data?.total_revenue ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           </div>
+          <p className="mt-0.5 truncate text-lg font-bold tabular-nums text-primary-copy sm:mt-1 sm:text-2xl">${(count.data?.total_revenue ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+        </div>
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border-default bg-white shadow-sm">
@@ -253,8 +253,8 @@ export default async function ApplicationsPage({
                       <td className="w-48">
                         <Link href={`/admin/countries/${app.destination_country_id}`} className="py-3.5 pr-2 flex items-center gap-2 hover:underline">
                           <CountryFlag code={app.destination_country_id} className="size-8 rounded-md shrink-0 border border-border-default shadow-sm" loading="lazy" />
-                          <div>
-                            <div className="text-base font-semibold text-secondary truncate">{app.visa_type_name}</div>
+                          <div className="min-w-0">
+                            <div className="text-base font-semibold text-secondary break-words">{app.visa_type_name?.split(" - ")[0]}</div>
                             <span className="truncate font-normal">{app.destination_country_name}</span>
                           </div>
                         </Link>

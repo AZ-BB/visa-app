@@ -14,6 +14,7 @@ import {
   Timer,
   Plane,
   Hash,
+  Phone,
 } from "lucide-react"
 import { getApplication, getApplicationActivityLogs } from "@/actions/applications"
 import { getAdmins, getCurrentAdmin } from "@/actions/admins"
@@ -65,11 +66,13 @@ function StatCard({
   label,
   value,
   valueClassName,
+  href,
 }: {
   icon: React.ReactNode
   label: string
   value: string
   valueClassName?: string
+  href?: string
 }) {
   return (
     <div className="flex items-start gap-3 rounded-xl border border-border-default bg-white p-4 shadow-sm">
@@ -78,9 +81,22 @@ function StatCard({
       </div>
       <div className="min-w-0">
         <p className="text-xs font-medium text-secondary-copy">{label}</p>
-        <p className={cn("mt-0.5 truncate text-sm font-semibold", valueClassName ?? "text-primary-copy")}>
-          {value}
-        </p>
+        {href ? (
+          <Link
+            href={href}
+            className={cn(
+              "mt-0.5 flex items-center gap-1 truncate text-sm font-semibold transition-colors hover:text-primary",
+              valueClassName ?? "text-primary-copy"
+            )}
+          >
+            {value}
+            <ExternalLink className="size-3 shrink-0 opacity-50" />
+          </Link>
+        ) : (
+          <p className={cn("mt-0.5 truncate text-sm font-semibold", valueClassName ?? "text-primary-copy")}>
+            {value}
+          </p>
+        )}
       </div>
     </div>
   )
@@ -243,7 +259,16 @@ export default async function AdminApplicationDetailPage({
           icon={<Mail className="size-4 text-primary" />}
           label="Contact email"
           value={application.contact_email}
+          href={`/admin/clients/${application.profile_id}`}
         />
+        {application.profile?.phone && (
+          <StatCard
+            icon={<Phone className="size-4 text-primary" />}
+            label="Contact phone"
+            value={application.profile.phone}
+            href={`/admin/clients/${application.profile_id}`}
+          />
+        )}
         <StatCard
           icon={<Plane className="size-4 text-primary" />}
           label="Arrival date"
