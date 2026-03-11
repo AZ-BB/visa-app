@@ -18,11 +18,11 @@ export function VisaSelector({ rounded = true, shadow = true }: { rounded?: bool
   }, []);
 
   useEffect(() => {
-    fetch("https://ipapi.co/json/")
+    fetch("https://api.country.is/")
       .then((res) => res.json())
-      .then((data: { country_code?: string }) => {
-        if (data.country_code) {
-          setFromCountry(data.country_code);
+      .then((data: { country?: string }) => {
+        if (data.country) {
+          setFromCountry(data.country);
         }
       })
       .catch(() => {

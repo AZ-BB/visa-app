@@ -77,14 +77,14 @@ export async function proxy(request: NextRequest) {
     const isAdminRoute = matchesRoute(pathname, ADMIN_ROUTES);
     const isPublic = matchesRoute(pathname, PUBLIC_ROUTES);
     const isClient = matchesRoute(pathname, CLIENT_ROUTES);
-    const isAuthPage = pathname === "/login" || pathname === "/signup";
+    const isAuthPage = pathname === "/login" || pathname === "/signup" || pathname === "/forgot-password" || pathname === "/reset-password";
     if (!isAdminRoute && (isPublic || isClient || isAuthPage)) {
       return redirectWithCookies(new URL("/admin", request.url));
     }
   }
 
-  // Login/signup are for unauthenticated users only
-  if ((pathname === "/login" || pathname === "/signup") && user) {
+  // Login/signup/forgot-password are for unauthenticated users only (reset-password excluded: user may have recovery session)
+  if ((pathname === "/login" || pathname === "/signup" || pathname === "/forgot-password") && user) {
     return redirectWithCookies(new URL("/", request.url));
   }
 
