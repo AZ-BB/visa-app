@@ -4,12 +4,14 @@ import { useEffect, useState } from "react";
 import { VisaSelector } from "@/components/landing-page/VisaSelector";
 import { ChevronDown } from "@/components/svgs/chevron-down";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 const STICK_TOP_OFFSET = 80; // matches nav height (top-20)
 
 export function StickyVisaBar() {
   const [visible, setVisible] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const t = useTranslations("visaSelector");
 
   useEffect(() => {
     const heroBar = document.getElementById("hero-visa-selector");
@@ -53,7 +55,7 @@ export function StickyVisaBar() {
         aria-controls="sticky-visa-bar-content"
         id="sticky-visa-bar-toggle"
       >
-        <span>Choose your visa</span>
+        <span>{t("chooseYourVisa")}</span>
         <span
           className={cn(
             "flex shrink-0 transition-transform duration-200",

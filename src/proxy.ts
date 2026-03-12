@@ -1,19 +1,34 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import createIntlMiddleware from "next-intl/middleware";
+import { routing } from "@/i18n/routing";
 import type { Database } from "@/database.types";
+
+const intlMiddleware = createIntlMiddleware(routing);
+
+const LOCALES = ["en", "es", "fr", "de", "it"] as const;
 
 /** Routes accessible by anyone (unauthenticated or clients). Admins cannot access these. */
 const PUBLIC_ROUTES: (string | RegExp)[] = [
-  "/",
-  /^\/[^/]+$/, // /[country] e.g. /us, /uk
-  /^\/[^/]+\/apply$/, // /[country]/apply
-  /^\/[^/]+\/application$/, // /[country]/application
+  /^\/(en|es|fr|de|it)\/?$/, // /[locale] or /[locale]/
+  /^\/(en|es|fr|de|it)\/[^/]+$/, // /[locale]/[country]
+  /^\/(en|es|fr|de|it)\/[^/]+\/apply$/, // /[locale]/[country]/apply
+  /^\/(en|es|fr|de|it)\/[^/]+\/application$/, // /[locale]/[country]/application
+  /^\/(en|es|fr|de|it)\/(terms|contact-us)$/, // /[locale]/terms, contact-us
 ];
 
 /** Routes for authenticated client users only. Admins cannot access these. */
 const CLIENT_ROUTES: (string | RegExp)[] = [
-  "/applications",
-  "/account",
+  /^\/(en|es|fr|de|it)\/applications/,
+  /^\/(en|es|fr|de|it)\/account/,
+];
+
+/** Auth pages (login, signup, etc.) */
+const AUTH_PAGES = [
+  /^\/(en|es|fr|de|it)\/login$/,
+  /^\/(en|es|fr|de|it)\/signup$/,
+  /^\/(en|es|fr|de|it)\/forgot-password$/,
+  /^\/(en|es|fr|de|it)\/reset-password$/,
 ];
 
 /** Routes for admins only. Non-admins cannot access these. */
@@ -21,13 +36,32 @@ const ADMIN_ROUTES: (string | RegExp)[] = [
   /^\/admin(\/.*)?$/, // /admin and /admin/*
 ];
 
+function getLocaleFromPath(pathname: string): string {
+  const match = pathname.match(/^\/(en|es|fr|de|it)/);
+  return match ? match[1] : "en";
+}
+
 function matchesRoute(pathname: string, routes: (string | RegExp)[]): boolean {
   return routes.some((p) =>
     typeof p === "string" ? pathname === p : p.test(pathname)
   );
 }
 
+function isAuthPage(pathname: string): boolean {
+  return AUTH_PAGES.some((p) => p.test(pathname));
+}
+
 export async function proxy(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  // Run next-intl for paths that need locale (exclude /admin, /api)
+  if (!pathname.startsWith("/admin") && !pathname.startsWith("/api")) {
+    const intlResponse = intlMiddleware(request);
+    if (intlResponse) {
+      return intlResponse;
+    }
+  }
+
   let response = NextResponse.next({
     request,
   });
@@ -61,7 +95,7 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  const pathname = request.nextUrl.pathname;
+  const locale = getLocaleFromPath(pathname);
 
   // Helper: redirect while preserving Supabase session cookies (avoids "too many redirects")
   const redirectWithCookies = (url: URL) => {
@@ -71,37 +105,34 @@ export async function proxy(request: NextRequest) {
   };
 
   // Admins can ONLY access admin routes — redirect from public and client routes.
-  // Must check isAdminRoute first: the PUBLIC_ROUTES regex /^\/[^/]+$/ also matches
-  // /admin, so without this guard an admin on /admin would loop-redirect to /admin.
   if (user && isAdmin) {
     const isAdminRoute = matchesRoute(pathname, ADMIN_ROUTES);
     const isPublic = matchesRoute(pathname, PUBLIC_ROUTES);
     const isClient = matchesRoute(pathname, CLIENT_ROUTES);
-    const isAuthPage = pathname === "/login" || pathname === "/signup" || pathname === "/forgot-password" || pathname === "/reset-password";
-    if (!isAdminRoute && (isPublic || isClient || isAuthPage)) {
+    if (!isAdminRoute && (isPublic || isClient || isAuthPage(pathname))) {
       return redirectWithCookies(new URL("/admin", request.url));
     }
   }
 
   // Login/signup/forgot-password are for unauthenticated users only (reset-password excluded: user may have recovery session)
-  if ((pathname === "/login" || pathname === "/signup" || pathname === "/forgot-password") && user) {
-    return redirectWithCookies(new URL("/", request.url));
+  if (isAuthPage(pathname) && pathname !== `/${locale}/reset-password` && user) {
+    return redirectWithCookies(new URL(`/${locale}`, request.url));
   }
 
   // Client routes: require authenticated user (non-admin)
   if (matchesRoute(pathname, CLIENT_ROUTES)) {
     if (!user) {
-      return redirectWithCookies(new URL("/login", request.url));
+      return redirectWithCookies(new URL(`/${locale}/login`, request.url));
     }
   }
 
   // Admin routes: require auth and admin role
   if (matchesRoute(pathname, ADMIN_ROUTES)) {
     if (!user) {
-      return redirectWithCookies(new URL("/login", request.url));
+      return redirectWithCookies(new URL("/en/login", request.url));
     }
     if (!isAdmin) {
-      return redirectWithCookies(new URL("/", request.url));
+      return redirectWithCookies(new URL(`/${locale}`, request.url));
     }
   }
 

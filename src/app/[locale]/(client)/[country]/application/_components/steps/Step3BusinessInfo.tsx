@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import isVisaAvailable from "@/actions/visas";
 import {
@@ -30,20 +31,21 @@ function ApplicationSidebar({
 }: {
   travellerCount?: number;
 }) {
+  const t = useTranslations("application.step1");
   return (
     <div className="space-y-5">
       <div className="bg-white rounded-2xl p-5 border border-border-default/50 shadow-sm">
 
         <h3 className="text-xl font-bold text-primary-copy mb-2">
-          Additional costs
+          {t("additionalCosts")}
         </h3>
 
-        <p className="text-base">{travellerCount} of traveller/s</p>
+        <p className="text-base">{t("ofTravellers", { count: travellerCount })}</p>
         <Separator className="mt-2 mb-4" />
 
         <div className="flex justify-between text-base">
-          <span className="text-secondary-copy">Total</span>
-          <span className="font-medium">Calculated at checkout</span>
+          <span className="text-secondary-copy">{t("total")}</span>
+          <span className="font-medium">{t("calculatedAtCheckout")}</span>
         </div>
       </div>
 
@@ -53,9 +55,9 @@ function ApplicationSidebar({
             href="#"
             className="font-semibold text-primary underline-offset-2 hover:underline"
           >
-            Find out more
+            {t("findOutMore")}
           </a>{" "}
-          about how we keep your information safe.
+          {t("privacyTip")}
         </p>
       </TipCard>
     </div>
@@ -70,6 +72,7 @@ function PassportFields({
   onNationalityChange,
   errors,
   defaultNationality,
+  t,
 }: {
   idPrefix: string;
   index: number;
@@ -78,6 +81,7 @@ function PassportFields({
   onNationalityChange?: (value: string) => void;
   errors?: Record<string, string> | null;
   defaultNationality?: string;
+  t: (key: string, values?: Record<string, string | number>) => string;
 }) {
   const field = (key: string) => errors?.[`traveller_${index}_${key}`];
   const nationalityValue =
@@ -89,10 +93,10 @@ function PassportFields({
           htmlFor={`${idPrefix}-nationality`}
           className="block text-base font-semibold text-primary-copy mb-2"
         >
-          Passport nationality
+          {t("passportNationality")}
         </label>
         <CountryDropdown
-          placeholder="Select nationality"
+          placeholder={t("selectNationality")}
           value={nationalityValue}
           className="py-4"
           onValueChange={(value) => {
@@ -109,12 +113,12 @@ function PassportFields({
           htmlFor={`${idPrefix}-passport-number`}
           className="block text-base font-semibold text-primary-copy mb-2"
         >
-          Passport number
+          {t("passportNumber")}
         </label>
         <Input
           id={`${idPrefix}-passport-number`}
           type="text"
-          placeholder="12345678"
+          placeholder={t("passportNumberPlaceholder")}
           value={traveller.passport_number}
           onChange={(e) => onUpdate({ passport_number: e.target.value })}
           className={field("passport_number") ? "border-red-500" : ""}
@@ -129,13 +133,13 @@ function PassportFields({
           htmlFor={`${idPrefix}-passport-expiry-date`}
           className="block text-base font-semibold text-primary-copy mb-2"
         >
-          Passport expiry date
+          {t("passportExpiry")}
         </label>
         <DatePicker
           id={`${idPrefix}-passport-expiry-date`}
           value={traveller.passport_expiry_date || undefined}
           onValueChange={(date) => onUpdate({ passport_expiry_date: date ? date.toISOString().split("T")[0] ?? "" : "" })}
-          placeholder="DD MM YYYY"
+          placeholder={t("datePlaceholder")}
           disableBeforeToday={true}
         />
         {field("passport_expiry_date") && (
@@ -144,10 +148,10 @@ function PassportFields({
       </div>
       <div>
         <label className="block text-base font-semibold text-primary-copy mb-2">
-          Country of birth
+          {t("countryOfBirth")}
         </label>
         <CountryDropdown
-          placeholder="Select country of birth"
+          placeholder={t("selectCountryOfBirth")}
           value={traveller.country_of_birth || undefined}
           onValueChange={(value) => onUpdate({ country_of_birth: value })}
           aria-label="Country of birth"
@@ -162,10 +166,10 @@ function PassportFields({
           htmlFor={`${idPrefix}-country-residence`}
           className="block text-base font-semibold text-primary-copy mb-2"
         >
-          Country of residence
+          {t("countryOfResidence")}
         </label>
         <CountryDropdown
-          placeholder="Select country of residence"
+          placeholder={t("selectCountryOfResidence")}
           value={traveller.country_of_residence || undefined}
           onValueChange={(value) => onUpdate({ country_of_residence: value })}
           aria-label="Country of residence"
@@ -180,6 +184,7 @@ function PassportFields({
 }
 
 export function Step3BusinessInfo({ onNext, onBack, errors }: Step3BusinessInfoProps) {
+  const t = useTranslations("application.step3");
   const { order, updateOrder } = useApplicationOrder();
   const { travellers } = order;
   const [isValidatingNationality, setIsValidatingNationality] = useState(false);
@@ -301,10 +306,10 @@ export function Step3BusinessInfo({ onNext, onBack, errors }: Step3BusinessInfoP
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
       <div className="lg:col-span-2">
         <h2 className="text-2xl font-bold text-primary-copy mb-2">
-          Passport info
+          {t("title")}
         </h2>
         <p className="text-secondary-copy text-base mb-6">
-          Add passport details for each traveller. Each section matches a traveller from the previous step.
+          {t("intro")}
         </p>
 
         <Accordion
@@ -328,6 +333,7 @@ export function Step3BusinessInfo({ onNext, onBack, errors }: Step3BusinessInfoP
                   traveller={traveller}
                   onUpdate={(patch) => updateTraveller(index, patch)}
                   onNationalityChange={(value) => handleNationalityChange(index, value)}
+                  t={t}
                   errors={{
                     ...(errors ?? {}),
                     ...Object.fromEntries(
@@ -346,7 +352,7 @@ export function Step3BusinessInfo({ onNext, onBack, errors }: Step3BusinessInfoP
 
         <StepActionButtons
           onBack={onBack}
-          primaryLabel="Save & continue"
+          primaryLabel={t("saveContinue")}
           primaryOnClick={onNext}
           primaryDisabled={isValidatingNationality || Object.keys(nationalityVisaErrors).length > 0}
         />

@@ -1,11 +1,11 @@
 "use client"
 import { CountryDropdown } from "@/components/ui/country-dropdown"
 import { Tables } from "@/database.types"
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
-import { Separator } from "@/components/ui/separator";
 import ArrowButton from "@/components/ArrowButton";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 
 export function SelectAnotherCountry({
     destinationCountry,
@@ -15,15 +15,16 @@ export function SelectAnotherCountry({
     passportCountry: Tables<"countries">
 }) {
     const router = useRouter();
+    const t = useTranslations("apply");
 
     return (
         <div className="max-w-7xl mx-auto min-h-screen pb-10 sm:pb-0 px-5 md:px-6 pt-6 md:pt-10 space-y-6 md:space-y-10">
             <h2 className="text-2xl md:text-4xl font-bold">
-                Apply for your visa to {destinationCountry.name}
+                {t("applyForVisaTo", { destination: destinationCountry.name })}
             </h2>
 
             <p>
-                A visa is mandatory for {passportCountry.name} passport holders traveling to {destinationCountry.name}. Currently, VisaPro does not provide it.
+                {t("visaMandatory", { passport: passportCountry.name, destination: destinationCountry.name })}
             </p>
             <div
                 className={cn(
@@ -34,17 +35,16 @@ export function SelectAnotherCountry({
 
                     <div className="space-y-3">
                         <div className="space-y-1">
-                            <h3 className="text-lg font-semibold">Where am I from?</h3>
+                            <h3 className="text-lg font-semibold">{t("whereAmIFrom")}</h3>
                             <p className="text-secondary-copy text-base">
-                                Must match the nationality of the passport you&apos;ll be
-                                travelling with.
+                                {t("nationalityHint")}
                             </p>
                         </div>
                         <CountryDropdown
                             className="py-4"
                             value={passportCountry.id}
                             onValueChange={(value) => router.push(`/${destinationCountry.id}/apply?from=${value}`)}
-                            placeholder="Choose nationality"
+                            placeholder={t("chooseNationality")}
                         />
                     </div>
 
@@ -54,7 +54,7 @@ export function SelectAnotherCountry({
             <div className="w-full flex items-center justify-center">
                 <Link href="/" className="w-fit">
                     <ArrowButton className="sm:text-base">
-                        Check other destinations
+                        {t("checkOtherDestinations")}
                     </ArrowButton>
                 </Link>
             </div>

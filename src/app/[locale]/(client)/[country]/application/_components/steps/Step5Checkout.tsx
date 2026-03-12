@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "@/i18n/navigation";
+import { useSearchParams } from "next/navigation";
 import { formatValidFor } from "@/lib/utils";
 import { useApplicationOrder } from "../ApplicationOrderContext";
 import type { TempTraveller } from "../ApplicationOrderContext";
@@ -12,9 +13,10 @@ import { Separator } from "@/components/ui/separator";
 import InfoIcon from "@/components/svgs/info";
 import { checkEmailExists } from "@/actions/auth";
 import { CheckoutAuthModal } from "../CheckoutAuthModal";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import type { Tables } from "@/database.types";
 import { useCurrency } from "@/components/providers/CurrencyProvider";
+import { useTranslations } from "next-intl";
 
 const TURNAROUND_LABELS: Record<number, string> = {
   1: "Standard",
@@ -149,32 +151,31 @@ export function Step5Checkout({
       setIsSubmitting(false);
 
       if (!res.ok || !data.url) {
-        setCheckoutError(data.error ?? "Failed to create checkout session");
+        setCheckoutError(data.error ?? tErrors("checkoutSession"));
         return;
       }
 
       onContinueToPayment?.();
       window.location.href = data.url;
     } else {
-      setCheckoutError(result.error ?? "Failed to create application");
+      setCheckoutError(result.error ?? tErrors("createApplication"));
       return;
     }
   };
 
+  const t = useTranslations("application.step5");
+  const tApply = useTranslations("apply");
+  const tErrors = useTranslations("application.errors");
   const countryName = getCountryNameFromCode(country || "");
   const { formatPriceFromUsd } = useCurrency();
   return (
     <div className="max-w-2xl mx-auto space-y-5 min-h-screen">
-      <h2 className="text-2xl font-bold text-primary-copy">Checkout</h2>
+      <h2 className="text-2xl font-bold text-primary-copy">{t("title")}</h2>
 
       {/* Application readiness */}
       <TipCard>
         <p className="text-base">
-          Your application will be ready by the <strong>{readyByDate}</strong>{" "}
-          <span className="text-secondary-copy">
-            (in {turnaroundHours} hours)
-          </span>
-          . We&apos;ll make sure to contact you and let you know.
+          {t("readyBy", { date: readyByDate, hours: turnaroundHours })}
         </p>
       </TipCard>
 
@@ -195,21 +196,21 @@ export function Step5Checkout({
 
           <dl className="space-y-2 text-primary-copy">
             <div className="flex justify-between gap-4">
-              <dt className="text-secondary-copy">Valid for</dt>
+              <dt className="text-secondary-copy">{tApply("validFor")}</dt>
               <dd className="font-semibold">
-                {formatValidFor(visaType?.valid_for)} after issue
+                {formatValidFor(visaType?.valid_for)} {tApply("afterIssue")}
               </dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-secondary-copy">Number of entries</dt>
+              <dt className="text-secondary-copy">{tApply("numberOfEntries")}</dt>
               <dd className="font-semibold">
-                {(visaType?.number_of_entries === -1 ? "Multiple" : visaType?.number_of_entries) ?? "—"} entries
+                {(visaType?.number_of_entries === -1 ? tApply("multiple") : visaType?.number_of_entries) ?? "—"} {t("entries")}
               </dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-secondary-copy">Max stay</dt>
+              <dt className="text-secondary-copy">{tApply("maxStay")}</dt>
               <dd className="font-semibold">
-                {visaType?.max_stay ?? "—"} days per entry
+                {visaType?.max_stay ?? "—"} {tApply("daysPerEntry")}
               </dd>
             </div>
           </dl>
@@ -220,26 +221,26 @@ export function Step5Checkout({
         {/* Travellers */}
         <section className="mb-8">
           <h3 className="text-xl font-bold text-primary-copy mb-3">
-            Travellers
+            {t("travellers")}
           </h3>
           <ul className="space-y-2 text-primary-copy">
-            {travellers.map((t, i) => {
+            {travellers.map((tr, i) => {
               const fees = travellerFees[i];
               return (
                 <li key={i}>
                   <div className="flex justify-between items-center">
                     <div className="text-secondary-copy">
-                      Traveller #{i + 1}
+                      {t("travellerNum", { num: i + 1 })}
                     </div>
                     <div className="font-semibold">
-                      {[t.first_name, t.last_name].filter(Boolean).join(" ") ||
+                      {[tr.first_name, tr.last_name].filter(Boolean).join(" ") ||
                         "—"}
                     </div>
                   </div>
                   <div className="space-y-2 mt-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-secondary-copy">
-                        Governmental Fee
+                        {t("governmentalFee")}
                       </span>
                       <span className="font-semibold">
                         {formatPriceFromUsd(fees?.govFee ?? 0)}
@@ -247,14 +248,14 @@ export function Step5Checkout({
                     </div>
                     <div className="flex justify-between">
                       <span className="text-secondary-copy">
-                        Processing Fee
+                        {t("processingFee")}
                       </span>
                       <span className="font-semibold">
                         {formatPriceFromUsd(fees?.processingFee ?? 0)}
                       </span>
                     </div>
                   </div>
-                  {i < travellers.length - 1 && <Separator className="my-4" />}
+                  {i < travellers.length - 1 && <Separator className="my-4" key={`sep-${i}`} />}
                 </li>
               );
             })}
@@ -266,20 +267,20 @@ export function Step5Checkout({
         {/* Additional costs */}
         <section className="mb-8">
           <h3 className="text-xl font-bold text-primary-copy mb-4">
-            Additional costs
+            {t("additionalCosts")}
           </h3>
           <div className="space-y-2 text-primary-copy">
             <div className="flex justify-between">
-              <span className="text-secondary-copy">Turnaround time</span>
+              <span className="text-secondary-copy">{t("turnaroundTime")}</span>
               <span className="font-semibold">{formatPriceFromUsd(turnaroundFee)}</span>
             </div>
           </div>
           <div className="mt-4 pt-4">
             <div className="flex justify-between items-baseline">
               <div>
-                <p className="font-semibold text-primary-copy">Total</p>
+                <p className="font-semibold text-primary-copy">{t("total")}</p>
                 <p className="text-sm text-secondary-copy">
-                  Including taxes & fees
+                  {t("includingTaxes")}
                 </p>
               </div>
               <span className="text-xl font-bold text-primary-copy">
@@ -301,15 +302,15 @@ export function Step5Checkout({
             href="/terms"
             className="font-semibold underline underline-offset-2 hover:text-primary"
           >
-            Find out more
+            {t("findOutMore")}
           </Link>{" "}
-          about how we keep your information safe.
+          {t("privacyTip")}
         </p>
       </div>
 
       <StepActionButtons
         onBack={onBack}
-        primaryLabel="Continue to payment"
+        primaryLabel={t("continueToPayment")}
         primaryOnClick={onContinueToPayment ? handleContinueClick : undefined}
         primaryLoading={isSubmitting}
         errorMessage={checkoutError}

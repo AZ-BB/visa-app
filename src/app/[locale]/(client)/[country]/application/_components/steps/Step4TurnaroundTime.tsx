@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { useApplicationOrder } from "../ApplicationOrderContext";
 import { Separator } from "@/components/ui/separator";
@@ -11,14 +12,16 @@ interface Step4TurnaroundTimeProps {
   onBack?: () => void;
 }
 
-function formatTurnaroundDescription(hours: number): string {
-  if (hours < 24) return `Takes ${hours} hours`;
-  const days = Math.round(hours / 24);
-  return days === 1 ? "Takes 1 day" : `Takes ${days} days`;
-}
-
 export function Step4TurnaroundTime({ onNext, onBack }: Step4TurnaroundTimeProps) {
+  const t = useTranslations("application.step4");
+  const tSidebar = useTranslations("application.step1");
   const { order, updateOrder, turnaroundTimes } = useApplicationOrder();
+
+  function formatTurnaroundDescription(hours: number): string {
+    if (hours < 24) return t("takesHours", { hours });
+    const days = Math.round(hours / 24);
+    return days === 1 ? t("takes1Day") : t("takesDays", { days });
+  }
   const selected = order.turnaround_time_id;
   const options = turnaroundTimes.filter((tt) => !tt.is_disabled);
 
@@ -26,10 +29,10 @@ export function Step4TurnaroundTime({ onNext, onBack }: Step4TurnaroundTimeProps
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
       <div className="lg:col-span-2">
         <h2 className="text-2xl font-bold text-primary-copy mb-8">
-          Turnaround time
+          {t("title")}
         </h2>
 
-        <fieldset className="space-y-3" role="radiogroup" aria-label="Turnaround time">
+        <fieldset className="space-y-3" role="radiogroup" aria-label={t("title")}>
           {options.map((option) => {
             const isSelected = selected === option.id;
             const hours = (option as { turnaround_time_hours?: number }).turnaround_time_hours ?? 24;
@@ -80,7 +83,7 @@ export function Step4TurnaroundTime({ onNext, onBack }: Step4TurnaroundTimeProps
 
         <StepActionButtons
           onBack={onBack}
-          primaryLabel="Save & continue"
+          primaryLabel={t("saveContinue")}
           primaryOnClick={onNext}
           primaryDisabled={selected == null}
         />
@@ -91,15 +94,15 @@ export function Step4TurnaroundTime({ onNext, onBack }: Step4TurnaroundTimeProps
         <div className="bg-white rounded-2xl p-5 border border-border-default/50 shadow-sm">
 
           <h3 className="text-xl font-bold text-primary-copy mb-2">
-            Additional costs
+            {tSidebar("additionalCosts")}
           </h3>
 
-          <p className="text-base">{order.travellers.length} of traveller/s</p>
+          <p className="text-base">{tSidebar("ofTravellers", { count: order.travellers.length })}</p>
           <Separator className="mt-2 mb-4" />
 
           <div className="flex justify-between text-base">
-            <span className="text-secondary-copy">Total</span>
-            <span className="font-medium">Calculated on checkout</span>
+            <span className="text-secondary-copy">{tSidebar("total")}</span>
+            <span className="font-medium">{t("calculatedOnCheckout")}</span>
           </div>
         </div>
 
@@ -109,9 +112,9 @@ export function Step4TurnaroundTime({ onNext, onBack }: Step4TurnaroundTimeProps
               href="#"
               className="font-semibold text-primary underline-offset-2 hover:underline"
             >
-              Find out more
+              {tSidebar("findOutMore")}
             </a>{" "}
-            about how we keep your information safe.
+            {tSidebar("privacyTip")}
           </p>
         </TipCard>
       </div>

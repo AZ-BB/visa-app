@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { ArrowLeft } from "lucide-react"
 import { cn } from "@/lib/utils"
 import ArrowButton from "@/components/ArrowButton"
+import { useTranslations } from "next-intl"
 
 interface StepActionButtonsProps {
   onBack?: () => void
@@ -22,6 +23,7 @@ export function StepActionButtons({
   primaryLoading = false,
   errorMessage,
 }: StepActionButtonsProps) {
+  const t = useTranslations("application.buttons")
   const sentinelRef = useRef<HTMLDivElement>(null)
   const [showFixedButton, setShowFixedButton] = useState(true)
 
@@ -79,7 +81,7 @@ export function StepActionButtons({
               )}
             >
               <ArrowLeft className="size-5" aria-hidden />
-              Previous step
+              {t("previousStep")}
             </button>
           ) : (
             <span />
@@ -112,7 +114,7 @@ export function StepActionButtons({
               )}
             >
               <ArrowLeft className="size-6" aria-hidden />
-              Previous step
+              {t("previousStep")}
             </button>
           )}
         </div>
@@ -143,7 +145,7 @@ export function StepActionButtons({
                 )}
               >
                 <ArrowLeft className="size-5" aria-hidden />
-                Previous step
+                {t("previousStep")}
               </button>
             )}
           </div>

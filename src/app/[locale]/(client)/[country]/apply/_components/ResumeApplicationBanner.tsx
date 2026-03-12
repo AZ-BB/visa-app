@@ -1,14 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
-import { getStoredOrder } from "@/app/(client)/[country]/application/_components/ApplicationOrderContext";
+import { getStoredOrder } from "../../application/_components/ApplicationOrderContext";
 import isVisaAvailable from "@/actions/visas";
 import { cn } from "@/lib/utils";
 import { ChevronRightIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export function ResumeApplicationBanner() {
+  const t = useTranslations("apply");
   const [storedOrder, setStoredOrder] = useState<ReturnType<typeof getStoredOrder>>(null);
   const [dismissed, setDismissed] = useState(false);
   const [visaAvailable, setVisaAvailable] = useState<boolean | null>(null);
@@ -86,9 +88,9 @@ export function ResumeApplicationBanner() {
       <div className="min-h-0 overflow-hidden">
         <div className="bg-[#3CB179] text-white px-4 md:px-5 py-4 md:py-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex flex-col gap-2">
-            <h3 className="text-lg md:text-xl font-bold">Pick up where you left off</h3>
+            <h3 className="text-lg md:text-xl font-bold">{t("resumeTitle")}</h3>
             <p className="font-normal text-sm md:text-base">
-              Save time and jump back into your previously started application.
+              {t("resumeDescription")}
             </p>
           </div>
           <div className="flex flex-row items-center gap-2">
@@ -98,14 +100,14 @@ export function ResumeApplicationBanner() {
               className="border-white text-white bg-light-primary h-14 px-7 rounded-full hover:bg-white/20 border w-1/2 sm:w-auto"
               onClick={handleDismiss}
             >
-              Dismiss
+              {t("dismiss")}
             </Button>
             <Link href={applicationHref} className="w-1/2 sm:w-auto">
               <Button
                 className={cn("flex gap-3 group items-center justify-end sm:justify-center h-14 rounded-full text-sm pr-3 sm:pr-3 w-full")}
                 variant={'outline'}
               >
-                Continue
+                {t("continue")}
                 <div className={cn(
                   " w-8 h-8 rounded-full flex items-center justify-center bg-[#F3F6FC] group-hover:bg-white/60 transition-colors duration-100",
                 )}>

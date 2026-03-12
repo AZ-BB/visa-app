@@ -1,0 +1,258 @@
+{
+  "common": {
+    "termsOfService": "Términos de servicio",
+    "contactUs": "Contáctenos",
+    "english": "Inglés",
+    "spanish": "Español",
+    "french": "Francés",
+    "german": "Alemán",
+    "italian": "Italiano"
+  },
+  "footer": {
+    "copyright": "© 2025 Visa Pro LTD. Todos los derechos reservados. Número de empresa 123456",
+    "ratesBy": "Tasas por Exchange Rate API"
+  },
+  "nav": {
+    "testimonials": "Testimonios",
+    "howItWorks": "Cómo funciona",
+    "featured": "Destacados",
+    "faqs": "Preguntas frecuentes",
+    "contactUs": "Contáctenos",
+    "signUp": "Registrarse",
+    "login": "Iniciar sesión",
+    "myApplications": "Mis solicitudes",
+    "myAccount": "Mi cuenta",
+    "account": "Cuenta",
+    "logout": "Cerrar sesión"
+  },
+  "visaSelector": {
+    "whereAmIFrom": "¿De dónde soy?",
+    "whereAmITravelling": "¿A dónde viajo?",
+    "chooseCountry": "Elegir país",
+    "chooseLocation": "Elegir ubicación",
+    "chooseYourVisa": "Elige tu visa"
+  },
+  "landing": {
+    "hero": {
+      "titleLine1": "Tu",
+      "titleHighlight": "viaje",
+      "titleLine2": "comienza aquí",
+      "subtitle": "Elige el país al que viajas y te diremos si necesitas visa. Solo necesitamos algunos datos de cada viajero para ponerte en camino."
+    },
+    "stats": {
+      "customersHelped": "Clientes ayudados",
+      "approvalRate": "Tasa de aprobación",
+      "support": "Soporte"
+    },
+    "testimonials": {
+      "heading": "Cómo hemos ayudado a las personas",
+      "testimonialText": "Es un hecho establecido que el lector se distraerá con el contenido legible de una página al mirar su diseño.",
+      "customerLabel": "Cliente"
+    },
+    "howItWorks": {
+      "heading": "Cómo funciona",
+      "step1Title": "Elige tu destino",
+      "step1Desc": "Dinos de dónde viajas y a dónde viajas.",
+      "step2Title": "Añade tus viajeros",
+      "step2Desc": "Si se necesita visa, solo necesitamos saber quiénes viajarán.",
+      "step3Title": "Siéntate y relájate",
+      "step3Desc": "Sigue planificando tu viaje mientras nosotros nos encargamos del trabajo pesado."
+    },
+    "featured": {
+      "heading": "Destinos destacados",
+      "subheading": "Ofrecemos visas para todos los destinos más populares. Comienza tu solicitud de visa para uno de ellos ahora.",
+      "unitedStates": "Estados Unidos",
+      "unitedStatesDesc": "Si eres elegible para el VWP (Programa de exención de visa), necesitarás solicitar un ESTA.",
+      "australia": "Australia",
+      "australiaDesc": "La opción de visa más común es la Autoridad de Viaje Electrónica Australiana (ETA), subclase 601.",
+      "india": "India",
+      "indiaDesc": "El e-Visa de turista viene en 3 duraciones diferentes y permite múltiples entradas para turistas."
+    },
+    "faq": {
+      "heading": "Preguntas frecuentes",
+      "subheading": "Encuentra las respuestas a nuestras preguntas más comunes. Si aún necesitas ayuda, contáctanos y estaremos encantados de ayudarte.",
+      "faq1Q": "¿Cómo sé si necesito visa para mi viaje?",
+      "faq1A": "Selecciona tu país de origen y tu destino en nuestra página de inicio. Comprobaremos al instante los requisitos de visa para tu viaje. Si se necesita visa, te guiaremos paso a paso en el proceso de solicitud.",
+      "faq2Q": "¿Cuánto tarda el proceso de solicitud de visa?",
+      "faq2A": "Los tiempos de procesamiento varían según el destino y el tipo de visa. La mayoría de las e-Visas (p. ej. ESTA, ETA) se procesan en 24–72 horas. Ofrecemos diferentes opciones de entrega para que elijas la velocidad que se adapte a tus planes de viaje.",
+      "faq3Q": "¿Qué documentos necesito para solicitar?",
+      "faq3A": "Los requisitos dependen de tu destino. Normalmente necesitarás un pasaporte válido, detalles del viaje e información personal. Te diremos exactamente qué se requiere para tu visa específica antes de que comiences tu solicitud.",
+      "faq4Q": "¿Puedo solicitar para varios viajeros a la vez?",
+      "faq4A": "Sí. Cuando se requiere visa, puedes añadir a todos los viajeros de tu grupo en una sola solicitud. Recopilaremos los datos necesarios de cada persona y los procesaremos juntos para tu comodidad.",
+      "faq5Q": "¿Qué pasa si mi solicitud es rechazada?",
+      "faq5A": "Tenemos una tasa de aprobación del 99%. Si una solicitud no tiene éxito, explicaremos el motivo y aconsejaremos los próximos pasos. En la mayoría de los casos, volver a solicitar con la información corregida resuelve el problema.",
+      "faq6Q": "¿Es seguro mi pago?",
+      "faq6A": "Absolutamente. Utilizamos procesamiento de pagos seguro y nunca almacenamos los datos de tu tarjeta. Verás un desglose claro de nuestra tarifa de servicio y cualquier tarifa gubernamental antes de pagar."
+    }
+  },
+  "apply": {
+    "noVisaRequired": "¡Buenas noticias! No necesitas visa para viajar a {destination}",
+    "travelSomewhereElse": "Viajar a otro lugar",
+    "notSupported": "Actualmente no admitimos este viaje",
+    "trySomewhereElse": "Probar otro destino",
+    "applyForTitle": "Solicita tu {visa}",
+    "visaRequiredTip": "Se requiere visa para viajar a {destination} con pasaporte de {passport}.",
+    "whereAmIFrom": "¿De dónde soy?",
+    "nationalityHint": "Debe coincidir con la nacionalidad del pasaporte con el que viajarás.",
+    "chooseNationality": "Elegir nacionalidad",
+    "whichVisa": "¿Qué visa necesitas?",
+    "selectVisa": "Seleccionar visa",
+    "numberOfTravelers": "Número de viajeros",
+    "decreaseTravelers": "Reducir número de viajeros",
+    "increaseTravelers": "Aumentar número de viajeros",
+    "validFor": "Válido por",
+    "afterIssue": "después de la emisión",
+    "numberOfEntries": "Número de entradas",
+    "multiple": "Múltiple",
+    "maxStay": "Estancia máxima",
+    "daysPerEntry": "días por entrada",
+    "startApplication": "Iniciar tu solicitud",
+    "resumeTitle": "Retoma donde lo dejaste",
+    "resumeDescription": "Ahorra tiempo y vuelve a tu solicitud previamente iniciada.",
+    "dismiss": "Descartar",
+    "continue": "Continuar",
+    "applyForVisaTo": "Solicita tu visa para {destination}",
+    "visaMandatory": "Se requiere visa para titulares de pasaporte {passport} que viajan a {destination}. Actualmente VisaPro no la ofrece.",
+    "checkOtherDestinations": "Ver otros destinos",
+    "notFoundTitle": "No encontrado",
+    "notFoundDescription": "El país que buscas no existe.",
+    "goBackHome": "Volver a la página principal"
+  },
+  "application": {
+    "page": {
+      "notSupportedDestination": "Actualmente no admitimos viajes a {destination}",
+      "technicalIssues": "Estamos experimentando problemas técnicos. Por favor, inténtalo más tarde.",
+      "tryAgain": "Intentar de nuevo"
+    },
+    "progress": {
+      "ariaLabel": "Progreso de la solicitud",
+      "stepOf": "Paso {current} de {total}",
+      "tripDetails": "Detalles del viaje",
+      "personalInfo": "Información personal",
+      "passportInfo": "Información del pasaporte",
+      "turnaroundTime": "Tiempo de procesamiento",
+      "checkout": "Pago"
+    },
+    "step1": {
+      "title": "Detalles del viaje",
+      "arrivalLabel": "¿Cuándo llegas a {country}?",
+      "arrivalPlaceholder": "DD MM AAAA",
+      "emailLabel": "¿Cuál es tu correo electrónico?",
+      "emailHint": "Te avisaremos cuando tu visa esté lista",
+      "emailPlaceholder": "juan.garcia@empresa.es",
+      "additionalCosts": "Costes adicionales",
+      "ofTravellers": "{count} viajero/s",
+      "total": "Total",
+      "calculatedAtCheckout": "Calculado en el pago",
+      "findOutMore": "Más información",
+      "privacyTip": "sobre cómo protegemos tu información.",
+      "saveContinue": "Guardar y continuar"
+    },
+    "step2": {
+      "title": "Información personal",
+      "intro": "Los datos de cada viajero deben coincidir con el pasaporte con el que viajará.",
+      "travellerNum": "Viajero #{num}",
+      "firstName": "Nombre y segundo nombre",
+      "firstNamePlaceholder": "Juan",
+      "lastName": "Apellido",
+      "lastNamePlaceholder": "García",
+      "dob": "Fecha de nacimiento",
+      "dobPlaceholder": "DD MM AAAA",
+      "deniedVisa": "¿Te han denegado un {visa} en los últimos 6 meses?",
+      "deniedVisaError": "No podemos ayudarte con una nueva solicitud ahora ya que probablemente sería denegada de nuevo.",
+      "removeTraveller": "Eliminar viajero",
+      "addTraveller": "Añadir viajero",
+      "saveContinue": "Guardar y continuar"
+    },
+    "step3": {
+      "title": "Información del pasaporte",
+      "intro": "Añade los datos del pasaporte de cada viajero. Cada sección corresponde a un viajero del paso anterior.",
+      "passportNationality": "Nacionalidad del pasaporte",
+      "selectNationality": "Seleccionar nacionalidad",
+      "passportNumber": "Número de pasaporte",
+      "passportNumberPlaceholder": "12345678",
+      "passportExpiry": "Fecha de caducidad del pasaporte",
+      "countryOfBirth": "País de nacimiento",
+      "selectCountryOfBirth": "Seleccionar país de nacimiento",
+      "countryOfResidence": "País de residencia",
+      "selectCountryOfResidence": "Seleccionar país de residencia"
+    },
+    "step4": {
+      "title": "Tiempo de procesamiento",
+      "takesHours": "Tarda {hours} horas",
+      "takes1Day": "Tarda 1 día",
+      "takesDays": "Tarda {days} días",
+      "calculatedOnCheckout": "Calculado en el pago"
+    },
+    "step5": {
+      "title": "Pago",
+      "readyBy": "Tu solicitud estará lista el {date} (en {hours} horas). Nos aseguraremos de contactarte e informarte.",
+      "validFor": "Válido por",
+      "afterIssue": "después de la emisión",
+      "numberOfEntries": "Número de entradas",
+      "entries": "entradas",
+      "maxStay": "Estancia máxima",
+      "daysPerEntry": "días por entrada",
+      "travellers": "Viajeros",
+      "travellerNum": "Viajero #{num}",
+      "governmentalFee": "Tasa gubernamental",
+      "processingFee": "Tasa de procesamiento",
+      "additionalCosts": "Costes adicionales",
+      "turnaroundTime": "Tiempo de procesamiento",
+      "total": "Total",
+      "includingTaxes": "Incluyendo impuestos y tasas",
+      "continueToPayment": "Continuar al pago",
+      "findOutMore": "Más información",
+      "privacyTip": "sobre cómo protegemos tu información."
+    },
+    "buttons": {
+      "previousStep": "Paso anterior"
+    },
+    "checkoutAuth": {
+      "signIn": "Iniciar sesión",
+      "signInDescription": "Este correo ya tiene una cuenta. Inicia sesión directamente.",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "passwordPlaceholder": "Introduce tu contraseña",
+      "loggingIn": "Iniciando sesión…",
+      "login": "Iniciar sesión",
+      "createAccount": "Crear cuenta",
+      "createAccountDescription": "Regístrate para continuar al pago.",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "firstNamePlaceholder": "Nombre",
+      "lastNamePlaceholder": "Apellido",
+      "emailPlaceholder": "ejemplo@correo.com",
+      "phoneOptional": "(Opcional)",
+      "confirmPassword": "Confirmar contraseña",
+      "confirmPasswordPlaceholder": "Confirma tu contraseña",
+      "passwordHint": "Al menos 8 caracteres",
+      "creatingAccount": "Creando cuenta…",
+      "createAccountBtn": "Crear cuenta",
+      "emailRequired": "El correo es obligatorio",
+      "passwordRequired": "La contraseña es obligatoria"
+    },
+    "validation": {
+      "arrivalDateRequired": "La fecha de llegada es obligatoria",
+      "arrivalDatePast": "La fecha de llegada no puede ser en el pasado",
+      "emailRequired": "El correo es obligatorio",
+      "emailInvalid": "Por favor introduce un correo válido",
+      "firstNameRequired": "El nombre es obligatorio",
+      "lastNameRequired": "El apellido es obligatorio",
+      "dobRequired": "La fecha de nacimiento es obligatoria",
+      "dobFuture": "La fecha de nacimiento no puede ser en el futuro",
+      "deniedVisa": "No podemos ayudarte con una nueva solicitud ahora ya que probablemente sería denegada de nuevo.",
+      "nationalityRequired": "La nacionalidad del pasaporte es obligatoria",
+      "passportNumberRequired": "El número de pasaporte es obligatorio",
+      "passportExpiryRequired": "La fecha de caducidad del pasaporte es obligatoria",
+      "passportExpiryPast": "La fecha de caducidad no puede ser en el pasado",
+      "countryOfBirthRequired": "El país de nacimiento es obligatorio",
+      "countryOfResidenceRequired": "El país de residencia es obligatorio",
+      "turnaroundRequired": "El tiempo de procesamiento es obligatorio"
+    },
+    "errors": {
+      "checkoutSession": "Error al crear la sesión de pago",
+      "createApplication": "Error al crear la solicitud"
+    }
+  }
+}

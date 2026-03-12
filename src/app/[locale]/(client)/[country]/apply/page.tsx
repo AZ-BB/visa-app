@@ -1,13 +1,14 @@
 import ArrowButton from "@/components/ArrowButton";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { ApplyFormSection } from "./_components/ApplyFormSection";
 import { createSupabaseServerClient } from "@/lib/supabase/supabase-server";
 import { notFound } from "next/navigation";
 import { getUser } from "@/lib/get-user";
 import { SelectAnotherCountry } from "./_components/SelectAnotherCountry";
+import { getTranslations } from "next-intl/server";
 
-export default async function ApplyPage({ params, searchParams }: { params: Promise<{ country: string }>, searchParams: Promise<{ from: string }> }) {
+export default async function ApplyPage({ params, searchParams }: { params: Promise<{ locale: string; country: string }>, searchParams: Promise<{ from: string }> }) {
     const { country } = await params;
     const { from } = await searchParams;
 
@@ -53,6 +54,7 @@ export default async function ApplyPage({ params, searchParams }: { params: Prom
     const isVisaRequired = visaRules.is_visa_required ?? false;
 
     if (!isVisaRequired) {
+        const t = await getTranslations("apply");
         return (
             <div className="w-full flex flex-col items-center justify-start min-h-screen px-4 sm:px-0">
                 <div className="bg-white mt-24 flex flex-col items-center justify-center gap-4 relative pt-24 pb-10 px-10 rounded-lg border border-border-default/40">
@@ -65,14 +67,12 @@ export default async function ApplyPage({ params, searchParams }: { params: Prom
                     />
 
                     <h2 className="text-2xl md:text-4xl font-bold text-center">
-                        Good news! You don’t need a visa to
-                        <br className="hidden md:block" />
-                        travel to {destinationCountry.name}
+                        {t("noVisaRequired", { destination: destinationCountry.name })}
                     </h2>
 
                     <Link href="/">
                         <ArrowButton>
-                            Travel somewhere else
+                            {t("travelSomewhereElse")}
                         </ArrowButton>
                     </Link>
                 </div>
@@ -103,16 +103,17 @@ export default async function ApplyPage({ params, searchParams }: { params: Prom
     }
 
     if (products && products.length === 0) {
+        const t = await getTranslations("apply");
         return (
             <div className="w-full flex flex-col items-center justify-start min-h-screen px-4 sm:px-0">
                 <div className="bg-red-50 mt-24 flex flex-col items-center justify-center gap-4 pt-10 pb-10 px-10 rounded-lg border border-red-200">
                     <h2 className="text-2xl md:text-4xl font-bold text-center">
-                        We currently don&apos;t support this trip
+                        {t("notSupported")}
                     </h2>
 
                     <Link href="/">
                         <ArrowButton>
-                            Try somewhere else
+                            {t("trySomewhereElse")}
                         </ArrowButton>
                     </Link>
                 </div>

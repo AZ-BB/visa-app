@@ -1,0 +1,258 @@
+{
+  "common": {
+    "termsOfService": "Conditions d'utilisation",
+    "contactUs": "Contactez-nous",
+    "english": "Anglais",
+    "spanish": "Espagnol",
+    "french": "Français",
+    "german": "Allemand",
+    "italian": "Italien"
+  },
+  "footer": {
+    "copyright": "© 2025 Visa Pro LTD. Tous droits réservés. Numéro d'entreprise 123456",
+    "ratesBy": "Taux par Exchange Rate API"
+  },
+  "nav": {
+    "testimonials": "Témoignages",
+    "howItWorks": "Comment ça marche",
+    "featured": "En vedette",
+    "faqs": "FAQ",
+    "contactUs": "Contactez-nous",
+    "signUp": "S'inscrire",
+    "login": "Connexion",
+    "myApplications": "Mes demandes",
+    "myAccount": "Mon compte",
+    "account": "Compte",
+    "logout": "Déconnexion"
+  },
+  "visaSelector": {
+    "whereAmIFrom": "D'où suis-je ?",
+    "whereAmITravelling": "Où je voyage ?",
+    "chooseCountry": "Choisir un pays",
+    "chooseLocation": "Choisir un lieu",
+    "chooseYourVisa": "Choisissez votre visa"
+  },
+  "landing": {
+    "hero": {
+      "titleLine1": "Votre",
+      "titleHighlight": "voyage",
+      "titleLine2": "commence ici",
+      "subtitle": "Choisissez le pays où vous voyagez et nous vous indiquerons si vous avez besoin d'un visa. Il nous suffit de quelques détails pour chaque voyageur pour vous mettre en route."
+    },
+    "stats": {
+      "customersHelped": "Clients aidés",
+      "approvalRate": "Taux d'approbation",
+      "support": "Assistance"
+    },
+    "testimonials": {
+      "heading": "Comment nous avons aidé les gens",
+      "testimonialText": "Il est établi de longue date qu'un lecteur sera distrait par le contenu lisible d'une page en regardant sa mise en page.",
+      "customerLabel": "Client"
+    },
+    "howItWorks": {
+      "heading": "Comment ça marche",
+      "step1Title": "Choisissez votre destination",
+      "step1Desc": "Indiquez-nous d'où vous partez et où vous allez.",
+      "step2Title": "Ajoutez vos voyageurs",
+      "step2Desc": "Si un visa est nécessaire, nous avons juste besoin de savoir qui voyagera.",
+      "step3Title": "Détendez-vous",
+      "step3Desc": "Continuez à planifier votre voyage pendant que nous nous occupons du reste."
+    },
+    "featured": {
+      "heading": "Destinations en vedette",
+      "subheading": "Nous proposons des visas pour toutes les destinations les plus populaires. Commencez votre demande de visa pour l'une d'entre elles maintenant.",
+      "unitedStates": "États-Unis",
+      "unitedStatesDesc": "Si vous êtes éligible au VWP (Programme d'exemption de visa), vous devrez demander un ESTA.",
+      "australia": "Australie",
+      "australiaDesc": "L'option de visa la plus courante est l'Autorité de voyage électronique australienne (ETA), sous-classe 601.",
+      "india": "Inde",
+      "indiaDesc": "Le e-Visa touristique existe en 3 durées différentes et permet plusieurs entrées pour les touristes."
+    },
+    "faq": {
+      "heading": "Questions fréquentes",
+      "subheading": "Trouvez les réponses à nos questions les plus courantes. Si vous avez encore besoin d'aide, contactez-nous et nous serons ravis de vous aider.",
+      "faq1Q": "Comment savoir si j'ai besoin d'un visa pour mon voyage ?",
+      "faq1A": "Sélectionnez votre pays d'origine et votre destination sur notre page d'accueil. Nous vérifierons instantanément les exigences en matière de visa pour votre voyage. Si un visa est nécessaire, nous vous guiderons étape par étape dans le processus de demande.",
+      "faq2Q": "Combien de temps prend le processus de demande de visa ?",
+      "faq2A": "Les délais de traitement varient selon la destination et le type de visa. La plupart des e-Visas (ex. ESTA, ETA) sont traités sous 24 à 72 heures. Nous proposons différentes options de délai pour que vous puissiez choisir la rapidité qui convient à vos projets de voyage.",
+      "faq3Q": "Quels documents dois-je fournir pour ma demande ?",
+      "faq3A": "Les exigences dépendent de votre destination. En général, vous aurez besoin d'un passeport valide, des détails du voyage et des informations personnelles. Nous vous indiquerons exactement ce qui est requis pour votre visa spécifique avant de commencer votre demande.",
+      "faq4Q": "Puis-je demander un visa pour plusieurs voyageurs en même temps ?",
+      "faq4A": "Oui. Lorsqu'un visa est requis, vous pouvez ajouter tous les voyageurs de votre groupe à une seule demande. Nous recueillerons les informations nécessaires pour chaque personne et les traiterons ensemble pour votre commodité.",
+      "faq5Q": "Que se passe-t-il si ma demande est rejetée ?",
+      "faq5A": "Nous avons un taux d'approbation de 99 %. Si une demande échoue, nous expliquerons la raison et conseillerons les prochaines étapes. Dans la plupart des cas, une nouvelle demande avec les informations corrigées résout le problème.",
+      "faq6Q": "Mon paiement est-il sécurisé ?",
+      "faq6A": "Absolument. Nous utilisons un traitement de paiement sécurisé et ne stockons jamais les détails de votre carte. Vous verrez une ventilation claire de nos frais de service et des frais gouvernementaux avant de payer."
+    }
+  },
+  "apply": {
+    "noVisaRequired": "Bonne nouvelle ! Vous n'avez pas besoin de visa pour voyager en {destination}",
+    "travelSomewhereElse": "Voyager ailleurs",
+    "notSupported": "Nous ne prenons en charge ce voyage pour le moment",
+    "trySomewhereElse": "Essayer une autre destination",
+    "applyForTitle": "Demandez votre {visa}",
+    "visaRequiredTip": "Un visa est requis pour voyager en {destination} avec un passeport de {passport}.",
+    "whereAmIFrom": "D'où suis-je ?",
+    "nationalityHint": "Doit correspondre à la nationalité du passeport avec lequel vous voyagerez.",
+    "chooseNationality": "Choisir la nationalité",
+    "whichVisa": "De quel visa avez-vous besoin ?",
+    "selectVisa": "Sélectionner un visa",
+    "numberOfTravelers": "Nombre de voyageurs",
+    "decreaseTravelers": "Réduire le nombre de voyageurs",
+    "increaseTravelers": "Augmenter le nombre de voyageurs",
+    "validFor": "Valide pendant",
+    "afterIssue": "après l'émission",
+    "numberOfEntries": "Nombre d'entrées",
+    "multiple": "Multiple",
+    "maxStay": "Séjour maximum",
+    "daysPerEntry": "jours par entrée",
+    "startApplication": "Démarrer votre demande",
+    "resumeTitle": "Reprenez où vous en étiez",
+    "resumeDescription": "Gagnez du temps et reprenez votre demande précédemment commencée.",
+    "dismiss": "Ignorer",
+    "continue": "Continuer",
+    "applyForVisaTo": "Demandez votre visa pour {destination}",
+    "visaMandatory": "Un visa est obligatoire pour les titulaires de passeport {passport} voyageant en {destination}. VisaPro ne le propose actuellement pas.",
+    "checkOtherDestinations": "Voir d'autres destinations",
+    "notFoundTitle": "Non trouvé",
+    "notFoundDescription": "Le pays que vous recherchez n'existe pas.",
+    "goBackHome": "Retour à la page d'accueil"
+  },
+  "application": {
+    "page": {
+      "notSupportedDestination": "Nous ne prenons actuellement pas en charge les voyages vers {destination}",
+      "technicalIssues": "Nous rencontrons des problèmes techniques. Veuillez réessayer plus tard.",
+      "tryAgain": "Réessayer"
+    },
+    "progress": {
+      "ariaLabel": "Progression de la demande",
+      "stepOf": "Étape {current} sur {total}",
+      "tripDetails": "Détails du voyage",
+      "personalInfo": "Informations personnelles",
+      "passportInfo": "Informations passeport",
+      "turnaroundTime": "Délai de traitement",
+      "checkout": "Paiement"
+    },
+    "step1": {
+      "title": "Détails du voyage",
+      "arrivalLabel": "Quand arrivez-vous en {country} ?",
+      "arrivalPlaceholder": "JJ MM AAAA",
+      "emailLabel": "Quelle est votre adresse e-mail ?",
+      "emailHint": "Nous vous préviendrons lorsque votre visa sera prêt",
+      "emailPlaceholder": "jean.dupont@entreprise.fr",
+      "additionalCosts": "Frais supplémentaires",
+      "ofTravellers": "{count} voyageur(s)",
+      "total": "Total",
+      "calculatedAtCheckout": "Calculé au paiement",
+      "findOutMore": "En savoir plus",
+      "privacyTip": "sur la protection de vos informations.",
+      "saveContinue": "Enregistrer et continuer"
+    },
+    "step2": {
+      "title": "Informations personnelles",
+      "intro": "Les informations de chaque voyageur doivent correspondre au passeport avec lequel il voyagera.",
+      "travellerNum": "Voyageur n°{num}",
+      "firstName": "Prénom et deuxième prénom",
+      "firstNamePlaceholder": "Jean",
+      "lastName": "Nom",
+      "lastNamePlaceholder": "Dupont",
+      "dob": "Date de naissance",
+      "dobPlaceholder": "JJ MM AAAA",
+      "deniedVisa": "Avez-vous été refusé un {visa} au cours des 6 derniers mois ?",
+      "deniedVisaError": "Nous ne pouvons pas vous aider avec une nouvelle demande pour le moment car elle serait probablement refusée à nouveau.",
+      "removeTraveller": "Supprimer le voyageur",
+      "addTraveller": "Ajouter un voyageur",
+      "saveContinue": "Enregistrer et continuer"
+    },
+    "step3": {
+      "title": "Informations passeport",
+      "intro": "Ajoutez les détails du passeport pour chaque voyageur. Chaque section correspond à un voyageur de l'étape précédente.",
+      "passportNationality": "Nationalité du passeport",
+      "selectNationality": "Sélectionner la nationalité",
+      "passportNumber": "Numéro de passeport",
+      "passportNumberPlaceholder": "12345678",
+      "passportExpiry": "Date d'expiration du passeport",
+      "countryOfBirth": "Pays de naissance",
+      "selectCountryOfBirth": "Sélectionner le pays de naissance",
+      "countryOfResidence": "Pays de résidence",
+      "selectCountryOfResidence": "Sélectionner le pays de résidence"
+    },
+    "step4": {
+      "title": "Délai de traitement",
+      "takesHours": "Prend {hours} heures",
+      "takes1Day": "Prend 1 jour",
+      "takesDays": "Prend {days} jours",
+      "calculatedOnCheckout": "Calculé au paiement"
+    },
+    "step5": {
+      "title": "Paiement",
+      "readyBy": "Votre demande sera prête le {date} (dans {hours} heures). Nous nous assurerons de vous contacter.",
+      "validFor": "Valide pendant",
+      "afterIssue": "après émission",
+      "numberOfEntries": "Nombre d'entrées",
+      "entries": "entrées",
+      "maxStay": "Séjour maximum",
+      "daysPerEntry": "jours par entrée",
+      "travellers": "Voyageurs",
+      "travellerNum": "Voyageur n°{num}",
+      "governmentalFee": "Frais gouvernementaux",
+      "processingFee": "Frais de traitement",
+      "additionalCosts": "Frais supplémentaires",
+      "turnaroundTime": "Délai de traitement",
+      "total": "Total",
+      "includingTaxes": "TVA et frais inclus",
+      "continueToPayment": "Continuer vers le paiement",
+      "findOutMore": "En savoir plus",
+      "privacyTip": "sur la protection de vos informations."
+    },
+    "buttons": {
+      "previousStep": "Étape précédente"
+    },
+    "checkoutAuth": {
+      "signIn": "Connexion",
+      "signInDescription": "Cet e-mail a déjà un compte. Connectez-vous directement.",
+      "email": "E-mail",
+      "password": "Mot de passe",
+      "passwordPlaceholder": "Entrez votre mot de passe",
+      "loggingIn": "Connexion en cours…",
+      "login": "Connexion",
+      "createAccount": "Créer un compte",
+      "createAccountDescription": "Inscrivez-vous pour continuer vers le paiement.",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "firstNamePlaceholder": "Prénom",
+      "lastNamePlaceholder": "Nom",
+      "emailPlaceholder": "exemple@email.com",
+      "phoneOptional": "(Optionnel)",
+      "confirmPassword": "Confirmer le mot de passe",
+      "confirmPasswordPlaceholder": "Confirmez votre mot de passe",
+      "passwordHint": "Au moins 8 caractères",
+      "creatingAccount": "Création du compte…",
+      "createAccountBtn": "Créer un compte",
+      "emailRequired": "L'e-mail est requis",
+      "passwordRequired": "Le mot de passe est requis"
+    },
+    "validation": {
+      "arrivalDateRequired": "La date d'arrivée est requise",
+      "arrivalDatePast": "La date d'arrivée ne peut pas être dans le passé",
+      "emailRequired": "L'e-mail est requis",
+      "emailInvalid": "Veuillez entrer une adresse e-mail valide",
+      "firstNameRequired": "Le prénom est requis",
+      "lastNameRequired": "Le nom est requis",
+      "dobRequired": "La date de naissance est requise",
+      "dobFuture": "La date de naissance ne peut pas être dans le futur",
+      "deniedVisa": "Nous ne pouvons pas vous aider avec une nouvelle demande pour le moment.",
+      "nationalityRequired": "La nationalité du passeport est requise",
+      "passportNumberRequired": "Le numéro de passeport est requis",
+      "passportExpiryRequired": "La date d'expiration du passeport est requise",
+      "passportExpiryPast": "La date d'expiration ne peut pas être dans le passé",
+      "countryOfBirthRequired": "Le pays de naissance est requis",
+      "countryOfResidenceRequired": "Le pays de résidence est requis",
+      "turnaroundRequired": "Le délai de traitement est requis"
+    },
+    "errors": {
+      "checkoutSession": "Échec de la création de la session de paiement",
+      "createApplication": "Échec de la création de la demande"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { Menu, X, LogOut, ChevronDown, User, FileText } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../ui/button";
@@ -8,14 +8,18 @@ import { cn } from "@/lib/utils";
 import { DropdownMenu } from "radix-ui";
 import { logout } from "@/actions/auth";
 import { createSupabaseBrowserClient } from "@/lib/supabase/supabase-browser";
-import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 const NAV_LINKS = [
-  { label: "Testimonials", href: "#testimonials" },
-  { label: "How it works", href: "#how-it-works" },
-  { label: "Featured", href: "#featured" },
-  { label: "FAQs", href: "#faqs" },
+  { labelKey: "testimonials", href: "#testimonials" },
+  { labelKey: "howItWorks", href: "#how-it-works" },
+  { labelKey: "featured", href: "#featured" },
+  { labelKey: "faqs", href: "#faqs" },
 ];
+
+function isHomePath(pathname: string) {
+  return pathname === "/" || pathname === "";
+}
 
 export type AuthUser = {
   user_metadata?: { first_name?: string; last_name?: string };
@@ -30,21 +34,22 @@ export function NavbarClient({ user }: NavbarClientProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const t = useTranslations("nav");
 
   return (
     <header className="fixed left-0 right-0 top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-        <a
+        <Link
           href="/"
           className="flex font-bold items-center gap-1 text-[32px] text-gray-800"
           style={{ letterSpacing: "-0.5px" }}
         >
           <span>logo</span>
           <span className="text-orange-500">.</span>
-        </a>
+        </Link>
 
         {/* Desktop nav */}
-        {pathname === "/" && (
+        {isHomePath(pathname) && (
           <nav className="hidden items-center gap-8 md:flex">
             {NAV_LINKS.map((link) => (
               <a
@@ -52,7 +57,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
                 href={link.href}
                 className="text-sm font-semibold text-secondary-copy transition hover:text-gray-900"
               >
-                {link.label}
+                {t(link.labelKey)}
               </a>
             ))}
           </nav>
@@ -88,7 +93,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
                         className="flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 outline-none hover:bg-gray-100 focus:bg-gray-100"
                       >
                         <FileText className="size-4" />
-                        My Applications
+                        {t("myApplications")}
                       </button>
                     </Link>
                   </DropdownMenu.Item>
@@ -99,7 +104,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
                         className="flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none hover:bg-gray-100 focus:bg-gray-100"
                       >
                         <User className="size-4" />
-                        My Account
+                        {t("myAccount")}
                       </button>
                     </Link>
                   </DropdownMenu.Item>
@@ -114,7 +119,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
                       className="flex w-full text-red-600 cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 outline-none hover:bg-gray-100 focus:bg-gray-100"
                     >
                       <LogOut className="size-4" />
-                      Logout
+                      {t("logout")}
                     </button>
                   </DropdownMenu.Item>
                 </DropdownMenu.Content>
@@ -124,12 +129,12 @@ export function NavbarClient({ user }: NavbarClientProps) {
             <>
               <Link href="/contact-us">
                 <Button variant="outline" className="rounded-lg px-5 py-2.5 text-sm">
-                  Contact us
+                  {t("contactUs")}
                 </Button>
               </Link>
               <Link href="/login">
                 <Button variant="default" className="rounded-lg px-5 py-2.5 text-sm border-2 border-primary/60 hover:border-primary/75">
-                  Login
+                  {t("login")}
                 </Button>
               </Link>
             </>
@@ -165,7 +170,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
         )}
       >
         <nav className="flex flex-col px-6 py-4 gap-1">
-          {pathname === "/" && (
+          {isHomePath(pathname) && (
             <div className="mb-2 pb-2 border-b border-gray-100 flex flex-col">
               {
                 NAV_LINKS.map((link) => (
@@ -175,7 +180,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
                     onClick={() => setMenuOpen(false)}
                     className="py-3 text-base font-semibold text-primary-copy hover:text-gray-600"
                   >
-                    {link.label}
+                    {t(link.labelKey)}
                   </a>
                 ))
               }
@@ -197,7 +202,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
                   className="flex w-full items-center gap-2 rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
                   <FileText className="size-4" />
-                  My Applications
+                  {t("myApplications")}
                 </Link>
                 <Link
                   href="/account"
@@ -205,7 +210,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
                   className="flex w-full items-center gap-2 rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
                   <User className="size-4" />
-                  My Account
+                  {t("myAccount")}
                 </Link>
                 <form action={logout} className="w-full">
                   <button
@@ -214,7 +219,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
                     className="flex w-full items-center gap-2 rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50"
                   >
                     <LogOut className="size-4" />
-                    Logout
+                    {t("logout")}
                   </button>
                 </form>
               </div>
@@ -226,7 +231,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
                   asChild
                 >
                   <Link href="/login" onClick={() => setMenuOpen(false)}>
-                    Login
+                    {t("login")}
                   </Link>
                 </Button>
                 <Button
@@ -235,7 +240,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
                   asChild
                 >
                   <Link href="/contact-us" onClick={() => setMenuOpen(false)}>
-                    Contact us
+                    {t("contactUs")}
                   </Link>
                 </Button>
               </>

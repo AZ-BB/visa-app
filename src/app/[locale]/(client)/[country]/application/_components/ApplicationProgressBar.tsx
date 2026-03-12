@@ -3,16 +3,12 @@
 import CheckMark from "@/components/svgs/check-mark"
 import { cn } from "@/lib/utils"
 import { Fragment } from "react"
+import { useTranslations } from "next-intl"
 
-export const APPLICATION_STEPS = [
-  { id: 1, label: "Trip details" },
-  { id: 2, label: "Personal info" },
-  { id: 3, label: "Passport info" },
-  { id: 4, label: "Turnaround time" },
-  { id: 5, label: "Checkout" },
-] as const
+export const APPLICATION_STEP_IDS = [1, 2, 3, 4, 5] as const
+const STEP_LABEL_KEYS = ["tripDetails", "personalInfo", "passportInfo", "turnaroundTime", "checkout"] as const
 
-export type StepId = (typeof APPLICATION_STEPS)[number]["id"]
+export type StepId = (typeof APPLICATION_STEP_IDS)[number]
 
 interface ApplicationProgressBarProps {
   currentStep: StepId
@@ -23,17 +19,19 @@ export function ApplicationProgressBar({
   currentStep,
   className,
 }: ApplicationProgressBarProps) {
+  const t = useTranslations("application.progress")
   return (
-    <nav aria-label="Application progress" className={cn("w-full", className)}>
+    <nav aria-label={t("ariaLabel")} className={cn("w-full", className)}>
       <ol className="flex w-full items-center">
-        {APPLICATION_STEPS.map((step, index) => {
-          const isActive = step.id === currentStep
-          const isPast = step.id < currentStep
-          const isLast = index === APPLICATION_STEPS.length - 1
-          const lineIsPast = step.id < currentStep
+        {APPLICATION_STEP_IDS.map((stepId, index) => {
+          const isActive = stepId === currentStep
+          const isPast = stepId < currentStep
+          const isLast = index === APPLICATION_STEP_IDS.length - 1
+          const lineIsPast = stepId < currentStep
+          const label = t(STEP_LABEL_KEYS[index])
 
           return (
-            <Fragment key={step.id}>
+            <Fragment key={stepId}>
               <li className="flex shrink-0 items-center">
                 <div
                   className={cn(
@@ -46,7 +44,7 @@ export function ApplicationProgressBar({
                   )}
                   aria-current={isActive ? "step" : undefined}
                 >
-                  {isPast ? <CheckMark /> : step.id}
+                  {isPast ? <CheckMark /> : stepId}
                 </div>
                 <span
                   className={cn(
@@ -54,7 +52,7 @@ export function ApplicationProgressBar({
                     isActive || isPast ? "text-primary-copy" : "text-gray-400",
                   )}
                 >
-                  {step.label}
+                  {label}
                 </span>
               </li>
               {!isLast && (

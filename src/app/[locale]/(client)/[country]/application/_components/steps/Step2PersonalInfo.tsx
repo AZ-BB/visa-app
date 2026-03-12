@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   Accordion,
   AccordionContent,
@@ -32,20 +33,21 @@ function ApplicationSidebar({
 }: {
   travellerCount?: number;
 }) {
+  const t = useTranslations("application.step1");
   return (
     <div className="space-y-5">
       <div className="bg-white rounded-2xl p-5 border border-border-default/50 shadow-sm">
 
         <h3 className="text-xl font-bold text-primary-copy mb-2">
-          Additional costs
+          {t("additionalCosts")}
         </h3>
 
-        <p className="text-base">{travellerCount} of traveller/s</p>
+        <p className="text-base">{t("ofTravellers", { count: travellerCount })}</p>
         <Separator className="mt-2 mb-4" />
 
         <div className="flex justify-between text-base">
-          <span className="text-secondary-copy">Total</span>
-          <span className="font-medium">Calculated at checkout</span>
+          <span className="text-secondary-copy">{t("total")}</span>
+          <span className="font-medium">{t("calculatedAtCheckout")}</span>
         </div>
       </div>
 
@@ -55,16 +57,14 @@ function ApplicationSidebar({
             href="#"
             className="font-semibold text-primary underline-offset-2 hover:underline"
           >
-            Find out more
+            {t("findOutMore")}
           </a>{" "}
-          about how we keep your information safe.
+          {t("privacyTip")}
         </p>
       </TipCard>
     </div>
   );
 }
-
-const DENIED_VISA_ERROR = "We can't help you with a new application right now as it's likely to be denied again.";
 
 function TravellerFields({
   idPrefix,
@@ -73,6 +73,7 @@ function TravellerFields({
   onUpdate,
   errors,
   visaName,
+  t,
 }: {
   idPrefix: string;
   index: number;
@@ -80,6 +81,7 @@ function TravellerFields({
   onUpdate: (patch: Partial<TempTraveller>) => void;
   errors?: Record<string, string> | null;
   visaName: string;
+  t: (key: string, values?: Record<string, string | number>) => string;
 }) {
   const field = (key: string) => errors?.[`traveller_${index}_${key}`];
   return (
@@ -89,12 +91,12 @@ function TravellerFields({
           htmlFor={`${idPrefix}-first-name`}
           className="block text-base font-medium text-primary-copy mb-2"
         >
-          First and middle name
+          {t("firstName")}
         </label>
         <Input
           id={`${idPrefix}-first-name`}
           type="text"
-          placeholder="Joe"
+          placeholder={t("firstNamePlaceholder")}
           value={traveller.first_name}
           onChange={(e) => onUpdate({ first_name: e.target.value })}
           className={field("first_name") ? "border-red-500" : ""}
@@ -109,12 +111,12 @@ function TravellerFields({
           htmlFor={`${idPrefix}-last-name`}
           className="block text-base font-medium text-primary-copy mb-2"
         >
-          Last name
+          {t("lastName")}
         </label>
         <Input
           id={`${idPrefix}-last-name`}
           type="text"
-          placeholder="Smith"
+          placeholder={t("lastNamePlaceholder")}
           value={traveller.last_name}
           onChange={(e) => onUpdate({ last_name: e.target.value })}
           className={field("last_name") ? "border-red-500" : ""}
@@ -129,14 +131,14 @@ function TravellerFields({
           htmlFor={`${idPrefix}-dob`}
           className="block text-base font-medium text-primary-copy mb-2"
         >
-          Date of birth
+          {t("dob")}
         </label>
         <div className="relative">
           <DatePicker
             id={`${idPrefix}-dob`}
             value={traveller.date_of_birth || undefined}
             onValueChange={(date) => onUpdate({ date_of_birth: date ? date.toISOString().split("T")[0] ?? "" : "" })}
-            placeholder="DD MM YYYY"
+            placeholder={t("dobPlaceholder")}
             disableAfterToday={true}
           />
         </div>
@@ -149,17 +151,17 @@ function TravellerFields({
           htmlFor={`${idPrefix}-denied-visa`}
           className="block text-base font-medium text-primary-copy mb-2"
         >
-          Have you been denied a {visaName || "visa"} in the last 6 months?
+          {t("deniedVisa", { visa: visaName || "visa" })}
         </label>
         <YesNoRadioGroup
           id={`${idPrefix}-denied-visa`}
           value={traveller.denied_visa_last_6_months}
           onChange={(value) => onUpdate({ denied_visa_last_6_months: value })}
-          aria-label={`Have you been denied a ${visaName || "visa"} in the last 6 months?`}
+          aria-label={t("deniedVisa", { visa: visaName || "visa" })}
           aria-invalid={traveller.denied_visa_last_6_months === true}
         />
         {traveller.denied_visa_last_6_months === true && (
-          <p className="mt-1.5 text-sm text-red-600">{DENIED_VISA_ERROR}</p>
+          <p className="mt-1.5 text-sm text-red-600">{t("deniedVisaError")}</p>
         )}
       </div>
     </div>
@@ -167,6 +169,7 @@ function TravellerFields({
 }
 
 export function Step2PersonalInfo({ onNext, onBack, errors }: Step2PersonalInfoProps) {
+  const t = useTranslations("application.step2");
   const { order, updateOrder } = useApplicationOrder();
   const { travellers, visa_name } = order;
   const hasAnyDeniedVisa = travellers.some((t) => t.denied_visa_last_6_months === true);
@@ -193,11 +196,10 @@ export function Step2PersonalInfo({ onNext, onBack, errors }: Step2PersonalInfoP
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
       <div className="lg:col-span-2">
         <h2 className="text-2xl font-bold text-primary-copy mb-2">
-          Personal info
+          {t("title")}
         </h2>
         <p className="text-secondary-copy text-base mb-6">
-          Each travellers&apos; details must match the passport they&apos;ll be
-          travelling with.
+          {t("intro")}
         </p>
 
         <Accordion
@@ -208,7 +210,7 @@ export function Step2PersonalInfo({ onNext, onBack, errors }: Step2PersonalInfoP
           {travellers.map((traveller, index) => (
             <AccordionItem variant="variant-2" key={index} value={`traveller-${index + 1}`}>
               <AccordionTrigger className="text-lg text-primary-copy font-bold">
-                Traveller #{index + 1}
+                {t("travellerNum", { num: index + 1 })}
               </AccordionTrigger>
               <AccordionContent>
                 <TravellerFields
@@ -218,6 +220,7 @@ export function Step2PersonalInfo({ onNext, onBack, errors }: Step2PersonalInfoP
                   onUpdate={(patch) => updateTraveller(index, patch)}
                   errors={errors}
                   visaName={visa_name}
+                  t={t}
                 />
                 {
                   index > 0 && (
@@ -227,10 +230,10 @@ export function Step2PersonalInfo({ onNext, onBack, errors }: Step2PersonalInfoP
                         onClick={() => removeTraveller(index)}
                         disabled={index === 0}
                         className="flex text-red-500 items-center gap-2 hover:underline"
-                        aria-label="Remove traveller"
+                        aria-label={t("removeTraveller")}
                       >
                         <Trash2 className="size-4" aria-hidden />
-                        Remove traveller
+                        {t("removeTraveller")}
                       </button>
                     </div>
                   )
@@ -245,7 +248,7 @@ export function Step2PersonalInfo({ onNext, onBack, errors }: Step2PersonalInfoP
           onClick={addTraveller}
           className="inline-flex items-center bg-[#F0FAFF] justify-between gap-2 mt-3 rounded-xl border-3 border-dashed px-4 py-3 text-primary font-semibold hover:bg-primary/5 transition-colors w-full"
         >
-          <span className="text-primary-copy font-bold text-lg">Add traveller</span>
+          <span className="text-primary-copy font-bold text-lg">{t("addTraveller")}</span>
           <div className="flex items-center justify-center bg-primary rounded-lg size-10">
             <Plus className="size-6 text-white" aria-hidden />
           </div>
@@ -253,7 +256,7 @@ export function Step2PersonalInfo({ onNext, onBack, errors }: Step2PersonalInfoP
 
         <StepActionButtons
           onBack={onBack}
-          primaryLabel="Save & continue"
+          primaryLabel={t("saveContinue")}
           primaryOnClick={onNext}
           primaryDisabled={hasAnyDeniedVisa}
         />

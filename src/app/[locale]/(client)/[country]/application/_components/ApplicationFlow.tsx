@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
 import { ApplicationOrderProvider, useApplicationOrder } from "./ApplicationOrderContext"
 import { ApplicationProgressBar, type StepId } from "./ApplicationProgressBar"
 import { Step1TripDetails } from "./steps/Step1TripDetails"
@@ -32,6 +33,7 @@ function ApplicationFlowContent({
   country: string;
   isAuthenticated: boolean;
 }) {
+  const t = useTranslations("application.progress")
   const { order, updateOrder, travellerVisaErrors } = useApplicationOrder()
 
   const [currentStep, setCurrentStep] = useState<StepId>(() => {
@@ -55,8 +57,9 @@ function ApplicationFlowContent({
     updateOrder({ currentStep })
   }, [currentStep, updateOrder])
 
+  const tValidation = useTranslations("application.validation")
   const handleNext = async () => {
-    const errors = await validateStep(currentStep as ValidationStepId, order)
+    const errors = await validateStep(currentStep as ValidationStepId, order, tValidation)
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors)
     } else {
@@ -77,7 +80,7 @@ function ApplicationFlowContent({
 
       <section
         aria-live="polite"
-        aria-label={`Step ${currentStep} of ${MAX_STEP}`}
+        aria-label={t("stepOf", { current: currentStep, total: MAX_STEP })}
       >
         {currentStep === 1 && (
           <Step1TripDetails

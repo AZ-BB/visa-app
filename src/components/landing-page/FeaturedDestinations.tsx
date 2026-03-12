@@ -1,33 +1,16 @@
+"use client";
+
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 const DESTINATIONS = [
-  {
-    id: "united-states",
-    name: "United States",
-    description:
-      "If you're eligible for the VWP (Visa Waiver Programme), you'll need to apply for an ESTA.",
-    image: "/images/featured-1.png",
-    imageAlt: "Empire State Building and New York City skyline",
-  },
-  {
-    id: "australia",
-    name: "Australia",
-    description:
-      "The most common visa option is the Australian Electronic Travel Authority (ETA), subclass 601.",
-    image: "/images/featured-2.png",
-    imageAlt: "Sydney Opera House and Sydney Harbour Bridge",
-  },
-  {
-    id: "india",
-    name: "India",
-    description:
-      "The e-Tourist Visa comes in 3 different durations and allows multiple entries for tourists.",
-    image: "/images/featured-3.png",
-    imageAlt: "Taj Mahal with reflecting pool and gardens",
-  },
+  { id: "united-states", nameKey: "unitedStates", descKey: "unitedStatesDesc", image: "/images/featured-1.png", imageAlt: "Empire State Building and New York City skyline" },
+  { id: "australia", nameKey: "australia", descKey: "australiaDesc", image: "/images/featured-2.png", imageAlt: "Sydney Opera House and Sydney Harbour Bridge" },
+  { id: "india", nameKey: "india", descKey: "indiaDesc", image: "/images/featured-3.png", imageAlt: "Taj Mahal with reflecting pool and gardens" },
 ];
 
 export function FeaturedDestinations() {
+  const t = useTranslations("landing.featured");
   return (
     <section
       id="featured"
@@ -36,11 +19,10 @@ export function FeaturedDestinations() {
       <div className="mx-auto max-w-7xl px-6">
         <header className="mx-auto max-w-2xl text-center">
           <h2 className="text-[32px] sm:text-[36px] font-bold text-white ">
-            Featured destinations
+            {t("heading")}
           </h2>
           <p className="mt-4 text-lg text-white">
-            We offer visas for all of the most popular destinations. Start your
-            visa application for one of them now.
+            {t("subheading")}
           </p>
         </header>
 
@@ -61,10 +43,10 @@ export function FeaturedDestinations() {
               </div>
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-primary-copy">
-                  {dest.name}
+                  {t(dest.nameKey)}
                 </h3>
                 <p className="mt-2 text-primary-copy text-lg sm:text-sm leading-relaxed">
-                  {dest.description}
+                  {t(dest.descKey)}
                 </p>
               </div>
             </article>

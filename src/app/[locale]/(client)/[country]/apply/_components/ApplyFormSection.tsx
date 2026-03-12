@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/i18n/navigation"
 import { CountryDropdown } from "@/components/ui/country-dropdown"
 import {
   Select,
@@ -17,7 +17,7 @@ import {
   defaultTraveller,
   setStoredOrder,
   type ApplicationOrder,
-} from "@/app/(client)/[country]/application/_components/ApplicationOrderContext"
+} from "../../application/_components/ApplicationOrderContext"
 import { Minus, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -25,6 +25,7 @@ import TipCard from "@/components/TipCard"
 import { ResumeApplicationBanner } from "./ResumeApplicationBanner"
 import { Tables } from "@/database.types"
 import { AuthUser } from "@/lib/get-user"
+import { useTranslations } from "next-intl"
 
 interface ApplyFormSectionProps {
   user: AuthUser;
@@ -42,6 +43,7 @@ export function ApplyFormSection({
   products,
 }: ApplyFormSectionProps) {
   const router = useRouter()
+  const t = useTranslations("apply")
 
   const [selectedProductId, setSelectedProductId] = useState<string>(products[0]?.id.toString() ?? "")
   const [numberOfTravellers, setNumberOfTravellers] = useState<number>(1)
@@ -110,8 +112,7 @@ export function ApplyFormSection({
   return (
     <>
       <h2 className="text-2xl md:text-4xl font-bold">
-        Apply for your {" "}
-        {products.find((p) => p.id.toString() === selectedProductId)?.visa?.name?.split("- ")[0] ?? ""}
+        {t("applyForTitle", { visa: products.find((p) => p.id.toString() === selectedProductId)?.visa?.name?.split("- ")[0] ?? "" })}
       </h2>
 
       <ResumeApplicationBanner />
@@ -124,25 +125,22 @@ export function ApplyFormSection({
         <div className="space-y-6 md:space-y-8 order-1 md:col-span-2 md:col-start-1 md:row-start-1">
           <TipCard className="sm:inline-flex w-full hidden">
             <span>
-              A visa is <span className="font-semibold">required</span> when
-              travelling to {destinationCountry.name} with a passport from{" "}
-              {passportCountry.name}.
+              {t("visaRequiredTip", { destination: destinationCountry.name, passport: passportCountry.name })}
             </span>
           </TipCard>
 
           <div className="space-y-3">
             <div className="space-y-1">
-              <h3 className="text-lg font-semibold">Where am I from?</h3>
+              <h3 className="text-lg font-semibold">{t("whereAmIFrom")}</h3>
               <p className="text-secondary-copy text-base">
-                Must match the nationality of the passport you&apos;ll be
-                travelling with.
+                {t("nationalityHint")}
               </p>
             </div>
             <CountryDropdown
               className="py-4"
               value={passportCountry.id}
               onValueChange={handleNationalityChange}
-              placeholder="Choose nationality"
+              placeholder={t("chooseNationality")}
             />
           </div>
 
@@ -150,10 +148,10 @@ export function ApplyFormSection({
             {products.length !== 1 &&
               (
                 <>
-                  <h3 className="text-lg font-semibold">Which visa do you need?</h3>
+                  <h3 className="text-lg font-semibold">{t("whichVisa")}</h3>
                   <Select value={selectedProductId} onValueChange={setSelectedProductId}>
                     <SelectTrigger className="py-4">
-                      <SelectValue placeholder="Select a visa" />
+                      <SelectValue placeholder={t("selectVisa")} />
                     </SelectTrigger>
                     <SelectContent>
                       {products.map((product) => (
@@ -169,14 +167,14 @@ export function ApplyFormSection({
 
           <div className="space-y-3">
             <label className="block text-base font-medium text-primary-copy">
-              Number of travelers
+              {t("numberOfTravelers")}
             </label>
             <div className="flex items-center gap-2 border border-border-default rounded-2xl p-2 w-fit bg-white">
               <Button
                 type="button"
                 variant="outline"
                 size="icon"
-                aria-label="Decrease number of travelers"
+                aria-label={t("decreaseTravelers")}
                 disabled={numberOfTravellers <= 1}
                 onClick={() => setNumberOfTravellers((n) => Math.max(1, n - 1))}
                 className={cn(
@@ -200,7 +198,7 @@ export function ApplyFormSection({
                 type="button"
                 variant="outline"
                 size="icon"
-                aria-label="Increase number of travelers"
+                aria-label={t("increaseTravelers")}
                 disabled={numberOfTravellers >= 20}
                 onClick={() =>
                   setNumberOfTravellers((n) => Math.min(20, n + 1))
@@ -251,9 +249,9 @@ export function ApplyFormSection({
                   </svg>
                 </div>
                 <div>
-                  <p className="text-secondary-copy text-sm">Valid for</p>
+                  <p className="text-secondary-copy text-sm">{t("validFor")}</p>
                   <p className="text-base font-semibold">
-                    {products.find((product) => product.id.toString() === selectedProductId)?.visa.valid_for ?? ""} after issue
+                    {products.find((product) => product.id.toString() === selectedProductId)?.visa.valid_for ?? ""} {t("afterIssue")}
                   </p>
                 </div>
               </div>
@@ -286,10 +284,10 @@ export function ApplyFormSection({
                 </div>
                 <div>
                   <p className="text-secondary-copy text-sm">
-                    Number of entries
+                    {t("numberOfEntries")}
                   </p>
                   <p className="text-base font-semibold">
-                    {(products.find((product) => product.id.toString() === selectedProductId)?.visa.number_of_entries === -1 ? "Multiple" : products.find((product) => product.id.toString() === selectedProductId)?.visa.number_of_entries)}
+                    {(products.find((product) => product.id.toString() === selectedProductId)?.visa.number_of_entries === -1 ? t("multiple") : products.find((product) => product.id.toString() === selectedProductId)?.visa.number_of_entries)}
                   </p>
                 </div>
               </div>
@@ -321,9 +319,9 @@ export function ApplyFormSection({
                   </svg>
                 </div>
                 <div>
-                  <p className="text-secondary-copy text-sm">Max stay</p>
+                  <p className="text-secondary-copy text-sm">{t("maxStay")}</p>
                   <p className="text-base font-semibold">
-                    {products.find((product) => product.id.toString() === selectedProductId)?.visa.max_stay ?? ""} days per entry
+                    {products.find((product) => product.id.toString() === selectedProductId)?.visa.max_stay ?? ""} {t("daysPerEntry")}
                   </p>
                 </div>
               </div>
@@ -340,7 +338,7 @@ export function ApplyFormSection({
             type="button"
             onClick={handleStartApplication}
           >
-            Start your application
+            {t("startApplication")}
           </ArrowButton>
         </div>
       </div>
@@ -352,7 +350,7 @@ export function ApplyFormSection({
             type="button"
             onClick={handleStartApplication}
           >
-            Start your application
+            {t("startApplication")}
           </ArrowButton>
         </div>
       )}

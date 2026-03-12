@@ -3,15 +3,17 @@ import { ApplicationFlow } from "./_components/ApplicationFlow";
 import { createSupabaseServerClient } from "@/lib/supabase/supabase-server";
 import { notFound } from "next/navigation";
 import ArrowButton from "@/components/ArrowButton";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { getTurnaroundTimes } from "@/actions/turnaround-times";
+import { getTranslations } from "next-intl/server";
 
 export default async function ApplicationPage({
   params,
 }: {
-  params: Promise<{ country: string }>;
+  params: Promise<{ locale: string; country: string }>;
 }) {
   const { country } = await params;
+  const t = await getTranslations("application.page");
 
   const supabase = await createSupabaseServerClient();
   const { data: destinationCountry, error: destinationCountryError } = await supabase
@@ -26,17 +28,17 @@ export default async function ApplicationPage({
 
   const isDestinationDisabled = destinationCountry.is_disabled ?? false;
 
-  if (isDestinationDisabled) {
-    return (
+    if (isDestinationDisabled) {
+        return (
       <div className="w-full flex flex-col items-center justify-start min-h-screen px-4 sm:px-0">
         <div className="bg-red-50 mt-24 flex flex-col items-center justify-center gap-4 pt-10 pb-10 px-10 rounded-lg border border-red-200">
           <h2 className="text-2xl md:text-3xl font-bold text-center">
-            We currently don&apos;t support any trips to {destinationCountry.name}
+            {t("notSupportedDestination", { destination: destinationCountry.name })}
           </h2>
 
           <Link href="/">
             <ArrowButton>
-              Try somewhere else
+              {t("tryAgain")}
             </ArrowButton>
           </Link>
         </div>
@@ -53,12 +55,12 @@ export default async function ApplicationPage({
       <div className="w-full flex flex-col items-center justify-start min-h-screen px-4 sm:px-0">
         <div className="bg-red-50 mt-24 flex flex-col items-center justify-center gap-4 pt-10 pb-10 px-10 rounded-lg border border-red-200">
           <h2 className="text-2xl md:text-3xl font-bold text-center">
-            We are currently experiencing technical issues. Please try again later.
+            {t("technicalIssues")}
           </h2>
 
           <Link href="/">
             <ArrowButton>
-              Try again
+              {t("tryAgain")}
             </ArrowButton>
           </Link>
         </div>

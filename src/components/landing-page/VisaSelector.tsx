@@ -5,8 +5,11 @@ import { Separator } from "../ui/separator"
 import { CountryDropdown } from "../ui/country-dropdown"
 import { cn } from "@/lib/utils"
 import { fetchAllCountriesList } from "@/actions/countries";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 export function VisaSelector({ rounded = true, shadow = true }: { rounded?: boolean; shadow?: boolean }) {
+  const t = useTranslations("visaSelector");
   const [fromCountry, setFromCountry] = useState<string | undefined>(undefined);
   const [toCountry, setToCountry] = useState<string | undefined>(undefined);
   const [countries, setCountries] = useState<{ id: string; name: string; is_disabled: boolean }[]>([]);
@@ -42,10 +45,10 @@ export function VisaSelector({ rounded = true, shadow = true }: { rounded?: bool
         {/* Where am I from? */}
         <div className="w-full flex flex-1 p-5 items-stretch justify-between">
           <CountryDropdown
-            label="Where am I from?"
+            label={t("whereAmIFrom")}
             value={fromCountry ?? ""}
             onValueChange={(v) => setFromCountry(v || undefined)}
-            placeholder="Choose country"
+            placeholder={t("chooseCountry")}
             aria-label="Country of origin"
             className=""
             contentClassName="w-full"
@@ -59,10 +62,10 @@ export function VisaSelector({ rounded = true, shadow = true }: { rounded?: bool
         <div className="w-full flex flex-1 p-5 items-stretch justify-between">
           <CountryDropdown
             values={countries.filter((c) => !c.is_disabled).map((c) => ({ id: c.id, name: c.name }))}
-            label="Where am I travelling?"
+            label={t("whereAmITravelling")}
             value={toCountry ?? ""}
             onValueChange={(v) => setToCountry(v || undefined)}
-            placeholder="Choose location"
+            placeholder={t("chooseLocation")}
             aria-label="Destination country"
             className=""
             contentClassName="w-full"
@@ -74,12 +77,12 @@ export function VisaSelector({ rounded = true, shadow = true }: { rounded?: bool
 
         {/* Choose your visa button */}
         <div className="shrink-0 p-3 md:w-fit w-full">
-          <a
+          <Link
             href={toCountry && fromCountry ? `/${toCountry}/apply?from=${fromCountry}` : "#"}
             className="flex items-center justify-between gap-3 rounded-full bg-primary px-6 py-4 text-base font-medium text-white transition hover:bg-primary-dark "
           >
             <span className="w-8 block md:hidden"></span>
-            <span>Choose your visa</span>
+            <span>{t("chooseYourVisa")}</span>
             <span
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0A8EFF]"
               aria-hidden
@@ -100,7 +103,7 @@ export function VisaSelector({ rounded = true, shadow = true }: { rounded?: bool
                 />
               </svg>
             </span>
-          </a>
+          </Link>
         </div>
       </div>
     </div>

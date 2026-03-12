@@ -10,9 +10,9 @@ import {
   type ReactNode,
 } from "react";
 import type { Tables } from "@/database.types";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import isVisaAvailable, { fetchVisaById, VisaType } from "@/actions/visas";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import ArrowButton from "@/components/ArrowButton";
 import { VisaProduct } from "@/actions/products";
 import { createApplicationClient } from "@/actions/applications";

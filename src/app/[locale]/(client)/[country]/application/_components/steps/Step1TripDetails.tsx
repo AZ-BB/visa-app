@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { DatePicker } from "@/components/ui/date-picker"
 import { Input } from "@/components/ui/input"
@@ -22,6 +23,7 @@ export function Step1TripDetails({
   onBack,
   errors,
 }: Step1TripDetailsProps) {
+  const t = useTranslations("application.step1")
   const { order, updateOrder } = useApplicationOrder()
 
   const countryName = getCountryNameFromCode(country)
@@ -31,7 +33,7 @@ export function Step1TripDetails({
       {/* Left: main form — ~2/3 */}
       <div className="lg:col-span-2">
         <h2 className="text-xl font-bold text-primary-copy mb-8">
-          Trip details
+          {t("title")}
         </h2>
 
         <div className="space-y-6">
@@ -40,7 +42,7 @@ export function Step1TripDetails({
               htmlFor="arrival-date"
               className="block text-base font-medium text-primary-copy mb-2"
             >
-              When do you arrive in {countryName}?
+              {t("arrivalLabel", { country: countryName })}
             </label>
             <div className="relative">
               <DatePicker
@@ -51,7 +53,7 @@ export function Step1TripDetails({
                     arrival_date: date ? date.toISOString().split("T")[0] ?? "" : "",
                   })
                 }
-                placeholder="DD MM YYYY"
+                placeholder={t("arrivalPlaceholder")}
                 disableBeforeToday={true}
               />
             </div>
@@ -70,15 +72,15 @@ export function Step1TripDetails({
               htmlFor="email"
               className="block text-base font-medium text-primary-copy mb-1"
             >
-              What is your email address?
+              {t("emailLabel")}
             </label>
             <p className="text-sm text-secondary-copy mb-2">
-              We&apos;ll let you know when your visa is ready
+              {t("emailHint")}
             </p>
             <Input
               id="email"
               type="email"
-              placeholder="josh.hadley@company.co.uk"
+              placeholder={t("emailPlaceholder")}
               value={order.contact_email}
               onChange={(e) =>
                 updateOrder({
@@ -99,7 +101,7 @@ export function Step1TripDetails({
 
         <StepActionButtons
           onBack={onBack}
-          primaryLabel="Save & continue"
+          primaryLabel={t("saveContinue")}
           primaryOnClick={onNext}
         />
       </div>
@@ -109,15 +111,15 @@ export function Step1TripDetails({
         <div className="bg-white rounded-2xl p-5 border border-border-default/50 shadow-sm">
 
           <h3 className="text-xl font-bold text-primary-copy mb-2">
-            Additional costs
+            {t("additionalCosts")}
           </h3>
 
-          <p className="text-base">{order.travellers.length} of traveller/s</p>
+          <p className="text-base">{t("ofTravellers", { count: order.travellers.length })}</p>
           <Separator className="mt-2 mb-4" />
 
           <div className="flex justify-between text-base">
-            <span className="text-secondary-copy">Total</span>
-            <span className="font-medium">Calculated at checkout</span>
+            <span className="text-secondary-copy">{t("total")}</span>
+            <span className="font-medium">{t("calculatedAtCheckout")}</span>
           </div>
         </div>
 
@@ -127,9 +129,9 @@ export function Step1TripDetails({
               href="#"
               className="font-semibold text-primary underline-offset-2 hover:underline"
             >
-              Find out more
+              {t("findOutMore")}
             </a>{" "}
-            about how we keep your information safe.
+            {t("privacyTip")}
           </p>
         </TipCard>
       </div>

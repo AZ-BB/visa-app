@@ -1,8 +1,15 @@
+"use client";
+
 import { InstagramIcon, TwitterIcon } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { FooterCurrency } from "./FooterCurrency";
+import { FooterLanguage } from "./FooterLanguage";
+import { useTranslations } from "next-intl";
 
 export function Footer() {
+  const t = useTranslations("footer");
+  const tCommon = useTranslations("common");
+
   return (
     <footer className="bg-primary-dark text-white py-8">
       <div className="max-w-7xl mx-auto space-y-6 px-4 sm:px-6">
@@ -12,14 +19,14 @@ export function Footer() {
 
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <span className="font-normal text-sm sm:text-base">
-            © 2025 Visa Pro LTD. All rights reserved. Company Number 123456
+            {t("copyright")}
           </span>
 
           <div className="flex gap-5">
-            <a href="https://twitter.com" target="_blank">
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
               <TwitterIcon />
             </a>
-            <a href="https://instagram.com" target="_blank">
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
               <InstagramIcon />
             </a>
           </div>
@@ -27,12 +34,12 @@ export function Footer() {
 
         <div className="flex flex-col sm:flex-row sm:justify-between gap-4">
           <div className="flex flex-wrap gap-4 font-semibold text-sm sm:text-base">
-            <Link href="/terms" className="hover:underline">Terms of Service</Link>
-            <Link href="/contact-us" className="hover:underline">Contact Us</Link>
+            <Link href="/terms" className="hover:underline">{tCommon("termsOfService")}</Link>
+            <Link href="/contact-us" className="hover:underline">{tCommon("contactUs")}</Link>
           </div>
 
           <div className="flex flex-wrap items-center gap-4 text-sm sm:text-base">
-            <span className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <svg width="24" height="16" viewBox="0 0 24 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M22.2024 0.00012207H1.79741C0.804698 0.00012207 0 0.818934 0 1.82906V14.171C0 15.1811 0.804698 16 1.79741 16H22.2024C23.1951 16 23.9999 15.1812 23.9999 14.171V1.82906C23.9999 0.818934 23.1952 0.00012207 22.2024 0.00012207Z" fill="#41479B" />
                 <path d="M23.975 1.52663C23.8333 0.660506 23.0939 0 22.2024 0H21.7348L14.0689 5.11057V4.76706e-05H9.93097V5.11062L2.26508 4.76706e-05H1.79741C0.905995 4.76706e-05 0.166546 0.660506 0.0248905 1.52668L6.57695 5.89476H0V10.1052H6.57695L0.0248905 14.4732C0.166546 15.3394 0.905995 15.9999 1.79741 15.9999H2.26508L9.93097 10.8893V15.9999H14.0689V10.8893L21.7348 15.9999H22.2024C23.0939 15.9999 23.8333 15.3394 23.975 14.4732L17.4229 10.1051H23.9999V5.89466H17.4229L23.975 1.52663Z" fill="white" />
@@ -42,10 +49,11 @@ export function Footer() {
                 <path d="M0.189941 1.01121L7.58349 5.89475H9.10355L0.725532 0.360962C0.50058 0.531335 0.316503 0.754079 0.189941 1.01121Z" fill="#FF4B55" />
                 <path d="M15.5889 5.89471L23.5592 0.63017C23.3624 0.399747 23.1103 0.219644 22.8234 0.112183L14.0688 5.89471H15.5889Z" fill="#FF4B55" />
               </svg>
-              English
-            </span>
+              <FooterLanguage />
+            </div>
 
             <FooterCurrency />
+
           </div>
         </div>
       </div>

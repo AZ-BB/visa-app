@@ -1,27 +1,12 @@
-import Image from "next/image"
+"use client";
 
-const STEPS = [
-  {
-    number: 1,
-    title: "Choose your destination",
-    description:
-      "Let us know where you're travelling from, and where you're travelling to.",
-  },
-  {
-    number: 2,
-    title: "Add your travellers",
-    description:
-      "If a visa is needed, then all we need to know is who will be travelling.",
-  },
-  {
-    number: 3,
-    title: "Sit back and relax",
-    description:
-      "Carry on planning your trip while we take care of the heavy lifting.",
-  },
-]
+import Image from "next/image"
+import { useTranslations } from "next-intl"
+
+const STEP_KEYS = ["step1", "step2", "step3"] as const;
 
 export function HowItWorks() {
+  const t = useTranslations("landing.howItWorks");
   return (
     <section id="how-it-works" className=" py-16 md:py-24 bg-white">
       <div className="mx-auto max-w-7xl px-6 flex flex-col md:flex-row justify-center items-center gap-10 sm:gap-32 ">
@@ -49,22 +34,22 @@ export function HowItWorks() {
         {/* Right: Heading and steps */}
         <div className="flex flex-col justify-center py-5 sm:ph-20">
           <h2 className="text-[36px] font-bold text-primary-copy sm:text-left text-center">
-            How it works
+            {t("heading")}
           </h2>
           <ul className="mt-8 space-y-10 sm:space-y-6">
-            {STEPS.map((step) => (
-              <li key={step.number} className="flex gap-4 flex-col sm:flex-row w-full items-center">
+            {STEP_KEYS.map((key, i) => (
+              <li key={key} className="flex gap-4 flex-col sm:flex-row w-full items-center">
                 <span
                   className="flex h-[64px] w-[64px] shrink-0 items-center justify-center bg-[#F3F6FC] rounded-full text-[24px] font-bold text-primary"
                   aria-hidden
                 >
-                  {step.number}
+                  {i + 1}
                 </span>
                 <div className="text-center sm:text-left">
                   <h3 className="font-bold text-[24px] text-primary-copy">
-                    {step.title}
+                    {t(`${key}Title`)}
                   </h3>
-                  <p className="mt-1 text-[18px] text-secondary-copy">{step.description}</p>
+                  <p className="mt-1 text-[18px] text-secondary-copy">{t(`${key}Desc`)}</p>
                 </div>
               </li>
             ))}

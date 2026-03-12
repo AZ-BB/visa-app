@@ -1,0 +1,262 @@
+{
+  "common": {
+    "termsOfService": "Terms of Service",
+    "contactUs": "Contact Us",
+    "english": "English",
+    "spanish": "Spanish",
+    "french": "French",
+    "german": "German",
+    "italian": "Italian"
+  },
+  "footer": {
+    "copyright": "© 2025 Visa Pro LTD. All rights reserved. Company Number 123456",
+    "ratesBy": "Rates by Exchange Rate API"
+  },
+  "nav": {
+    "testimonials": "Testimonials",
+    "howItWorks": "How it works",
+    "featured": "Featured",
+    "faqs": "FAQs",
+    "contactUs": "Contact Us",
+    "signUp": "Sign Up",
+    "login": "Login",
+    "myApplications": "My Applications",
+    "myAccount": "My Account",
+    "account": "Account",
+    "logout": "Log out"
+  },
+  "visaSelector": {
+    "whereAmIFrom": "Where am I from?",
+    "whereAmITravelling": "Where am I travelling?",
+    "chooseCountry": "Choose country",
+    "chooseLocation": "Choose location",
+    "chooseYourVisa": "Choose your visa"
+  },
+  "landing": {
+    "hero": {
+      "titleLine1": "Your",
+      "titleHighlight": "journey",
+      "titleLine2": "starts here",
+      "subtitle": "Choose the country you're traveling to, and we'll let you know if you need a visa. Then all we need are some details for each traveller to get you on your way."
+    },
+    "stats": {
+      "customersHelped": "Customers helped",
+      "approvalRate": "Approval rate",
+      "support": "Support"
+    },
+    "testimonials": {
+      "heading": "How we've helped people",
+      "testimonialText": "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.",
+      "customerLabel": "Customer"
+    },
+    "howItWorks": {
+      "heading": "How it works",
+      "step1Title": "Choose your destination",
+      "step1Desc": "Let us know where you're travelling from, and where you're travelling to.",
+      "step2Title": "Add your travellers",
+      "step2Desc": "If a visa is needed, then all we need to know is who will be travelling.",
+      "step3Title": "Sit back and relax",
+      "step3Desc": "Carry on planning your trip while we take care of the heavy lifting."
+    },
+    "featured": {
+      "heading": "Featured destinations",
+      "subheading": "We offer visas for all of the most popular destinations. Start your visa application for one of them now.",
+      "unitedStates": "United States",
+      "unitedStatesDesc": "If you're eligible for the VWP (Visa Waiver Programme), you'll need to apply for an ESTA.",
+      "australia": "Australia",
+      "australiaDesc": "The most common visa option is the Australian Electronic Travel Authority (ETA), subclass 601.",
+      "india": "India",
+      "indiaDesc": "The e-Tourist Visa comes in 3 different durations and allows multiple entries for tourists."
+    },
+    "faq": {
+      "heading": "Frequently Asked Questions",
+      "subheading": "Find the answers to our commonly asked questions. If you still need help, get in touch and we'll be happy to assist.",
+      "faq1Q": "How do I know if I need a visa for my trip?",
+      "faq1A": "Select your country of origin and your destination on our homepage. We'll instantly check the visa requirements for your trip. If a visa is needed, we'll guide you through the application process step by step.",
+      "faq2Q": "How long does the visa application process take?",
+      "faq2A": "Processing times vary by destination and visa type. Most e-Visas (e.g. ESTA, ETA) are processed within 24–72 hours. We offer different turnaround options so you can choose the speed that suits your travel plans.",
+      "faq3Q": "What documents do I need to apply?",
+      "faq3A": "Requirements depend on your destination. Typically you'll need a valid passport, travel details, and personal information. We'll tell you exactly what's required for your specific visa before you start your application.",
+      "faq4Q": "Can I apply for multiple travellers at once?",
+      "faq4A": "Yes. When a visa is required, you can add all travellers in your group to a single application. We'll collect the necessary details for each person and process them together for your convenience.",
+      "faq5Q": "What if my application is rejected?",
+      "faq5A": "We have a 99% approval rate. If an application is unsuccessful, we'll explain the reason and advise on next steps. In most cases, reapplying with corrected information resolves the issue.",
+      "faq6Q": "Is my payment secure?",
+      "faq6A": "Absolutely. We use secure payment processing and never store your card details. You'll see a clear breakdown of our service fee and any government fees before you pay."
+    }
+  },
+  "apply": {
+    "noVisaRequired": "Good news! You don't need a visa to travel to {destination}",
+    "travelSomewhereElse": "Travel somewhere else",
+    "notSupported": "We currently don't support this trip",
+    "trySomewhereElse": "Try somewhere else",
+    "applyForTitle": "Apply for your {visa}",
+    "visaRequiredTip": "A visa is required when travelling to {destination} with a passport from {passport}.",
+    "whereAmIFrom": "Where am I from?",
+    "nationalityHint": "Must match the nationality of the passport you'll be travelling with.",
+    "chooseNationality": "Choose nationality",
+    "whichVisa": "Which visa do you need?",
+    "selectVisa": "Select a visa",
+    "numberOfTravelers": "Number of travelers",
+    "decreaseTravelers": "Decrease number of travelers",
+    "increaseTravelers": "Increase number of travelers",
+    "validFor": "Valid for",
+    "afterIssue": "after issue",
+    "numberOfEntries": "Number of entries",
+    "multiple": "Multiple",
+    "maxStay": "Max stay",
+    "daysPerEntry": "days per entry",
+    "startApplication": "Start your application",
+    "resumeTitle": "Pick up where you left off",
+    "resumeDescription": "Save time and jump back into your previously started application.",
+    "dismiss": "Dismiss",
+    "continue": "Continue",
+    "applyForVisaTo": "Apply for your visa to {destination}",
+    "visaMandatory": "A visa is mandatory for {passport} passport holders traveling to {destination}. Currently, VisaPro does not provide it.",
+    "checkOtherDestinations": "Check other destinations",
+    "notFoundTitle": "Not found",
+    "notFoundDescription": "The country you are looking for does not exist.",
+    "goBackHome": "Go back to the home page"
+  },
+  "application": {
+    "page": {
+      "notSupportedDestination": "We currently don't support any trips to {destination}",
+      "technicalIssues": "We are currently experiencing technical issues. Please try again later.",
+      "tryAgain": "Try again"
+    },
+    "progress": {
+      "ariaLabel": "Application progress",
+      "stepOf": "Step {current} of {total}",
+      "tripDetails": "Trip details",
+      "personalInfo": "Personal info",
+      "passportInfo": "Passport info",
+      "turnaroundTime": "Turnaround time",
+      "checkout": "Checkout"
+    },
+    "step1": {
+      "title": "Trip details",
+      "arrivalLabel": "When do you arrive in {country}?",
+      "arrivalPlaceholder": "DD MM YYYY",
+      "emailLabel": "What is your email address?",
+      "emailHint": "We'll let you know when your visa is ready",
+      "emailPlaceholder": "josh.hadley@company.co.uk",
+      "additionalCosts": "Additional costs",
+      "ofTravellers": "{count} of traveller/s",
+      "total": "Total",
+      "calculatedAtCheckout": "Calculated at checkout",
+      "findOutMore": "Find out more",
+      "privacyTip": "about how we keep your information safe.",
+      "saveContinue": "Save & continue"
+    },
+    "step2": {
+      "title": "Personal info",
+      "intro": "Each traveller's details must match the passport they'll be travelling with.",
+      "travellerNum": "Traveller #{num}",
+      "firstName": "First and middle name",
+      "firstNamePlaceholder": "Joe",
+      "lastName": "Last name",
+      "lastNamePlaceholder": "Smith",
+      "dob": "Date of birth",
+      "dobPlaceholder": "DD MM YYYY",
+      "deniedVisa": "Have you been denied a {visa} in the last 6 months?",
+      "deniedVisaError": "We can't help you with a new application right now as it's likely to be denied again.",
+      "removeTraveller": "Remove traveller",
+      "addTraveller": "Add traveller",
+      "saveContinue": "Save & continue"
+    },
+    "step3": {
+      "title": "Passport info",
+      "intro": "Add passport details for each traveller. Each section matches a traveller from the previous step.",
+      "passportNationality": "Passport nationality",
+      "selectNationality": "Select nationality",
+      "passportNumber": "Passport number",
+      "passportNumberPlaceholder": "12345678",
+      "passportExpiry": "Passport expiry date",
+      "datePlaceholder": "DD MM YYYY",
+      "countryOfBirth": "Country of birth",
+      "selectCountryOfBirth": "Select country of birth",
+      "countryOfResidence": "Country of residence",
+      "selectCountryOfResidence": "Select country of residence",
+      "saveContinue": "Save & continue"
+    },
+    "step4": {
+      "title": "Turnaround time",
+      "takesHours": "Takes {hours} hours",
+      "takes1Day": "Takes 1 day",
+      "takesDays": "Takes {days} days",
+      "calculatedOnCheckout": "Calculated on checkout",
+      "saveContinue": "Save & continue"
+    },
+    "step5": {
+      "title": "Checkout",
+      "readyBy": "Your application will be ready by the {date} (in {hours} hours). We'll make sure to contact you and let you know.",
+      "validFor": "Valid for",
+      "afterIssue": "after issue",
+      "numberOfEntries": "Number of entries",
+      "entries": "entries",
+      "maxStay": "Max stay",
+      "daysPerEntry": "days per entry",
+      "travellers": "Travellers",
+      "travellerNum": "Traveller #{num}",
+      "governmentalFee": "Governmental Fee",
+      "processingFee": "Processing Fee",
+      "additionalCosts": "Additional costs",
+      "turnaroundTime": "Turnaround time",
+      "total": "Total",
+      "includingTaxes": "Including taxes & fees",
+      "continueToPayment": "Continue to payment",
+      "findOutMore": "Find out more",
+      "privacyTip": "about how we keep your information safe."
+    },
+    "buttons": {
+      "previousStep": "Previous step"
+    },
+    "checkoutAuth": {
+      "signIn": "Sign in",
+      "signInDescription": "This email already has an account. Sign in directly.",
+      "email": "Email",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "loggingIn": "Logging in…",
+      "login": "Login",
+      "createAccount": "Create account",
+      "createAccountDescription": "Sign up to continue to payment.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "firstNamePlaceholder": "First name",
+      "lastNamePlaceholder": "Last name",
+      "emailPlaceholder": "example@email.com",
+      "phone": "Phone",
+      "phoneOptional": "(Optional)",
+      "confirmPassword": "Confirm password",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "passwordHint": "At least 8 characters",
+      "creatingAccount": "Creating account…",
+      "createAccountBtn": "Create account",
+      "emailRequired": "Email is required",
+      "passwordRequired": "Password is required"
+    },
+    "validation": {
+      "arrivalDateRequired": "Arrival date is required",
+      "arrivalDatePast": "Arrival date cannot be in the past",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address",
+      "firstNameRequired": "First name is required",
+      "lastNameRequired": "Last name is required",
+      "dobRequired": "Date of birth is required",
+      "dobFuture": "Date of birth cannot be in the future",
+      "deniedVisa": "We can't help you with a new application right now as it's likely to be denied again.",
+      "nationalityRequired": "Passport nationality is required",
+      "passportNumberRequired": "Passport number is required",
+      "passportExpiryRequired": "Passport expiry date is required",
+      "passportExpiryPast": "Passport expiry date cannot be in the past",
+      "countryOfBirthRequired": "Country of birth is required",
+      "countryOfResidenceRequired": "Country of residence is required",
+      "turnaroundRequired": "Turnaround time is required"
+    },
+    "errors": {
+      "checkoutSession": "Failed to create checkout session",
+      "createApplication": "Failed to create application"
+    }
+  }
+}
