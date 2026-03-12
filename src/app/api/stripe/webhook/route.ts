@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createSupabaseAdminServerClient } from "@/lib/supabase/supabase-server";
+import { sendApplicationCreatedEmail } from "@/lib/email";
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -58,12 +59,19 @@ export async function POST(request: Request) {
     const supabase = await createSupabaseAdminServerClient();
     const { data: app } = await supabase
       .from("applications")
-      .select("total_fee")
+      .select(
+        "total_fee, contact_email, arrival_date, countries!applications_destination_country_id_fkey(name), visa_types(name)"
+      )
       .eq("id", applicationId)
       .single();
 
+    if (!app) {
+      console.error("checkout.session.completed: application not found", applicationId);
+      return NextResponse.json({ received: true });
+    }
+
     const amountPaidCents =
-      app?.total_fee != null ? Math.round((app.total_fee as number) * 100) : null;
+      app.total_fee != null ? Math.round((app.total_fee as number) * 100) : null;
 
     const { error } = await supabase
       .from("applications")
@@ -81,6 +89,24 @@ export async function POST(request: Request) {
         { error: "Failed to update application" },
         { status: 500 }
       );
+    }
+
+    // Send confirmation email after payment is completed
+    const destinationName =
+      (app as { countries?: { name: string } | null })?.countries?.name ?? "your destination";
+    const visaTypeName =
+      (app as { visa_types?: { name: string } | null })?.visa_types?.name ?? "Visa";
+    const contactEmail = app.contact_email;
+    if (contactEmail) {
+      sendApplicationCreatedEmail({
+        to: contactEmail,
+        applicationId,
+        destinationName,
+        visaTypeName,
+        arrivalDate: app.arrival_date ?? "",
+      }).catch((err) => {
+        console.error("[email] Failed to send application created email", err);
+      });
     }
   }
 

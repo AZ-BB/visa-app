@@ -263,7 +263,7 @@ export default async function VisasPage({
                           <DoorOpen className="size-3.5 shrink-0 opacity-50" />
                           {visa.number_of_entries === -1
                             ? "Multiple"
-                            : visa.number_of_entries}
+                            : (visa.number_of_entries === 1 ? "Single" : visa.number_of_entries)}
                         </span>
                         <span className="text-border-default">/</span>
                         <span className="inline-flex items-center gap-1.5">

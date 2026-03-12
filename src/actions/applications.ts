@@ -10,6 +10,7 @@ import GeneralResponse from "@/types/general";
 import { getUser } from "@/lib/get-user";
 import { ApplicationStatus } from "@/enums";
 import { logApplicationActivity } from "@/lib/application-activity-log";
+import { sendApplicationCompletedEmail } from "@/lib/email";
 
 export async function createApplicationClient({
   arrival_date,
@@ -603,7 +604,7 @@ export async function updateApplicationStatus(
 
     const { data: current } = await supabase
       .from("applications")
-      .select("status")
+      .select("status, contact_email, destination_country_id")
       .eq("id", applicationId)
       .single();
 
@@ -628,6 +629,19 @@ export async function updateApplicationStatus(
         actorType: "admin",
         content: { from: fromStatus ?? "unknown", to: status },
       });
+
+      if (status === ApplicationStatus.COMPLETED) {
+        const to = (current?.contact_email as string) ?? "";
+        if (to) {
+          // Best-effort completed email; do not block status update
+          sendApplicationCompletedEmail({
+            to,
+            applicationId,
+          }).catch((err) => {
+            console.error("[email] Failed to send application completed email", err);
+          });
+        }
+      }
     }
 
     return { status: true };

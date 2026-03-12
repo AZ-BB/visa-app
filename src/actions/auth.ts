@@ -3,6 +3,7 @@
 import { createSupabaseAdminServerClient, createSupabaseServerClient } from "@/lib/supabase/supabase-server";
 import GeneralResponse from "@/types/general";
 import { redirect } from "next/navigation";
+import { sendPasswordResetEmail } from "@/lib/email";
 
 export async function checkEmailExists(email: string): Promise<{ exists: boolean } | { error: string }> {
     if (!email?.trim()) {
@@ -131,8 +132,10 @@ export async function requestPasswordReset(email: string): Promise<{ success: tr
         const origin = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
         const resetUrl = `${origin}/reset-password?token_hash=${hashedToken}&type=recovery`;
 
-        // Placeholder: Replace with your email integration
-        console.log("[Password Reset] Send this link to", email.trim(), ":", resetUrl);
+        await sendPasswordResetEmail({
+            to: email.trim(),
+            resetUrl,
+        });
 
         return { success: true };
     } catch {

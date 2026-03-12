@@ -45,8 +45,8 @@ export default function ForgotPasswordPage() {
                 <div className="w-full max-w-xl space-y-4">
                     <h2 className="text-4xl font-bold text-primary-copy">Check your email</h2>
                     <p className="text-secondary-copy text-sm">
-                        If an account exists for that email, we&apos;ve logged a password reset link.
-                        Check your server console for the link (placeholder until you add your email integration).
+                        If an account exists for that email, we&apos;ve sent you a password reset link.
+                        Please check your inbox (and spam folder) and follow the link to set a new password.
                     </p>
                     <Link
                         href="/login"
