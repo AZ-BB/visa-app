@@ -104,3 +104,25 @@ export async function sendPasswordResetEmail(params: {
   await sendRawEmail({ to, subject, html });
 }
 
+export async function sendRefundEmail(params: {
+  to: string;
+  applicationId: string;
+  amountRefundedDollars: string;
+  destinationName?: string;
+  isFullRefund: boolean;
+}) {
+  const { to, applicationId, amountRefundedDollars, destinationName, isFullRefund } = params;
+  const subject = `Refund processed for your visa application${destinationName ? ` (${destinationName})` : ""}`;
+  const html = `
+    <p>Hi,</p>
+    <p>A refund of <strong>$${amountRefundedDollars}</strong> has been processed for your visa application${
+    destinationName ? ` for <strong>${destinationName}</strong>` : ""
+  }.</p>
+    <p>Application ID: <strong>${applicationId}</strong></p>
+    ${isFullRefund ? "<p>This was a full refund of the amount paid.</p>" : "<p>This was a partial refund. If you have questions about the remaining balance, please contact us.</p>"}
+    <p>Funds may take a few business days to appear in your account.</p>
+  `;
+
+  await sendRawEmail({ to, subject, html });
+}
+

@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { createSupabaseAdminServerClient } from "@/lib/supabase/supabase-server";
 import { getUser } from "@/lib/get-user";
 import { logApplicationActivity } from "@/lib/application-activity-log";
+import { sendRefundEmail } from "@/lib/email";
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -31,7 +32,9 @@ export async function POST(request: Request) {
     const supabase = await createSupabaseAdminServerClient();
     const { data: application, error: appError } = await supabase
       .from("applications")
-      .select("id, stripe_payment_intent_id, total_fee, amount_refunded_cents, is_paid")
+      .select(
+        "id, stripe_payment_intent_id, total_fee, amount_refunded_cents, is_paid, contact_email, countries!applications_destination_country_id_fkey(name)"
+      )
       .eq("id", applicationId)
       .single();
 
@@ -109,6 +112,21 @@ export async function POST(request: Request) {
         total_refunded_cents: newRefundedCents,
       },
     });
+
+    const contactEmail = application.contact_email;
+    if (contactEmail) {
+      const totalCents = Math.round((application.total_fee as number) * 100);
+      const destinationName = (application as { countries?: { name: string } | null })?.countries?.name;
+      sendRefundEmail({
+        to: contactEmail,
+        applicationId,
+        amountRefundedDollars: (refundAmountCents / 100).toFixed(2),
+        destinationName: destinationName ?? undefined,
+        isFullRefund: newRefundedCents >= totalCents,
+      }).catch((err) => {
+        console.error("[email] Failed to send refund email", err);
+      });
+    }
 
     return NextResponse.json({
       success: true,
