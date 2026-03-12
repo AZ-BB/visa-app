@@ -291,6 +291,11 @@
   },
   "applications": {
     "title": "Richieste",
+    "filterByStatus": "Filtra per stato",
+    "filterAllStatuses": "Tutti gli stati",
+    "filterByDestination": "Filtra per destinazione",
+    "filterAllDestinations": "Tutte le destinazioni",
+    "noFilterResults": "Nessuna richiesta corrisponde a questo filtro.",
     "emptyTitle": "Non hai ancora richieste.",
     "emptyHint": "Inizia richiedendo un visto dalla pagina iniziale.",
     "turnaroundTime": "Tempi di elaborazione",

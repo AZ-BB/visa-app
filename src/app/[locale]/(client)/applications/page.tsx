@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getUser } from "@/lib/get-user";
 import { createSupabaseServerClient } from "@/lib/supabase/supabase-server";
-import { ApplicationsList } from "./_components/ApplicationsList";
+import { ApplicationsFilter } from "./_components/ApplicationsFilter";
 import { getTranslations } from "next-intl/server";
 
 export default async function ApplicationsPage() {
@@ -52,7 +52,7 @@ export default async function ApplicationsPage() {
                         </p>
                     </div>
                 ) : (
-                    <ApplicationsList applications={displayApplications} />
+                    <ApplicationsFilter applications={displayApplications} />
                 )}
             </div>
         </div>

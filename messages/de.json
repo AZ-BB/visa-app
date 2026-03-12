@@ -291,6 +291,11 @@
   },
   "applications": {
     "title": "Anträge",
+    "filterByStatus": "Nach Status filtern",
+    "filterAllStatuses": "Alle Status",
+    "filterByDestination": "Nach Zielland filtern",
+    "filterAllDestinations": "Alle Ziele",
+    "noFilterResults": "Keine Anträge entsprechen diesem Filter.",
     "emptyTitle": "Sie haben noch keine Anträge.",
     "emptyHint": "Beginnen Sie mit einer Visumantrag von der Startseite.",
     "turnaroundTime": "Bearbeitungszeit",

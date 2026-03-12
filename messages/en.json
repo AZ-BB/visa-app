@@ -295,6 +295,11 @@
   },
   "applications": {
     "title": "Applications",
+    "filterByStatus": "Filter by status",
+    "filterAllStatuses": "All statuses",
+    "filterByDestination": "Filter by destination",
+    "filterAllDestinations": "All destinations",
+    "noFilterResults": "No applications match this filter.",
     "emptyTitle": "You have no applications yet.",
     "emptyHint": "Start by applying for a visa from the homepage.",
     "turnaroundTime": "Turnaround time",

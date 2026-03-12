@@ -291,6 +291,11 @@
   },
   "applications": {
     "title": "Solicitudes",
+    "filterByStatus": "Filtrar por estado",
+    "filterAllStatuses": "Todos los estados",
+    "filterByDestination": "Filtrar por destino",
+    "filterAllDestinations": "Todos los destinos",
+    "noFilterResults": "Ninguna solicitud coincide con este filtro.",
     "emptyTitle": "Aún no tiene solicitudes.",
     "emptyHint": "Comience solicitando un visado desde la página de inicio.",
     "turnaroundTime": "Tiempo de procesamiento",

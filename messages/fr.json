@@ -291,6 +291,11 @@
   },
   "applications": {
     "title": "Demandes",
+    "filterByStatus": "Filtrer par statut",
+    "filterAllStatuses": "Tous les statuts",
+    "filterByDestination": "Filtrer par destination",
+    "filterAllDestinations": "Toutes les destinations",
+    "noFilterResults": "Aucune demande ne correspond à ce filtre.",
     "emptyTitle": "Vous n'avez pas encore de demandes.",
     "emptyHint": "Commencez par demander un visa depuis la page d'accueil.",
     "turnaroundTime": "Délai de traitement",
