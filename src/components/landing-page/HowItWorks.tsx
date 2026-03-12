@@ -1,12 +1,10 @@
-"use client";
-
-import Image from "next/image"
-import { useTranslations } from "next-intl"
+import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 
 const STEP_KEYS = ["step1", "step2", "step3"] as const;
 
-export function HowItWorks() {
-  const t = useTranslations("landing.howItWorks");
+export async function HowItWorks() {
+  const t = await getTranslations("landing.howItWorks");
   return (
     <section id="how-it-works" className=" py-16 md:py-24 bg-white">
       <div className="mx-auto max-w-7xl px-6 flex flex-col md:flex-row justify-center items-center gap-10 sm:gap-32 ">

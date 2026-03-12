@@ -1,12 +1,10 @@
-"use client";
-
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
 const STAT_KEYS = ["customersHelped", "approvalRate", "support"] as const;
 const STAT_VALUES = ["1,000+", "99%", "24/7"] as const;
 
-export function Stats() {
-  const t = useTranslations("landing.stats");
+export async function Stats() {
+  const t = await getTranslations("landing.stats");
   return (
     <section className="relative md:py-16 py-10">
       <div className="mx-auto max-w-7xl px-6 flex flex-col md:flex-row items-center justify-center">

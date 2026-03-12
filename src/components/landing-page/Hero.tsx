@@ -1,13 +1,11 @@
-"use client";
+import Image from "next/image";
+import { Stats } from "./Stats";
+import Dots from "../svgs/dots";
+import { VisaSelector } from "./VisaSelector";
+import { getTranslations } from "next-intl/server";
 
-import Image from "next/image"
-import { Stats } from "./Stats"
-import Dots from "../svgs/dots"
-import { VisaSelector } from "./VisaSelector"
-import { useTranslations } from "next-intl"
-
-export function Hero() {
-  const t = useTranslations("landing.hero");
+export async function Hero() {
+  const t = await getTranslations("landing.hero");
   return (
     <section className="relative pt-8 md:pt-24">
       <div className="mx-auto max-w-7xl px-6 relative">

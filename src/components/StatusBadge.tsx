@@ -1,11 +1,7 @@
-import { cn } from "@/lib/utils";
+"use client";
 
-const STATUS_LABELS: Record<string, string> = {
-    NOT_STARTED: "Not Started",
-    IN_PROGRESS: "In Progress",
-    COMPLETED: "Completed",
-    REJECTED: "Rejected",
-};
+import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 const STATUS_STYLES: Record<string, string> = {
     NOT_STARTED: "bg-slate-100 text-slate-700 border-2 border-slate-200",
@@ -20,7 +16,10 @@ interface StatusBadgeProps {
 }
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
-    const label = STATUS_LABELS[status] ?? status;
+    const t = useTranslations("applications.status");
+    const label = ["NOT_STARTED", "IN_PROGRESS", "COMPLETED", "REJECTED"].includes(status)
+        ? t(status as "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "REJECTED")
+        : status;
     const style = STATUS_STYLES[status] ?? STATUS_STYLES.NOT_STARTED;
 
     return (

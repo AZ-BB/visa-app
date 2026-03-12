@@ -10,7 +10,11 @@
   },
   "footer": {
     "copyright": "© 2025 Visa Pro LTD. Tous droits réservés. Numéro d'entreprise 123456",
-    "ratesBy": "Taux par Exchange Rate API"
+    "ratesBy": "Taux par Exchange Rate API",
+    "preferencesTitle": "Langue et devise",
+    "language": "Langue",
+    "currency": "Devise",
+    "savePreferences": "Enregistrer les préférences"
   },
   "nav": {
     "testimonials": "Témoignages",
@@ -253,6 +257,78 @@
     "errors": {
       "checkoutSession": "Échec de la création de la session de paiement",
       "createApplication": "Échec de la création de la demande"
+    }
+  },
+  "contactUs": {
+    "title": "Contactez-nous",
+    "intro": "Envoyez-nous un e-mail et nous nous efforcerons de répondre à votre demande dès que possible. Vous pouvez également nous appeler au numéro indiqué ci-dessous.",
+    "phone": "Téléphone",
+    "registeredAddress": "Adresse enregistrée",
+    "address": "202a1 2e étage\n146 - 150 Hagley Road Edgbaston\nBirmingham\nB16 9NX",
+    "form": {
+      "name": "Nom",
+      "namePlaceholder": "Entrez votre nom",
+      "email": "E-mail",
+      "emailPlaceholder": "exemple@email.com",
+      "phone": "Téléphone",
+      "phoneOptional": "(Optionnel)",
+      "phonePlaceholder": "Entrez votre numéro de téléphone",
+      "subject": "Sujet",
+      "subjectPlaceholder": "Entrez le sujet de votre message",
+      "message": "Message",
+      "messagePlaceholder": "Entrez votre message",
+      "sendEmail": "Envoyer l'e-mail"
+    }
+  },
+  "terms": {
+    "title": "Conditions d'utilisation",
+    "introduction": "Introduction",
+    "introductionText": "Bienvenue sur [Your Company Name]. En accédant à notre site ou en l'utilisant, vous acceptez de respecter les présentes conditions générales. Veuillez les lire attentivement avant d'utiliser nos services.",
+    "userResponsibilities": "Responsabilités de l'utilisateur",
+    "userResponsibilitiesText": "En tant qu'utilisateur de notre site, vous acceptez de ne pas vous livrer à des activités susceptibles de nuire ou de perturber nos services, de violer les lois applicables ou de porter atteinte aux droits d'autrui. L'utilisation non autorisée de notre plateforme peut entraîner la résiliation de votre accès.",
+    "limitationOfLiability": "Limitation de responsabilité",
+    "limitationOfLiabilityText": "[Your Company Name] ne sera pas responsable des dommages résultant de l'utilisation ou de l'impossibilité d'utiliser nos services. Nous ne garantissons pas l'exactitude, l'exhaustivité ou la fiabilité du contenu de notre site."
+  },
+  "applications": {
+    "title": "Demandes",
+    "emptyTitle": "Vous n'avez pas encore de demandes.",
+    "emptyHint": "Commencez par demander un visa depuis la page d'accueil.",
+    "turnaroundTime": "Délai de traitement",
+    "travellers": "Voyageurs",
+    "created": "Créé",
+    "cost": "Coût",
+    "refunded": "Remboursé",
+    "backToApplications": "Retour aux demandes",
+    "status": {
+      "NOT_STARTED": "Non commencé",
+      "IN_PROGRESS": "En cours",
+      "COMPLETED": "Terminé",
+      "REJECTED": "Refusé"
+    },
+    "detail": {
+      "paymentSuccess": "Paiement réussi. Votre demande a été soumise.",
+      "contactEmail": "E-mail de contact",
+      "arrivalDate": "Date d'arrivée",
+      "totalCost": "Coût total",
+      "invoice": "Facture",
+      "govFee": "Frais gouvernementaux",
+      "proFee": "Frais de traitement",
+      "subtotal": "Sous-total",
+      "additionalCost": "Coût supplémentaire",
+      "turnaround": "Délai",
+      "total": "Total",
+      "netAmount": "Montant net",
+      "travellersCount": "Voyageurs ({count})",
+      "passportNumber": "Numéro de passeport",
+      "passportExpiry": "Expiration du passeport",
+      "dateOfBirth": "Date de naissance",
+      "nationality": "Nationalité",
+      "countryOfBirth": "Pays de naissance",
+      "countryOfResidence": "Pays de résidence",
+      "openPortal": "Ouvrir le portail client Stripe",
+      "opening": "Ouverture…",
+      "portalError": "Impossible d'ouvrir le portail",
+      "portalErrorGeneric": "Une erreur s'est produite"
     }
   }
 }

@@ -10,7 +10,11 @@
   },
   "footer": {
     "copyright": "© 2025 Visa Pro LTD. Todos los derechos reservados. Número de empresa 123456",
-    "ratesBy": "Tasas por Exchange Rate API"
+    "ratesBy": "Tasas por Exchange Rate API",
+    "preferencesTitle": "Idioma y moneda",
+    "language": "Idioma",
+    "currency": "Moneda",
+    "savePreferences": "Guardar preferencias"
   },
   "nav": {
     "testimonials": "Testimonios",
@@ -253,6 +257,78 @@
     "errors": {
       "checkoutSession": "Error al crear la sesión de pago",
       "createApplication": "Error al crear la solicitud"
+    }
+  },
+  "contactUs": {
+    "title": "Contáctenos",
+    "intro": "Envíenos un correo electrónico y nos esforzaremos por responder a su consulta lo antes posible. Alternativamente, puede llamarnos al número que se muestra a continuación.",
+    "phone": "Teléfono",
+    "registeredAddress": "Dirección registrada",
+    "address": "202a1 2.º piso\n146 - 150 Hagley Road Edgbaston\nBirmingham\nB16 9NX",
+    "form": {
+      "name": "Nombre",
+      "namePlaceholder": "Introduzca su nombre",
+      "email": "Correo electrónico",
+      "emailPlaceholder": "ejemplo@email.com",
+      "phone": "Teléfono",
+      "phoneOptional": "(Opcional)",
+      "phonePlaceholder": "Introduzca su número de teléfono",
+      "subject": "Asunto",
+      "subjectPlaceholder": "Introduzca el asunto de su mensaje",
+      "message": "Mensaje",
+      "messagePlaceholder": "Introduzca su mensaje",
+      "sendEmail": "Enviar correo"
+    }
+  },
+  "terms": {
+    "title": "Términos de servicio",
+    "introduction": "Introducción",
+    "introductionText": "Bienvenido a [Your Company Name]. Al acceder o utilizar nuestro sitio web, acepta cumplir y estar sujeto a los siguientes términos y condiciones. Por favor, revíselos cuidadosamente antes de utilizar nuestros servicios.",
+    "userResponsibilities": "Responsabilidades del usuario",
+    "userResponsibilitiesText": "Como usuario de nuestro sitio web, acepta no participar en ninguna actividad que pueda dañar o interrumpir nuestros servicios, violar las leyes aplicables o infringir los derechos de otros. El uso no autorizado de nuestra plataforma puede resultar en la terminación de su acceso.",
+    "limitationOfLiability": "Limitación de responsabilidad",
+    "limitationOfLiabilityText": "[Your Company Name] no será responsable de ningún daño que surja del uso o la imposibilidad de usar nuestros servicios. No garantizamos la exactitud, integridad o confiabilidad de ningún contenido en nuestro sitio web."
+  },
+  "applications": {
+    "title": "Solicitudes",
+    "emptyTitle": "Aún no tiene solicitudes.",
+    "emptyHint": "Comience solicitando un visado desde la página de inicio.",
+    "turnaroundTime": "Tiempo de procesamiento",
+    "travellers": "Viajeros",
+    "created": "Creado",
+    "cost": "Coste",
+    "refunded": "Reembolsado",
+    "backToApplications": "Volver a solicitudes",
+    "status": {
+      "NOT_STARTED": "No iniciado",
+      "IN_PROGRESS": "En progreso",
+      "COMPLETED": "Completado",
+      "REJECTED": "Rechazado"
+    },
+    "detail": {
+      "paymentSuccess": "Pago exitoso. Su solicitud ha sido enviada.",
+      "contactEmail": "Correo de contacto",
+      "arrivalDate": "Fecha de llegada",
+      "totalCost": "Coste total",
+      "invoice": "Factura",
+      "govFee": "Tasa gubernamental",
+      "proFee": "Tasa de procesamiento",
+      "subtotal": "Subtotal",
+      "additionalCost": "Coste adicional",
+      "turnaround": "Procesamiento",
+      "total": "Total",
+      "netAmount": "Importe neto",
+      "travellersCount": "Viajeros ({count})",
+      "passportNumber": "Número de pasaporte",
+      "passportExpiry": "Caducidad del pasaporte",
+      "dateOfBirth": "Fecha de nacimiento",
+      "nationality": "Nacionalidad",
+      "countryOfBirth": "País de nacimiento",
+      "countryOfResidence": "País de residencia",
+      "openPortal": "Abrir portal de cliente Stripe",
+      "opening": "Abriendo…",
+      "portalError": "No se pudo abrir el portal",
+      "portalErrorGeneric": "Algo salió mal"
     }
   }
 }

@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { ExternalLink } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export function StripeCustomerPortalButton({
   applicationId,
 }: {
   applicationId: string;
 }) {
+  const t = useTranslations("applications.detail");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,12 +24,12 @@ export function StripeCustomerPortalButton({
       });
       const data = (await res.json()) as { url?: string; error?: string };
       if (!res.ok || !data.url) {
-        setError(data.error ?? "Could not open portal");
+        setError(data.error ?? t("portalError"));
         return;
       }
       window.location.href = data.url;
     } catch {
-      setError("Something went wrong");
+      setError(t("portalErrorGeneric"));
     } finally {
       setLoading(false);
     }
@@ -42,10 +44,10 @@ export function StripeCustomerPortalButton({
         className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary/90 disabled:opacity-50"
       >
         {loading ? (
-          "Opening…"
+          t("opening")
         ) : (
           <>
-            Open Stripe customer portal
+            {t("openPortal")}
             <ExternalLink className="size-4" aria-hidden />
           </>
         )}

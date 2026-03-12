@@ -3,25 +3,29 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ChevronRightIcon } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
-export default function ContactUs() {
+export default async function ContactUs() {
+    const t = await getTranslations("contactUs");
+    const tForm = await getTranslations("contactUs.form");
+
     return (
         <div className="min-h-screen max-w-7xl mx-auto flex flex-col sm:flex-row gap-10 pt-16 px-6 sm:px-0 scale-95">
 
             <div className="w-full sm:w-1/2 space-y-10">
                 <section className="space-y-4">
                     <h2 className="text-4xl font-bold text-primary-copy">
-                        Contact Us
+                        {t("title")}
                     </h2>
 
                     <p className="text-secondary-copy text-lg">
-                        Drop us an email, and we’ll aim to respond to your enquiry as soon as possible. Alternatively, you can give us ring on the number shown below.
+                        {t("intro")}
                     </p>
                 </section>
 
                 <section className="space-y-4">
                     <h3 className="text-xl font-bold text-secondary-copy">
-                        Phone
+                        {t("phone")}
                     </h3>
 
                     <p className="text-primary text-xl font-bold">
@@ -32,11 +36,11 @@ export default function ContactUs() {
                 <section className="space-y-4">
 
                     <h3 className="text-xl font-bold text-secondary-copy">
-                        Registered address
+                        {t("registeredAddress")}
                     </h3>
 
-                    <p className="text-primary text-xl font-bold">
-                        202a1 2nd floor <br /> 146 - 150 Hagley Road Edgbaston <br /> Birmingham <br /> B16 9NX
+                    <p className="text-primary text-xl font-bold whitespace-pre-line">
+                        {t("address")}
                     </p>
                 </section>
             </div>
@@ -45,55 +49,55 @@ export default function ContactUs() {
             <div className="w-full sm:w-1/2">
                 <form className="space-y-5">
                     <section className="flex flex-col gap-2">
-                        <Label htmlFor="name">Name</Label>
+                        <Label htmlFor="name">{tForm("name")}</Label>
                         <Input
                             type="text"
                             id="name"
                             name="name"
                             required
-                            placeholder="Enter your name"
+                            placeholder={tForm("namePlaceholder")}
                         />
                     </section>
 
                     <section className="flex flex-col gap-2">
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="email">{tForm("email")}</Label>
                         <Input
                             type="email"
                             id="email"
                             name="email"
                             required
-                            placeholder="example@email.com"
+                            placeholder={tForm("emailPlaceholder")}
                         />
                     </section>
 
                     <section className="flex flex-col gap-2">
-                        <Label htmlFor="phone">Phone <span className="text-secondary-copy text-base italic font-normal">(Optional)</span></Label>
+                        <Label htmlFor="phone">{tForm("phone")} <span className="text-secondary-copy text-base italic font-normal">{tForm("phoneOptional")}</span></Label>
                         <Input
                             type="tel"
                             id="phone"
                             name="phone"
-                            placeholder="Enter your phone number"
+                            placeholder={tForm("phonePlaceholder")}
                         />
                     </section>
 
                     <section className="flex flex-col gap-2">
-                        <Label htmlFor="subject">Subject</Label>
+                        <Label htmlFor="subject">{tForm("subject")}</Label>
                         <Input
                             type="text"
                             id="subject"
                             name="subject"
                             required
-                            placeholder="Enter the subject of your message"
+                            placeholder={tForm("subjectPlaceholder")}
                         />
                     </section>
 
                     <section className="flex flex-col gap-2">
-                        <Label htmlFor="message">Message</Label>
+                        <Label htmlFor="message">{tForm("message")}</Label>
                         <Textarea
                             id="message"
                             name="message"
                             required
-                            placeholder="Enter your message"
+                            placeholder={tForm("messagePlaceholder")}
                             className="resize-none h-[150px] overflow-y-auto"
                             rows={5}
                         />
@@ -103,7 +107,7 @@ export default function ContactUs() {
                         <Button
                             className="flex gap-3 group items-center pl-6 pr-4 py-8 rounded-full text-lg"
                         >
-                            Send email
+                            {tForm("sendEmail")}
                             <div className="w-9 h-9 rounded-full bg-[#0A8EFF] group-hover:bg-[#0A8EFF]/10 transition-colors duration-200 flex items-center justify-center">
                                 <ChevronRightIcon className="size-6" />
                             </div>

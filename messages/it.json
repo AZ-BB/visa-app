@@ -10,7 +10,11 @@
   },
   "footer": {
     "copyright": "© 2025 Visa Pro LTD. Tutti i diritti riservati. Numero azienda 123456",
-    "ratesBy": "Tassi da Exchange Rate API"
+    "ratesBy": "Tassi da Exchange Rate API",
+    "preferencesTitle": "Lingua e valuta",
+    "language": "Lingua",
+    "currency": "Valuta",
+    "savePreferences": "Salva preferenze"
   },
   "nav": {
     "testimonials": "Testimonianze",
@@ -253,6 +257,78 @@
     "errors": {
       "checkoutSession": "Impossibile creare la sessione di pagamento",
       "createApplication": "Impossibile creare la richiesta"
+    }
+  },
+  "contactUs": {
+    "title": "Contattaci",
+    "intro": "Inviaci una e-mail e ci impegniamo a rispondere alla tua richiesta il prima possibile. In alternativa, puoi chiamarci al numero indicato di seguito.",
+    "phone": "Telefono",
+    "registeredAddress": "Indirizzo registrato",
+    "address": "202a1 2° piano\n146 - 150 Hagley Road Edgbaston\nBirmingham\nB16 9NX",
+    "form": {
+      "name": "Nome",
+      "namePlaceholder": "Inserisci il tuo nome",
+      "email": "E-mail",
+      "emailPlaceholder": "esempio@email.com",
+      "phone": "Telefono",
+      "phoneOptional": "(Opzionale)",
+      "phonePlaceholder": "Inserisci il tuo numero di telefono",
+      "subject": "Oggetto",
+      "subjectPlaceholder": "Inserisci l'oggetto del tuo messaggio",
+      "message": "Messaggio",
+      "messagePlaceholder": "Inserisci il tuo messaggio",
+      "sendEmail": "Invia e-mail"
+    }
+  },
+  "terms": {
+    "title": "Termini di servizio",
+    "introduction": "Introduzione",
+    "introductionText": "Benvenuto su [Your Company Name]. Accedendo o utilizzando il nostro sito web, accetti di rispettare e essere vincolato dai seguenti termini e condizioni. Si prega di leggerli attentamente prima di utilizzare i nostri servizi.",
+    "userResponsibilities": "Responsabilità dell'utente",
+    "userResponsibilitiesText": "Come utente del nostro sito web, accetti di non intraprendere attività che possano danneggiare o interrompere i nostri servizi, violare le leggi applicabili o ledere i diritti altrui. L'uso non autorizzato della nostra piattaforma può comportare la cessazione del tuo accesso.",
+    "limitationOfLiability": "Limitazione di responsabilità",
+    "limitationOfLiabilityText": "[Your Company Name] non sarà responsabile per eventuali danni derivanti dall'uso o dall'impossibilità di utilizzare i nostri servizi. Non garantiamo l'accuratezza, la completezza o l'affidabilità di alcun contenuto sul nostro sito web."
+  },
+  "applications": {
+    "title": "Richieste",
+    "emptyTitle": "Non hai ancora richieste.",
+    "emptyHint": "Inizia richiedendo un visto dalla pagina iniziale.",
+    "turnaroundTime": "Tempi di elaborazione",
+    "travellers": "Viaggiatori",
+    "created": "Creato",
+    "cost": "Costo",
+    "refunded": "Rimborsato",
+    "backToApplications": "Torna alle richieste",
+    "status": {
+      "NOT_STARTED": "Non iniziato",
+      "IN_PROGRESS": "In corso",
+      "COMPLETED": "Completato",
+      "REJECTED": "Rifiutato"
+    },
+    "detail": {
+      "paymentSuccess": "Pagamento riuscito. La tua richiesta è stata inviata.",
+      "contactEmail": "E-mail di contatto",
+      "arrivalDate": "Data di arrivo",
+      "totalCost": "Costo totale",
+      "invoice": "Fattura",
+      "govFee": "Tassa governativa",
+      "proFee": "Tassa di elaborazione",
+      "subtotal": "Subtotale",
+      "additionalCost": "Costo aggiuntivo",
+      "turnaround": "Elaborazione",
+      "total": "Totale",
+      "netAmount": "Importo netto",
+      "travellersCount": "Viaggiatori ({count})",
+      "passportNumber": "Numero di passaporto",
+      "passportExpiry": "Scadenza passaporto",
+      "dateOfBirth": "Data di nascita",
+      "nationality": "Nazionalità",
+      "countryOfBirth": "Paese di nascita",
+      "countryOfResidence": "Paese di residenza",
+      "openPortal": "Apri portale clienti Stripe",
+      "opening": "Apertura…",
+      "portalError": "Impossibile aprire il portale",
+      "portalErrorGeneric": "Qualcosa è andato storto"
     }
   }
 }

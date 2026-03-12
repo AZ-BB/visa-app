@@ -10,7 +10,11 @@
   },
   "footer": {
     "copyright": "© 2025 Visa Pro LTD. Alle Rechte vorbehalten. Firmennummer 123456",
-    "ratesBy": "Kurse von Exchange Rate API"
+    "ratesBy": "Kurse von Exchange Rate API",
+    "preferencesTitle": "Sprache & Währung",
+    "language": "Sprache",
+    "currency": "Währung",
+    "savePreferences": "Einstellungen speichern"
   },
   "nav": {
     "testimonials": "Erfahrungsberichte",
@@ -253,6 +257,78 @@
     "errors": {
       "checkoutSession": "Checkout-Sitzung konnte nicht erstellt werden",
       "createApplication": "Antrag konnte nicht erstellt werden"
+    }
+  },
+  "contactUs": {
+    "title": "Kontakt",
+    "intro": "Schreiben Sie uns eine E-Mail, und wir werden uns bemühen, Ihre Anfrage so schnell wie möglich zu beantworten. Alternativ können Sie uns auch unter der unten angegebenen Nummer anrufen.",
+    "phone": "Telefon",
+    "registeredAddress": "Eingetragene Adresse",
+    "address": "202a1 2. Obergeschoss\n146 - 150 Hagley Road Edgbaston\nBirmingham\nB16 9NX",
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "Geben Sie Ihren Namen ein",
+      "email": "E-Mail",
+      "emailPlaceholder": "beispiel@email.com",
+      "phone": "Telefon",
+      "phoneOptional": "(Optional)",
+      "phonePlaceholder": "Geben Sie Ihre Telefonnummer ein",
+      "subject": "Betreff",
+      "subjectPlaceholder": "Geben Sie den Betreff Ihrer Nachricht ein",
+      "message": "Nachricht",
+      "messagePlaceholder": "Geben Sie Ihre Nachricht ein",
+      "sendEmail": "E-Mail senden"
+    }
+  },
+  "terms": {
+    "title": "Nutzungsbedingungen",
+    "introduction": "Einführung",
+    "introductionText": "Willkommen bei [Your Company Name]. Durch den Zugriff auf oder die Nutzung unserer Website erklären Sie sich mit den folgenden Allgemeinen Geschäftsbedingungen einverstanden. Bitte lesen Sie diese sorgfältig durch, bevor Sie unsere Dienste nutzen.",
+    "userResponsibilities": "Pflichten des Nutzers",
+    "userResponsibilitiesText": "Als Nutzer unserer Website verpflichten Sie sich, keine Aktivitäten durchzuführen, die unsere Dienste schädigen oder stören, geltende Gesetze verletzen oder die Rechte anderer beeinträchtigen könnten. Unbefugte Nutzung unserer Plattform kann zur Beendigung Ihres Zugangs führen.",
+    "limitationOfLiability": "Haftungsbeschränkung",
+    "limitationOfLiabilityText": "[Your Company Name] haftet nicht für Schäden, die aus der Nutzung oder der Unfähigkeit zur Nutzung unserer Dienste entstehen. Wir garantieren nicht die Genauigkeit, Vollständigkeit oder Zuverlässigkeit von Inhalten auf unserer Website."
+  },
+  "applications": {
+    "title": "Anträge",
+    "emptyTitle": "Sie haben noch keine Anträge.",
+    "emptyHint": "Beginnen Sie mit einer Visumantrag von der Startseite.",
+    "turnaroundTime": "Bearbeitungszeit",
+    "travellers": "Reisende",
+    "created": "Erstellt",
+    "cost": "Kosten",
+    "refunded": "Erstattet",
+    "backToApplications": "Zurück zu den Anträgen",
+    "status": {
+      "NOT_STARTED": "Nicht begonnen",
+      "IN_PROGRESS": "In Bearbeitung",
+      "COMPLETED": "Abgeschlossen",
+      "REJECTED": "Abgelehnt"
+    },
+    "detail": {
+      "paymentSuccess": "Zahlung erfolgreich. Ihr Antrag wurde eingereicht.",
+      "contactEmail": "Kontakt-E-Mail",
+      "arrivalDate": "Ankunftsdatum",
+      "totalCost": "Gesamtkosten",
+      "invoice": "Rechnung",
+      "govFee": "Gov-Gebühr",
+      "proFee": "Pro-Gebühr",
+      "subtotal": "Zwischensumme",
+      "additionalCost": "Zusätzliche Kosten",
+      "turnaround": "Bearbeitung",
+      "total": "Gesamt",
+      "netAmount": "Nettobetrag",
+      "travellersCount": "Reisende ({count})",
+      "passportNumber": "Reisepassnummer",
+      "passportExpiry": "Reisepassablauf",
+      "dateOfBirth": "Geburtsdatum",
+      "nationality": "Nationalität",
+      "countryOfBirth": "Geburtsland",
+      "countryOfResidence": "Wohnsitzland",
+      "openPortal": "Stripe-Kundenportal öffnen",
+      "opening": "Wird geöffnet…",
+      "portalError": "Portal konnte nicht geöffnet werden",
+      "portalErrorGeneric": "Etwas ist schiefgelaufen"
     }
   }
 }

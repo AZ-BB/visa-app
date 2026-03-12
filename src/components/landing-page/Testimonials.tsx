@@ -1,10 +1,8 @@
-"use client";
-
 import { Qoutes } from "../svgs/qoutes";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
-export function Testimonials() {
-  const t = useTranslations("landing.testimonials");
+export async function Testimonials() {
+  const t = await getTranslations("landing.testimonials");
   return (
     <section id="testimonials" className="sm:py-20">
       <div className="mx-auto max-w-7xl px-6">

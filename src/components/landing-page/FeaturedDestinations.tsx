@@ -1,7 +1,5 @@
-"use client";
-
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
 const DESTINATIONS = [
   { id: "united-states", nameKey: "unitedStates", descKey: "unitedStatesDesc", image: "/images/featured-1.png", imageAlt: "Empire State Building and New York City skyline" },
@@ -9,8 +7,8 @@ const DESTINATIONS = [
   { id: "india", nameKey: "india", descKey: "indiaDesc", image: "/images/featured-3.png", imageAlt: "Taj Mahal with reflecting pool and gardens" },
 ];
 
-export function FeaturedDestinations() {
-  const t = useTranslations("landing.featured");
+export async function FeaturedDestinations() {
+  const t = await getTranslations("landing.featured");
   return (
     <section
       id="featured"

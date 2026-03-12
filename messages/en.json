@@ -10,7 +10,11 @@
   },
   "footer": {
     "copyright": "© 2025 Visa Pro LTD. All rights reserved. Company Number 123456",
-    "ratesBy": "Rates by Exchange Rate API"
+    "ratesBy": "Rates by Exchange Rate API",
+    "preferencesTitle": "Language & Currency",
+    "language": "Language",
+    "currency": "Currency",
+    "savePreferences": "Save preferences"
   },
   "nav": {
     "testimonials": "Testimonials",
@@ -257,6 +261,78 @@
     "errors": {
       "checkoutSession": "Failed to create checkout session",
       "createApplication": "Failed to create application"
+    }
+  },
+  "contactUs": {
+    "title": "Contact Us",
+    "intro": "Drop us an email, and we'll aim to respond to your enquiry as soon as possible. Alternatively, you can give us ring on the number shown below.",
+    "phone": "Phone",
+    "registeredAddress": "Registered address",
+    "address": "202a1 2nd floor\n146 - 150 Hagley Road Edgbaston\nBirmingham\nB16 9NX",
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "Enter your name",
+      "email": "Email",
+      "emailPlaceholder": "example@email.com",
+      "phone": "Phone",
+      "phoneOptional": "(Optional)",
+      "phonePlaceholder": "Enter your phone number",
+      "subject": "Subject",
+      "subjectPlaceholder": "Enter the subject of your message",
+      "message": "Message",
+      "messagePlaceholder": "Enter your message",
+      "sendEmail": "Send email"
+    }
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "introduction": "Introduction",
+    "introductionText": "Welcome to [Your Company Name]. By accessing or using our website, you agree to comply with and be bound by the following terms and conditions. Please review them carefully before using our services.",
+    "userResponsibilities": "User Responsibilities",
+    "userResponsibilitiesText": "As a user of our website, you agree not to engage in any activities that may harm or disrupt our services, violate applicable laws, or infringe on the rights of others. Unauthorised use of our platform may result in the termination of your access.",
+    "limitationOfLiability": "Limitation of Liability",
+    "limitationOfLiabilityText": "[Your Company Name] will not be liable for any damages arising from the use or inability to use our services. We do not guarantee the accuracy, completeness, or reliability of any content on our website."
+  },
+  "applications": {
+    "title": "Applications",
+    "emptyTitle": "You have no applications yet.",
+    "emptyHint": "Start by applying for a visa from the homepage.",
+    "turnaroundTime": "Turnaround time",
+    "travellers": "Travellers",
+    "created": "Created",
+    "cost": "Cost",
+    "refunded": "Refunded",
+    "backToApplications": "Back to applications",
+    "status": {
+      "NOT_STARTED": "Not Started",
+      "IN_PROGRESS": "In Progress",
+      "COMPLETED": "Completed",
+      "REJECTED": "Rejected"
+    },
+    "detail": {
+      "paymentSuccess": "Payment successful. Your application has been submitted.",
+      "contactEmail": "Contact email",
+      "arrivalDate": "Arrival date",
+      "totalCost": "Total cost",
+      "invoice": "Invoice",
+      "govFee": "Gov fee",
+      "proFee": "Pro fee",
+      "subtotal": "Subtotal",
+      "additionalCost": "Additional Cost",
+      "turnaround": "Turnaround",
+      "total": "Total",
+      "netAmount": "Net amount",
+      "travellersCount": "Travellers ({count})",
+      "passportNumber": "Passport number",
+      "passportExpiry": "Passport expiry",
+      "dateOfBirth": "Date of birth",
+      "nationality": "Nationality",
+      "countryOfBirth": "Country of birth",
+      "countryOfResidence": "Country of residence",
+      "openPortal": "Open Stripe customer portal",
+      "opening": "Opening…",
+      "portalError": "Could not open portal",
+      "portalErrorGeneric": "Something went wrong"
     }
   }
 }
