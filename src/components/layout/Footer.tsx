@@ -1,5 +1,6 @@
 import { InstagramIcon, TwitterIcon } from "lucide-react";
 import Link from "next/link";
+import { FooterCurrency } from "./FooterCurrency";
 
 export function Footer() {
   return (
@@ -30,7 +31,7 @@ export function Footer() {
             <Link href="/contact-us" className="hover:underline">Contact Us</Link>
           </div>
 
-          <div className="flex flex-wrap gap-4 text-sm sm:text-base">
+          <div className="flex flex-wrap items-center gap-4 text-sm sm:text-base">
             <span className="flex items-center gap-2">
               <svg width="24" height="16" viewBox="0 0 24 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M22.2024 0.00012207H1.79741C0.804698 0.00012207 0 0.818934 0 1.82906V14.171C0 15.1811 0.804698 16 1.79741 16H22.2024C23.1951 16 23.9999 15.1812 23.9999 14.171V1.82906C23.9999 0.818934 23.1952 0.00012207 22.2024 0.00012207Z" fill="#41479B" />
@@ -41,18 +42,12 @@ export function Footer() {
                 <path d="M0.189941 1.01121L7.58349 5.89475H9.10355L0.725532 0.360962C0.50058 0.531335 0.316503 0.754079 0.189941 1.01121Z" fill="#FF4B55" />
                 <path d="M15.5889 5.89471L23.5592 0.63017C23.3624 0.399747 23.1103 0.219644 22.8234 0.112183L14.0688 5.89471H15.5889Z" fill="#FF4B55" />
               </svg>
-
-
               English
             </span>
 
-            <span className="flex items-center gap-2">
-              <span className="font-semibold">$</span>
-              GBP
-            </span>
+            <FooterCurrency />
           </div>
         </div>
-
       </div>
     </footer>
   );

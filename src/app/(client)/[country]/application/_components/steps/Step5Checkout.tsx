@@ -14,6 +14,7 @@ import { checkEmailExists } from "@/actions/auth";
 import { CheckoutAuthModal } from "../CheckoutAuthModal";
 import Link from "next/link";
 import type { Tables } from "@/database.types";
+import { useCurrency } from "@/components/providers/CurrencyProvider";
 
 const TURNAROUND_LABELS: Record<number, string> = {
   1: "Standard",
@@ -161,7 +162,7 @@ export function Step5Checkout({
   };
 
   const countryName = getCountryNameFromCode(country || "");
-
+  const { formatPriceFromUsd } = useCurrency();
   return (
     <div className="max-w-2xl mx-auto space-y-5 min-h-screen">
       <h2 className="text-2xl font-bold text-primary-copy">Checkout</h2>
@@ -241,7 +242,7 @@ export function Step5Checkout({
                         Governmental Fee
                       </span>
                       <span className="font-semibold">
-                        {formatCost(fees?.govFee ?? 0)}
+                        {formatPriceFromUsd(fees?.govFee ?? 0)}
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -249,7 +250,7 @@ export function Step5Checkout({
                         Processing Fee
                       </span>
                       <span className="font-semibold">
-                        {formatCost(fees?.processingFee ?? 0)}
+                        {formatPriceFromUsd(fees?.processingFee ?? 0)}
                       </span>
                     </div>
                   </div>
@@ -270,7 +271,7 @@ export function Step5Checkout({
           <div className="space-y-2 text-primary-copy">
             <div className="flex justify-between">
               <span className="text-secondary-copy">Turnaround time</span>
-              <span className="font-semibold">{formatCost(turnaroundFee)}</span>
+              <span className="font-semibold">{formatPriceFromUsd(turnaroundFee)}</span>
             </div>
           </div>
           <div className="mt-4 pt-4">
@@ -282,7 +283,7 @@ export function Step5Checkout({
                 </p>
               </div>
               <span className="text-xl font-bold text-primary-copy">
-                {formatCost(totalAmount)}
+                {formatPriceFromUsd(totalAmount)}
               </span>
             </div>
           </div>
