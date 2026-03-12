@@ -54,17 +54,9 @@ function isAuthPage(pathname: string): boolean {
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  // Run next-intl for paths that need locale (exclude /admin, /api)
-  if (!pathname.startsWith("/admin") && !pathname.startsWith("/api")) {
-    const intlResponse = intlMiddleware(request);
-    if (intlResponse) {
-      return intlResponse;
-    }
-  }
-
-  let response = NextResponse.next({
-    request,
-  });
+  // Run auth/admin checks BEFORE intl middleware so we can redirect admins away from client/public routes.
+  // (Intl middleware returns a response for all locale paths, so we'd never reach the admin check if we ran it after.)
+  let response = NextResponse.next({ request });
 
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -97,19 +89,19 @@ export async function proxy(request: NextRequest) {
 
   const locale = getLocaleFromPath(pathname);
 
-  // Helper: redirect while preserving Supabase session cookies (avoids "too many redirects")
   const redirectWithCookies = (url: URL) => {
     const res = NextResponse.redirect(url);
     response.cookies.getAll().forEach((c) => res.cookies.set(c.name, c.value));
     return res;
   };
 
-  // Admins can ONLY access admin routes — redirect from public and client routes.
+  // Admins can ONLY access admin routes — redirect from root, public, and client routes.
   if (user && isAdmin) {
     const isAdminRoute = matchesRoute(pathname, ADMIN_ROUTES);
     const isPublic = matchesRoute(pathname, PUBLIC_ROUTES);
     const isClient = matchesRoute(pathname, CLIENT_ROUTES);
-    if (!isAdminRoute && (isPublic || isClient || isAuthPage(pathname))) {
+    const isRoot = pathname === "/" || pathname === "";
+    if (!isAdminRoute && (isRoot || isPublic || isClient || isAuthPage(pathname))) {
       return redirectWithCookies(new URL("/admin", request.url));
     }
   }
@@ -133,6 +125,14 @@ export async function proxy(request: NextRequest) {
     }
     if (!isAdmin) {
       return redirectWithCookies(new URL(`/${locale}`, request.url));
+    }
+  }
+
+  // Run next-intl for paths that need locale (exclude /admin, /api)
+  if (!pathname.startsWith("/admin") && !pathname.startsWith("/api")) {
+    const intlResponse = intlMiddleware(request);
+    if (intlResponse) {
+      return intlResponse;
     }
   }
 
